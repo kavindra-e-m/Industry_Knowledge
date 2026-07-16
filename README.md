@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # PS08 — Industrial Knowledge Intelligence
 
 **One-liner:** Give it every scattered document a plant has ever produced —
@@ -72,8 +73,9 @@ cd data-infra/synthetic-data && python generate_documents.py
 - `main` — always demo-ready, protected.
 - `dev` — integration branch, everyone merges here first.
 - Feature branches per folder: `feature/backend-rag`, `feature/ml-ocr`,
-  `feature/frontend-dashboard`, `feature/data-infra`.
-- Agree on `docs/api-contracts.md` on day 1 before writing code — it's what
-  lets all four of you build in parallel without blocking each other.
+  `feature/frontend-dashboard`, `feature/data-devops`.
+- Agree on `docs/api-contracts.md` before writing code — it lets all teams
+  build in parallel without blocking.
 - Merge to `dev` at least once every few hours; merge `dev` → `main` before
   every judging checkpoint.
+
