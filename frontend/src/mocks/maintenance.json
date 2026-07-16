@@ -1,0 +1,56 @@
+[
+  {
+    "equipment_id": "EQ-1042",
+    "tag": "PUMP-A1",
+    "failure_probability": 0.87,
+    "predicted_component": "Mechanical Seal",
+    "rul_days": 4,
+    "severity": "critical",
+    "suggested_work_order": "Immediate seal replacement. Isolate pump from process line before maintenance."
+  },
+  {
+    "equipment_id": "EQ-2031",
+    "tag": "COMP-B3",
+    "failure_probability": 0.64,
+    "predicted_component": "Bearing Assembly",
+    "rul_days": 12,
+    "severity": "warning",
+    "suggested_work_order": "Schedule bearing inspection. Lubrication check recommended within 48 hours."
+  },
+  {
+    "equipment_id": "EQ-3017",
+    "tag": "HEX-C2",
+    "failure_probability": 0.41,
+    "predicted_component": "Tube Bundle",
+    "rul_days": 28,
+    "severity": "warning",
+    "suggested_work_order": "Plan tube bundle cleaning during next scheduled downtime window."
+  },
+  {
+    "equipment_id": "EQ-4055",
+    "tag": "VALVE-D7",
+    "failure_probability": 0.19,
+    "predicted_component": "Actuator",
+    "rul_days": 61,
+    "severity": "info",
+    "suggested_work_order": "Monitor actuator response time. No immediate action required."
+  },
+  {
+    "equipment_id": "EQ-5008",
+    "tag": "MOTOR-E1",
+    "failure_probability": 0.93,
+    "predicted_component": "Rotor Winding",
+    "rul_days": 2,
+    "severity": "critical",
+    "suggested_work_order": "URGENT: Motor showing thermal anomaly. Shutdown and inspect rotor winding immediately."
+  },
+  {
+    "equipment_id": "EQ-6022",
+    "tag": "TANK-F4",
+    "failure_probability": 0.08,
+    "predicted_component": "Level Sensor",
+    "rul_days": 90,
+    "severity": "healthy",
+    "suggested_work_order": "Routine calibration check at next quarterly maintenance cycle."
+  }
+]

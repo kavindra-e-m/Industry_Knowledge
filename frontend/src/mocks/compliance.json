@@ -1,0 +1,65 @@
+[
+  {
+    "equipment_id": "EQ-1042",
+    "tag": "PUMP-A1",
+    "overall_score": 42,
+    "regulation": "ISO 13849",
+    "last_audit": "2024-09-15",
+    "next_due": "2025-03-15",
+    "status": "non-compliant",
+    "gaps": [
+      { "clause": "4.3.1", "description": "Safety function documentation incomplete", "severity": "critical" },
+      { "clause": "6.2.4", "description": "Performance level verification missing", "severity": "high" },
+      { "clause": "7.1.2", "description": "Validation test records outdated", "severity": "medium" }
+    ]
+  },
+  {
+    "equipment_id": "EQ-2031",
+    "tag": "COMP-B3",
+    "overall_score": 71,
+    "regulation": "OSHA 1910.119",
+    "last_audit": "2024-11-02",
+    "next_due": "2025-05-02",
+    "status": "partial",
+    "gaps": [
+      { "clause": "1910.119(d)", "description": "Process hazard analysis needs update", "severity": "high" },
+      { "clause": "1910.119(j)", "description": "Hot work permit procedure gap", "severity": "medium" }
+    ]
+  },
+  {
+    "equipment_id": "EQ-3017",
+    "tag": "HEX-C2",
+    "overall_score": 88,
+    "regulation": "ASME PCC-2",
+    "last_audit": "2024-12-10",
+    "next_due": "2025-06-10",
+    "status": "compliant",
+    "gaps": [
+      { "clause": "Article 2.1", "description": "Minor documentation formatting issue", "severity": "low" }
+    ]
+  },
+  {
+    "equipment_id": "EQ-5008",
+    "tag": "MOTOR-E1",
+    "overall_score": 31,
+    "regulation": "IEC 60034",
+    "last_audit": "2024-07-20",
+    "next_due": "2025-01-20",
+    "status": "expired",
+    "gaps": [
+      { "clause": "8.6.2", "description": "Thermal protection class certification expired", "severity": "critical" },
+      { "clause": "9.1", "description": "Insulation resistance test overdue", "severity": "critical" },
+      { "clause": "11.2", "description": "Vibration limits not re-verified post-repair", "severity": "high" }
+    ]
+  },
+  {
+    "equipment_id": "EQ-4055",
+    "tag": "VALVE-D7",
+    "overall_score": 95,
+    "regulation": "API 6D",
+    "last_audit": "2025-01-05",
+    "next_due": "2025-07-05",
+    "status": "compliant",
+    "gaps": []
+  }
+]
