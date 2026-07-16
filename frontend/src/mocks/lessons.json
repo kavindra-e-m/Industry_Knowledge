@@ -1,0 +1,42 @@
+[
+  {
+    "pattern_id": "PAT-001",
+    "matched_incidents": ["INC-2022-047", "INC-2023-012", "INC-2024-089"],
+    "current_match_confidence": 0.91,
+    "warning_text": "Recurring seal failure pattern detected on centrifugal pumps operating above 85% load for >72 hours. Three prior incidents resulted in unplanned shutdowns. Recommend load reduction or proactive seal inspection.",
+    "equipment_tags": ["PUMP-A1", "PUMP-A3", "PUMP-B2"],
+    "first_seen": "2022-06-14",
+    "category": "Mechanical Failure",
+    "knowledge_cliff": true
+  },
+  {
+    "pattern_id": "PAT-002",
+    "matched_incidents": ["INC-2023-031", "INC-2024-055"],
+    "current_match_confidence": 0.74,
+    "warning_text": "Compressor bearing degradation pattern matches two prior incidents that escalated to full bearing seizure within 10 days of first vibration anomaly. Immediate inspection advised.",
+    "equipment_tags": ["COMP-B3"],
+    "first_seen": "2023-03-22",
+    "category": "Vibration Anomaly",
+    "knowledge_cliff": false
+  },
+  {
+    "pattern_id": "PAT-003",
+    "matched_incidents": ["INC-2021-008", "INC-2022-019", "INC-2023-044", "INC-2024-071"],
+    "current_match_confidence": 0.96,
+    "warning_text": "CRITICAL KNOWLEDGE CLIFF: Only one engineer (EMP-0042) holds institutional knowledge for motor rotor winding repair procedure. Four incidents handled exclusively by this individual. Succession risk is HIGH.",
+    "equipment_tags": ["MOTOR-E1", "MOTOR-E2"],
+    "first_seen": "2021-11-03",
+    "category": "Knowledge Risk",
+    "knowledge_cliff": true
+  },
+  {
+    "pattern_id": "PAT-004",
+    "matched_incidents": ["INC-2024-033"],
+    "current_match_confidence": 0.58,
+    "warning_text": "Heat exchanger fouling rate has increased 40% compared to baseline. Pattern partially matches 2024 incident. Monitor tube-side differential pressure closely.",
+    "equipment_tags": ["HEX-C2", "HEX-C4"],
+    "first_seen": "2024-08-17",
+    "category": "Fouling / Degradation",
+    "knowledge_cliff": false
+  }
+]
