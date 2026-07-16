@@ -3,6 +3,7 @@
 // EquipmentTracker, KnowledgeGraphView) from ./pages as they're built.
 import { useState, useEffect } from "react";
 import { askQuestion } from "./services/api";
+import LiveEvents from "./LiveEvents";
 
 export default function App() {
   const [status, setStatus] = useState("checking backend...");
@@ -18,7 +19,7 @@ export default function App() {
     <div style={{ fontFamily: "sans-serif", padding: 24 }}>
       <h1>PS08 — Industrial Knowledge Intelligence</h1>
       <p>Backend status: {status}</p>
-      {/* TODO: mount ChatPage / ComplianceReport / EquipmentTracker here */}
+      <LiveEvents />
     </div>
   );
 }
