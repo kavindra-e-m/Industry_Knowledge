@@ -12,9 +12,12 @@ echo "Installing ML deps..."
 (cd ml && pip install -r requirements.txt --break-system-packages)
 
 echo "Installing frontend deps..."
-(cd frontend/web-dashboard && npm install)
+cd frontend
+npm install
+cd ..
 
-echo "Generating synthetic demo data..."
-python data-infra/synthetic-data/generate_documents.py
+echo "Downloading SKAB dataset..."
+python -m kagglehub.dataset_download "yuriykatser/skoltech-anomaly-benchmark-skab"
 
-echo "Done. Run 'uvicorn app.main:app --reload' in backend/, and 'npm run dev' in frontend/web-dashboard/."
+echo "Done. Start the backend, then run the real-time SKAB streamer with:"
+echo "  python devops/scripts/stream_skab.py --backend-url http://localhost:8080/api/stream/event --delay 1.0"

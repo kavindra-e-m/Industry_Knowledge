@@ -14,3 +14,9 @@ router = APIRouter()
 async def ingest_document(file: UploadFile):
     # TODO: save file, call ml pipeline, push entities to graph + vector db
     return {"filename": file.filename, "status": "queued"}
+
+
+@router.post("/stream-event")
+async def ingest_stream_event(payload: dict):
+    # placeholder for future non-websocket real-time event ingestion
+    return {"status": "received", "payload": payload}
