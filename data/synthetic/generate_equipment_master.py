@@ -1,0 +1,1 @@
+# Generate equipment master placeholder

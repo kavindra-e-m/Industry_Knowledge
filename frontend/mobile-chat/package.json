@@ -1,0 +1,9 @@
+{
+  "name": "ps08-mobile-chat",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Mobile-first chat interface for field technicians. PWA or React Native - team's call.",
+  "scripts": {
+    "dev": "echo 'TODO: wire up chosen mobile stack (PWA/Vite or React Native)'"
+  }
+}

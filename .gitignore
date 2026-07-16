@@ -1,0 +1,22 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+*.egg-info/
+
+# Node
+node_modules/
+dist/
+build/
+
+# Env / secrets
+.env
+*.env.local
+
+# Data
+data-infra/synthetic-data/sample_docs/*
+!data-infra/synthetic-data/sample_docs/.gitkeep
+
+# OS
+.DS_Store
