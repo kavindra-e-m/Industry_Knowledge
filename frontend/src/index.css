@@ -10,43 +10,48 @@
   html { font-size: 14px; }
 
   body {
-    background-color: #07111F;
+    background-color: #060B14;
     color: #F0F6FF;
     font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    position: relative;
+    overflow-x: hidden;
   }
 
   h1, h2, h3 { font-family: 'Sora', sans-serif; }
 
-  ::-webkit-scrollbar { width: 4px; height: 4px; }
-  ::-webkit-scrollbar-track { background: #0F1C2E; }
-  ::-webkit-scrollbar-thumb { background: #1E3A5F; border-radius: 99px; }
-  ::-webkit-scrollbar-thumb:hover { background: #2a4a6b; }
+  ::-webkit-scrollbar { width: 5px; height: 5px; }
+  ::-webkit-scrollbar-track { background: #0b1523; }
+  ::-webkit-scrollbar-thumb { background: #1b2e46; border-radius: 99px; }
+  ::-webkit-scrollbar-thumb:hover { background: #4F9DFF; }
 }
 
 @layer components {
   /* Cards */
   .ib-card {
-    background: #16263D;
-    border: 1px solid #1E3A5F;
-    border-radius: 1rem;
-    box-shadow: 0 4px 24px rgba(0,0,0,0.4);
-    transition: all 0.2s ease;
+    background: linear-gradient(135deg, rgba(22, 38, 61, 0.6) 0%, rgba(15, 28, 46, 0.75) 100%);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(79, 157, 255, 0.1);
+    border-radius: 1.25rem;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.25);
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
   }
   .ib-card:hover {
-    border-color: #2a4a6b;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.5), 0 0 0 1px rgba(79,157,255,0.08);
-    transform: translateY(-1px);
+    border-color: rgba(79, 157, 255, 0.35);
+    box-shadow: 0 12px 40px 0 rgba(79, 157, 255, 0.12), 0 0 0 1px rgba(79,157,255,0.15);
+    transform: translateY(-2px) scale(1.005);
   }
 
   /* Glass card */
   .ib-glass {
-    background: rgba(22, 38, 61, 0.7);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(79,157,255,0.12);
-    border-radius: 1rem;
+    background: rgba(10, 21, 37, 0.45);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 1.25rem;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.35);
   }
 
   /* Buttons */
@@ -54,12 +59,12 @@
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
-    padding: 0.5rem 1rem;
-    border-radius: 0.625rem;
+    padding: 0.5rem 1.1rem;
+    border-radius: 0.75rem;
     font-size: 0.8125rem;
     font-weight: 600;
     font-family: 'Plus Jakarta Sans', sans-serif;
-    transition: all 0.15s ease;
+    transition: all 0.25s cubic-bezier(0.25, 0.8, 0.25, 1);
     cursor: pointer;
     white-space: nowrap;
   }
@@ -67,27 +72,32 @@
     background: linear-gradient(135deg, #4F9DFF 0%, #7C5CFC 100%);
     color: white;
     border: none;
-    box-shadow: 0 4px 12px rgba(79,157,255,0.3);
+    box-shadow: 0 4px 15px rgba(79,157,255,0.25), inset 0 1px 0 rgba(255,255,255,0.2);
   }
   .ib-btn-primary:hover {
-    box-shadow: 0 6px 20px rgba(79,157,255,0.45);
-    transform: translateY(-1px);
+    box-shadow: 0 6px 24px rgba(79,157,255,0.4), inset 0 1px 0 rgba(255,255,255,0.3);
+    transform: translateY(-1.5px) scale(1.015);
   }
   .ib-btn-ghost {
-    background: rgba(79,157,255,0.08);
+    background: rgba(79,157,255,0.05);
     color: #8BA3C7;
-    border: 1px solid #1E3A5F;
+    border: 1px solid rgba(79, 157, 255, 0.15);
   }
   .ib-btn-ghost:hover {
-    background: rgba(79,157,255,0.14);
+    background: rgba(79,157,255,0.12);
     color: #F0F6FF;
-    border-color: #2a4a6b;
+    border-color: rgba(79, 157, 255, 0.35);
+    transform: translateY(-1px) scale(1.01);
   }
   .ib-btn-critical {
     background: linear-gradient(135deg, #FF5C5C 0%, #cc3333 100%);
     color: white;
     border: none;
-    box-shadow: 0 4px 12px rgba(255,92,92,0.3);
+    box-shadow: 0 4px 15px rgba(255,92,92,0.25);
+  }
+  .ib-btn-critical:hover {
+    box-shadow: 0 6px 24px rgba(255,92,92,0.35);
+    transform: translateY(-1.5px) scale(1.015);
   }
 
   /* Badges */

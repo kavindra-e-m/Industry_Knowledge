@@ -1,11 +1,13 @@
 import { useState, useEffect } from "react";
 import { Search, Bell, Radio, BarChart2, Wifi } from "lucide-react";
 import { useAlertStore } from "../../store/alertStore";
+import { useUiStore } from "../../store/uiStore";
 
 export default function Topbar({ placeholder = "Query plant data..." }) {
   const [time, setTime] = useState(new Date());
   const alerts = useAlertStore((s) => s.alerts);
   const criticalCount = alerts.filter((a) => a.severity === "critical").length;
+  const openTab = useUiStore((s) => s.openTab);
 
   useEffect(() => {
     const t = setInterval(() => setTime(new Date()), 1000);
@@ -15,8 +17,8 @@ export default function Topbar({ placeholder = "Query plant data..." }) {
   const fmt = time.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: false });
 
   return (
-    <header className="h-12 shrink-0 flex items-center gap-3 px-4 border-b border-[#1E3A5F]"
-      style={{ background: "rgba(15,28,46,0.95)", backdropFilter: "blur(12px)" }}>
+    <header className="h-12 shrink-0 flex items-center gap-3 px-4 border-b border-[#1E3A5F] z-20 relative"
+      style={{ background: "rgba(15,28,46,0.9)", backdropFilter: "blur(16px)" }}>
 
       {/* Search */}
       <div className="flex-1 max-w-xs relative">
@@ -35,18 +37,26 @@ export default function Topbar({ placeholder = "Query plant data..." }) {
         </div>
 
         {/* Icons */}
-        <button className="w-7 h-7 rounded-lg flex items-center justify-center text-[#4A6080] hover:text-[#8BA3C7] hover:bg-[#1E3A5F] transition-all">
+        <button className="w-7 h-7 rounded-lg flex items-center justify-center text-[#4A6080] hover:text-[#8BA3C7] hover:bg-[#1E3A5F] active:scale-90 transition-all">
           <BarChart2 size={14} />
         </button>
-        <button className="w-7 h-7 rounded-lg flex items-center justify-center text-[#4A6080] hover:text-[#8BA3C7] hover:bg-[#1E3A5F] transition-all">
+        <button
+          onClick={() => openTab("telemetry")}
+          className="w-7 h-7 rounded-lg flex items-center justify-center text-[#4A6080] hover:text-[#8BA3C7] hover:bg-[#1E3A5F] active:scale-90 transition-all"
+          title="Telemetry Stream"
+        >
           <Radio size={14} />
         </button>
 
         {/* Notifications */}
-        <button className="w-7 h-7 rounded-lg flex items-center justify-center text-[#4A6080] hover:text-[#8BA3C7] hover:bg-[#1E3A5F] transition-all relative">
+        <button
+          onClick={() => openTab("alerts")}
+          className="w-7 h-7 rounded-lg flex items-center justify-center text-[#4A6080] hover:text-[#8BA3C7] hover:bg-[#1E3A5F] active:scale-90 transition-all relative"
+          title="Active Alerts"
+        >
           <Bell size={14} />
           {criticalCount > 0 && (
-            <span className="absolute -top-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-[#FF5C5C] text-white text-[8px] font-bold flex items-center justify-center">
+            <span className="absolute -top-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-[#FF5C5C] text-white text-[8px] font-bold flex items-center justify-center animate-bounce">
               {criticalCount}
             </span>
           )}

@@ -1,6 +1,8 @@
 import { lazy, Suspense } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Sidebar from "./components/layout/Sidebar";
+import BackgroundGlows from "./components/layout/BackgroundGlows";
+import SlidingDrawer from "./components/layout/SlidingDrawer";
 
 const Dashboard            = lazy(() => import("./pages/Dashboard"));
 const AICopilot            = lazy(() => import("./pages/AICopilot"));
@@ -17,7 +19,7 @@ const Settings             = lazy(() => import("./pages/Settings"));
 
 function PageLoader() {
   return (
-    <div className="flex-1 flex items-center justify-center" style={{ background: "#07111F" }}>
+    <div className="flex-1 flex items-center justify-center relative z-10" style={{ background: "#060B14" }}>
       <div className="flex gap-1.5">
         {[0,1,2].map((i) => (
           <div key={i} className="w-2 h-2 rounded-full bg-[#4F9DFF] animate-bounce" style={{ animationDelay: `${i * 0.15}s` }} />
@@ -30,9 +32,14 @@ function PageLoader() {
 export default function App() {
   return (
     <BrowserRouter>
-      <div className="flex h-screen overflow-hidden" style={{ background: "#07111F" }}>
+      <div className="flex h-screen overflow-hidden relative" style={{ background: "#060B14" }}>
+        {/* Background Mesh Glows */}
+        <BackgroundGlows />
+
+        {/* Layout content sitting on top of glows */}
         <Sidebar />
-        <main className="flex-1 flex flex-col overflow-hidden">
+        
+        <main className="flex-1 flex flex-col overflow-hidden relative z-10">
           <Suspense fallback={<PageLoader />}>
             <Routes>
               <Route path="/"                element={<Dashboard />} />
@@ -50,6 +57,9 @@ export default function App() {
             </Routes>
           </Suspense>
         </main>
+
+        {/* Global Operations Console Sliding Drawer */}
+        <SlidingDrawer />
       </div>
     </BrowserRouter>
   );
