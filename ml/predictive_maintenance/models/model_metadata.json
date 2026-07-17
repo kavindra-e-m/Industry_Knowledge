@@ -1,0 +1,29 @@
+{
+  "rf_features": [
+    "air_temperature_k",
+    "process_temperature_k",
+    "rotational_speed_rpm",
+    "torque_nm",
+    "tool_wear_min",
+    "days_since_maintenance",
+    "overdue_days",
+    "emergency_count_6m",
+    "corrective_ratio"
+  ],
+  "iso_features": [
+    "Accelerometer1RMS",
+    "Accelerometer2RMS",
+    "Current",
+    "Pressure",
+    "Temperature",
+    "Thermocouple",
+    "Voltage",
+    "Volume Flow RateRMS"
+  ],
+  "trained_on": {
+    "rf": "AI4I 2020 Predictive Maintenance Dataset (UCI ML Repository)",
+    "iso": "SKAB Skoltech Anomaly Benchmark (github.com/waico/SKAB)"
+  },
+  "trained_at": "2026-07-16T20:53:37",
+  "hardware": "CPU only"
+}

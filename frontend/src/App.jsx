@@ -1,25 +1,70 @@
-// PS08 Web Dashboard - Member 3
-// Landing shell: swap in real pages (ChatPage, ComplianceReport,
-// EquipmentTracker, KnowledgeGraphView) from ./pages as they're built.
 import { useState, useEffect } from "react";
-import { askQuestion } from "./services/api";
-import LiveEvents from "./LiveEvents";
+import LoginPage from "./pages/LoginPage";
+import Dashboard from "./pages/Dashboard";
+import { getCurrentUser, setAuthToken } from "./services/api";
 
 export default function App() {
-  const [status, setStatus] = useState("checking backend...");
+  const [currentUser, setCurrentUser] = useState(null);
+  const [checkingAuth, setCheckingAuth] = useState(true);
 
   useEffect(() => {
-    fetch("/health")
-      .then((r) => r.json())
-      .then((d) => setStatus(d.status))
-      .catch(() => setStatus("backend not reachable yet"));
+    // Check if user is already logged in (retrieve JWT token)
+    getCurrentUser()
+      .then((data) => {
+        if (data.authenticated) {
+          setCurrentUser(data.user);
+        }
+      })
+      .catch((e) => console.error("Session restoration failed:", e))
+      .finally(() => setCheckingAuth(false));
   }, []);
 
-  return (
-    <div style={{ fontFamily: "sans-serif", padding: 24 }}>
-      <h1>PS08 — Industrial Knowledge Intelligence</h1>
-      <p>Backend status: {status}</p>
-      <LiveEvents />
-    </div>
+  const handleLoginSuccess = (user) => {
+    setCurrentUser(user);
+  };
+
+  const handleLogout = () => {
+    setAuthToken("");
+    setCurrentUser(null);
+  };
+
+  if (checkingAuth) {
+    return (
+      <div style={styles.loadingContainer}>
+        <div style={styles.spinner} className="animate-spin-slow" />
+        <span style={styles.loadingText}>Initializing Security Protocols...</span>
+      </div>
+    );
+  }
+
+  return currentUser ? (
+    <Dashboard currentUser={currentUser} onLogout={handleLogout} />
+  ) : (
+    <LoginPage onLoginSuccess={handleLoginSuccess} />
   );
 }
+
+const styles = {
+  loadingContainer: {
+    height: "100vh",
+    width: "100vw",
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#0a0b10",
+    gap: 16,
+  },
+  spinner: {
+    width: 40,
+    height: 40,
+    border: "3px solid rgba(99, 102, 241, 0.1)",
+    borderTop: "3px solid #6366f1",
+    borderRadius: "50%",
+  },
+  loadingText: {
+    fontSize: 14,
+    color: "#64748b",
+    fontFamily: "'Space Grotesk', sans-serif",
+  },
+};
