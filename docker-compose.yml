@@ -3,37 +3,97 @@ version: "3.9"
 services:
   postgres:
     image: postgres:16
+    container_name: industrialbrain_postgres
     environment:
-      POSTGRES_USER: ps08
-      POSTGRES_PASSWORD: ps08pass
-      POSTGRES_DB: ps08
+      POSTGRES_USER: industrialbrain
+      POSTGRES_PASSWORD: industrialbrain123
+      POSTGRES_DB: industrialbrain
     ports:
       - "5432:5432"
     volumes:
-      - ./data-infra/db/postgres/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U industrialbrain"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   neo4j:
     image: neo4j:5
+    container_name: industrialbrain_neo4j
     environment:
-      NEO4J_AUTH: neo4j/ps08password
+      NEO4J_AUTH: neo4j/industrialbrain123
+      NEO4J_PLUGINS: '["apoc"]'
+      NEO4J_dbms_security_procedures_unrestricted: apoc.*
     ports:
       - "7474:7474"
       - "7687:7687"
+    volumes:
+      - neo4j_data:/data
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:7474 || exit 1"]
+      interval: 15s
+      timeout: 10s
+      retries: 5
 
   chromadb:
     image: chromadb/chroma:latest
+    container_name: industrialbrain_chromadb
+    environment:
+      - IS_PERSISTENT=TRUE
+      - ANONYMIZED_TELEMETRY=FALSE
     ports:
-      - "8000:8000"
+      - "8001:8000"
+    volumes:
+      - chroma_data:/chroma/chroma
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8000/api/v1/heartbeat || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: industrialbrain_redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --save 60 1 --loglevel warning
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   backend:
     build: ./backend
+    container_name: industrialbrain_backend
     environment:
+      DATABASE_URL: postgresql://industrialbrain:industrialbrain123@postgres:5432/industrialbrain
       NEO4J_URI: bolt://neo4j:7687
+      NEO4J_USER: neo4j
+      NEO4J_PASSWORD: industrialbrain123
       CHROMA_HOST: chromadb
-      POSTGRES_URL: postgresql://ps08:ps08pass@postgres:5432/ps08
+      CHROMA_PORT: 8000
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
     ports:
-      - "8080:8000"
+      - "8000:8000"
     depends_on:
-      - postgres
-      - neo4j
-      - chromadb
+      postgres:
+        condition: service_healthy
+      neo4j:
+        condition: service_healthy
+      chromadb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./data:/app/data
+
+volumes:
+  postgres_data:
+  neo4j_data:
+  chroma_data:
+  redis_data:

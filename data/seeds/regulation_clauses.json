@@ -1,1 +1,190 @@
-{}
+{
+  "regulations": [
+    {
+      "source": "OISD-137",
+      "clause_id": "OISD-137-7.1",
+      "title": "Pressure Vessel Statutory Inspection",
+      "description": "All pressure vessels shall undergo statutory inspection by a competent person at intervals not exceeding 24 months. Inspection shall include internal visual examination, thickness measurement by UT, and hydrostatic/pneumatic testing as applicable.",
+      "applicability": ["Pressure Vessel", "Reactor", "Column", "Separator"],
+      "inspection_interval_months": 24,
+      "severity_if_violated": "critical",
+      "authority": "OISD",
+      "legal_consequence": "Plant shutdown order by PESO authority. Section 31 of Factories Act 1948.",
+      "corrective_action": "Schedule statutory inspection with CCOE-approved competent person immediately."
+    },
+    {
+      "source": "OISD-137",
+      "clause_id": "OISD-137-7.2",
+      "title": "Pressure Vessel External Inspection",
+      "description": "External inspection of pressure vessels including visual check, corrosion assessment, insulation condition, and support integrity — annually.",
+      "applicability": ["Pressure Vessel", "Reactor", "Column", "Separator", "Boiler"],
+      "inspection_interval_months": 12,
+      "severity_if_violated": "major",
+      "authority": "OISD",
+      "legal_consequence": "Warning notice. Repeat violation leads to shutdown.",
+      "corrective_action": "Arrange external inspection by certified inspector. Document findings in equipment register."
+    },
+    {
+      "source": "OISD-142",
+      "clause_id": "OISD-142-6.1",
+      "title": "Safety Relief Valve Inspection and Testing",
+      "description": "All safety relief valves on pressure systems shall be tested for set pressure and leakage at intervals not exceeding 12 months. Valves shall be removed, bench-tested, and recertified.",
+      "applicability": ["Safety Relief Valve"],
+      "inspection_interval_months": 12,
+      "severity_if_violated": "critical",
+      "authority": "OISD",
+      "legal_consequence": "Critical safety violation. Immediate plant shutdown by factory inspector.",
+      "corrective_action": "Remove SRV immediately for bench testing. Install tested spare. Do not operate unprotected system."
+    },
+    {
+      "source": "OISD-116",
+      "clause_id": "OISD-116-5.3",
+      "title": "Fired Heater Inspection",
+      "description": "Fired heaters shall undergo comprehensive inspection covering firebox, tubes, refractory, burners, and safety interlock systems at intervals not exceeding 24 months.",
+      "applicability": ["Fired Heater"],
+      "inspection_interval_months": 24,
+      "severity_if_violated": "critical",
+      "authority": "OISD",
+      "legal_consequence": "Shutdown order. Potential criminal liability under Factories Act Section 92.",
+      "corrective_action": "Schedule turnaround inspection. Engage certified tube thickness inspection agency."
+    },
+    {
+      "source": "OISD-116",
+      "clause_id": "OISD-116-5.4",
+      "title": "Fired Heater Burner and Safety System Check",
+      "description": "Burner management systems, flame scanners, and fuel shut-off valves on fired heaters must be function-tested every 6 months.",
+      "applicability": ["Fired Heater"],
+      "inspection_interval_months": 6,
+      "severity_if_violated": "critical",
+      "authority": "OISD",
+      "legal_consequence": "Immediate shutdown. Section 7A OISD compliance requirement.",
+      "corrective_action": "Conduct functional test of BMS. Replace faulty components. Document test certificates."
+    },
+    {
+      "source": "FACTORIES ACT 1948",
+      "clause_id": "FA-1948-SEC31",
+      "title": "Boiler Statutory Certificate of Fitness",
+      "description": "No boiler shall be used unless it is in possession of a valid certificate of fitness granted by a competent authority. Certificate must be renewed annually.",
+      "applicability": ["Boiler"],
+      "inspection_interval_months": 12,
+      "severity_if_violated": "critical",
+      "authority": "Chief Inspector of Factories",
+      "legal_consequence": "Use of boiler without valid certificate is a cognisable offence under Section 92. Imprisonment up to 2 years or fine up to Rs 2 lakh.",
+      "corrective_action": "Obtain certificate of fitness from Boiler Inspectorate before resuming operation."
+    },
+    {
+      "source": "FACTORIES ACT 1948",
+      "clause_id": "FA-1948-SEC28",
+      "title": "Lifting Machinery Annual Examination",
+      "description": "All lifting machines, chains, ropes, and lifting tackle used in the factory shall be examined by a competent person at least once in every period of 12 months.",
+      "applicability": ["Overhead Crane", "Hoist", "Chain Pulley Block"],
+      "inspection_interval_months": 12,
+      "severity_if_violated": "major",
+      "authority": "Factory Inspector",
+      "legal_consequence": "Penalty under Section 92. Plant safety notice.",
+      "corrective_action": "Arrange examination by competent person. Certify and tag all lifting equipment."
+    },
+    {
+      "source": "PESO",
+      "clause_id": "PESO-SMPV-1981-R8",
+      "title": "Static and Mobile Pressure Vessel Rules — Periodic Testing",
+      "description": "All static pressure vessels under SMPV Rules 1981 shall undergo hydrostatic testing at 1.5x design pressure at intervals specified by the competent authority, generally every 5 years.",
+      "applicability": ["Pressure Vessel", "Storage Tank"],
+      "inspection_interval_months": 60,
+      "severity_if_violated": "critical",
+      "authority": "PESO",
+      "legal_consequence": "Revocation of licence to store petroleum/gas. Section 8 Petroleum Act 1934.",
+      "corrective_action": "Schedule hydrostatic test with PESO-approved testing agency. Obtain test certificate."
+    },
+    {
+      "source": "OISD-129",
+      "clause_id": "OISD-129-6.2",
+      "title": "Centrifugal Pump Predictive Maintenance Monitoring",
+      "description": "Critical centrifugal pumps shall have vibration and bearing temperature monitoring at intervals not exceeding 3 months. Pumps classified as critical must have baseline data established.",
+      "applicability": ["Centrifugal Pump"],
+      "inspection_interval_months": 3,
+      "severity_if_violated": "major",
+      "authority": "OISD",
+      "legal_consequence": "Audit finding. Potential production loss liability.",
+      "corrective_action": "Establish vibration baseline. Set up regular monitoring schedule. Install permanent monitoring if justified."
+    },
+    {
+      "source": "OISD-129",
+      "clause_id": "OISD-129-6.3",
+      "title": "Reciprocating Compressor Inspection",
+      "description": "Reciprocating compressors shall be opened for internal inspection of cylinders, valves, piston rings, and packing at intervals not exceeding 12 months.",
+      "applicability": ["Compressor"],
+      "inspection_interval_months": 12,
+      "severity_if_violated": "major",
+      "authority": "OISD",
+      "legal_consequence": "Major finding in statutory audit.",
+      "corrective_action": "Schedule compressor overhaul. Replace worn valves, rings, and packing."
+    },
+    {
+      "source": "OISD-113",
+      "clause_id": "OISD-113-7.1",
+      "title": "Control Valve Functional Test",
+      "description": "Safety-critical control valves shall undergo stroke testing and calibration check every 6 months. Valves on emergency shutdown duty must be proof-tested annually.",
+      "applicability": ["Control Valve"],
+      "inspection_interval_months": 6,
+      "severity_if_violated": "major",
+      "authority": "OISD",
+      "legal_consequence": "Safety case non-compliance. Insurance liability.",
+      "corrective_action": "Conduct stroke test. Check calibration. Replace actuator/positioner if required."
+    },
+    {
+      "source": "OISD-113",
+      "clause_id": "OISD-113-7.2",
+      "title": "Heat Exchanger Inspection",
+      "description": "Heat exchangers shall be inspected for fouling, tube thickness, and bundle condition at intervals not exceeding 24 months. Tube thickness measurement by UT/ET as applicable.",
+      "applicability": ["Heat Exchanger"],
+      "inspection_interval_months": 24,
+      "severity_if_violated": "major",
+      "authority": "OISD",
+      "legal_consequence": "Audit finding. Potential tube failure leading to product contamination or fire.",
+      "corrective_action": "Pull bundle. Conduct tube thickness survey. Plug or replace failed tubes. Document in inspection register."
+    },
+    {
+      "source": "OISD-STD-117",
+      "clause_id": "OISD-117-5.1",
+      "title": "Storage Tank API 653 Inspection",
+      "description": "Atmospheric storage tanks for petroleum products shall be inspected per API 653 standard. Full inspection at intervals determined by corrosion rates, but not exceeding 10 years. External inspection every 5 years.",
+      "applicability": ["Storage Tank"],
+      "inspection_interval_months": 60,
+      "severity_if_violated": "major",
+      "authority": "OISD",
+      "legal_consequence": "PESO licence condition. Failure may result in licence cancellation.",
+      "corrective_action": "Schedule tank inspection per API 653. Engage certified tank inspection contractor."
+    },
+    {
+      "source": "OISD-STD-105",
+      "clause_id": "OISD-105-6.1",
+      "title": "Electric Motor Insulation Resistance Test",
+      "description": "All electric motors driving critical equipment shall have insulation resistance (IR) test conducted at intervals not exceeding 12 months. Motors in humid or corrosive environments — 6 months.",
+      "applicability": ["Electric Motor"],
+      "inspection_interval_months": 12,
+      "severity_if_violated": "minor",
+      "authority": "OISD",
+      "legal_consequence": "Electrical safety audit finding.",
+      "corrective_action": "Conduct IR test with insulation tester (Megger). Rewind motor if IR below 1 MΩ/kV."
+    },
+    {
+      "source": "OISD-GDN-169",
+      "clause_id": "OISD-169-4.3",
+      "title": "Flow Meter and Instrument Calibration",
+      "description": "All process instruments used for custody transfer or safety shall be calibrated at intervals not exceeding 12 months. Instruments on safety systems — 6 months.",
+      "applicability": ["Flow Meter", "Level Transmitter", "Pressure Transmitter"],
+      "inspection_interval_months": 12,
+      "severity_if_violated": "minor",
+      "authority": "OISD",
+      "legal_consequence": "Measurement accuracy non-compliance.",
+      "corrective_action": "Calibrate against certified reference standard. Issue calibration certificate. Update tag."
+    }
+  ],
+  "metadata": {
+    "version": "1.0",
+    "sources": ["OISD-113", "OISD-116", "OISD-117", "OISD-129", "OISD-137", "OISD-142", "OISD-GDN-169", "FACTORIES ACT 1948", "PESO SMPV 1981"],
+    "last_updated": "2026-07-01",
+    "total_clauses": 15
+  }
+}
