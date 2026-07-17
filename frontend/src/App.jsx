@@ -1,70 +1,56 @@
-import { useState, useEffect } from "react";
-import LoginPage from "./pages/LoginPage";
-import Dashboard from "./pages/Dashboard";
-import { getCurrentUser, setAuthToken } from "./services/api";
+import { lazy, Suspense } from "react";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Sidebar from "./components/layout/Sidebar";
 
-export default function App() {
-  const [currentUser, setCurrentUser] = useState(null);
-  const [checkingAuth, setCheckingAuth] = useState(true);
+const Dashboard            = lazy(() => import("./pages/Dashboard"));
+const AICopilot            = lazy(() => import("./pages/AICopilot"));
+const KnowledgeGraph       = lazy(() => import("./pages/KnowledgeGraph"));
+const DocumentIntelligence = lazy(() => import("./pages/DocumentIntelligence"));
+const PredictiveMaintenance= lazy(() => import("./pages/PredictiveMaintenance"));
+const RCAReport            = lazy(() => import("./pages/RCAReport"));
+const ComplianceIntelligence=lazy(() => import("./pages/ComplianceIntelligence"));
+const AuditPackage         = lazy(() => import("./pages/AuditPackage"));
+const LessonsLearned       = lazy(() => import("./pages/LessonsLearned"));
+const PIDExplorer          = lazy(() => import("./pages/PIDExplorer"));
+const EquipmentDetails     = lazy(() => import("./pages/EquipmentDetails"));
+const Settings             = lazy(() => import("./pages/Settings"));
 
-  useEffect(() => {
-    // Check if user is already logged in (retrieve JWT token)
-    getCurrentUser()
-      .then((data) => {
-        if (data.authenticated) {
-          setCurrentUser(data.user);
-        }
-      })
-      .catch((e) => console.error("Session restoration failed:", e))
-      .finally(() => setCheckingAuth(false));
-  }, []);
-
-  const handleLoginSuccess = (user) => {
-    setCurrentUser(user);
-  };
-
-  const handleLogout = () => {
-    setAuthToken("");
-    setCurrentUser(null);
-  };
-
-  if (checkingAuth) {
-    return (
-      <div style={styles.loadingContainer}>
-        <div style={styles.spinner} className="animate-spin-slow" />
-        <span style={styles.loadingText}>Initializing Security Protocols...</span>
+function PageLoader() {
+  return (
+    <div className="flex-1 flex items-center justify-center" style={{ background: "#07111F" }}>
+      <div className="flex gap-1.5">
+        {[0,1,2].map((i) => (
+          <div key={i} className="w-2 h-2 rounded-full bg-[#4F9DFF] animate-bounce" style={{ animationDelay: `${i * 0.15}s` }} />
+        ))}
       </div>
-    );
-  }
-
-  return currentUser ? (
-    <Dashboard currentUser={currentUser} onLogout={handleLogout} />
-  ) : (
-    <LoginPage onLoginSuccess={handleLoginSuccess} />
+    </div>
   );
 }
 
-const styles = {
-  loadingContainer: {
-    height: "100vh",
-    width: "100vw",
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "#0a0b10",
-    gap: 16,
-  },
-  spinner: {
-    width: 40,
-    height: 40,
-    border: "3px solid rgba(99, 102, 241, 0.1)",
-    borderTop: "3px solid #6366f1",
-    borderRadius: "50%",
-  },
-  loadingText: {
-    fontSize: 14,
-    color: "#64748b",
-    fontFamily: "'Space Grotesk', sans-serif",
-  },
-};
+export default function App() {
+  return (
+    <BrowserRouter>
+      <div className="flex h-screen overflow-hidden" style={{ background: "#07111F" }}>
+        <Sidebar />
+        <main className="flex-1 flex flex-col overflow-hidden">
+          <Suspense fallback={<PageLoader />}>
+            <Routes>
+              <Route path="/"                element={<Dashboard />} />
+              <Route path="/copilot"         element={<AICopilot />} />
+              <Route path="/knowledge-graph" element={<KnowledgeGraph />} />
+              <Route path="/documents"       element={<DocumentIntelligence />} />
+              <Route path="/maintenance"     element={<PredictiveMaintenance />} />
+              <Route path="/rca"             element={<RCAReport />} />
+              <Route path="/compliance"      element={<ComplianceIntelligence />} />
+              <Route path="/audit"           element={<AuditPackage />} />
+              <Route path="/lessons"         element={<LessonsLearned />} />
+              <Route path="/pid"             element={<PIDExplorer />} />
+              <Route path="/equipment/:id"   element={<EquipmentDetails />} />
+              <Route path="/settings"        element={<Settings />} />
+            </Routes>
+          </Suspense>
+        </main>
+      </div>
+    </BrowserRouter>
+  );
+}
