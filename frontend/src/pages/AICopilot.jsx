@@ -1,13 +1,9 @@
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Send, Mic, Bot, User, Zap, Share2, FileText, Clock } from "lucide-react";
+import { Send, Mic, Bot, User, Zap, Share2, Clock, Sparkles } from "lucide-react";
 import PageShell from "../components/shared/PageShell";
 
-const HISTORY = [
-  "Turbine efficiency report...",
-  "P&ID mapping for Sector 7",
-  "Compliance audit log...",
-];
+const HISTORY = ["Turbine efficiency report...", "P&ID mapping for Sector 7", "Compliance audit log..."];
 
 const SUGGESTED = [
   "What is the vibration threshold for Stage 3 Compressor?",
@@ -38,42 +34,85 @@ const CONTEXT = {
   sub: "Stage 3 Compressor Unit",
   metrics: [
     { label: "Operating Temp", value: "184°C", max: "220°C", pct: 84, color: "#FBBF24" },
-    { label: "Throughput", value: "9,420 m³/h", pct: 72, color: "#34D399" },
+    { label: "Throughput",     value: "9,420 m³/h", pct: 72, color: "#34D399" },
   ],
 };
 
-function Message({ msg }) {
+function TypingIndicator() {
+  return (
+    <div className="flex gap-3">
+      <div className="w-8 h-8 rounded-xl bg-[#1E3A5F] flex items-center justify-center shrink-0">
+        <motion.div animate={{ rotate: 360 }} transition={{ duration: 2, repeat: Infinity, ease: "linear" }}>
+          <Bot size={15} className="text-[#4F9DFF]" />
+        </motion.div>
+      </div>
+      <div className="ib-card px-4 py-3 flex gap-1.5 items-center">
+        <span className="text-[11px] text-[#4A6080] mr-1">Analyzing</span>
+        {[0, 1, 2].map((i) => (
+          <motion.div key={i} className="w-1.5 h-1.5 rounded-full bg-[#4F9DFF]"
+            animate={{ opacity: [0.3, 1, 0.3], y: [0, -3, 0] }}
+            transition={{ duration: 0.8, repeat: Infinity, delay: i * 0.18 }} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function Message({ msg, isNew }) {
   const isAI = msg.role === "ai";
   return (
     <motion.div
-      initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
+      initial={{ opacity: 0, y: 10, scale: 0.97 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      transition={{ type: "spring", stiffness: 340, damping: 28 }}
       className={`flex gap-3 ${isAI ? "" : "flex-row-reverse"}`}
     >
-      <div className={`w-8 h-8 rounded-xl shrink-0 flex items-center justify-center ${isAI ? "bg-[#1E3A5F]" : "bg-[#7C5CFC]/20"}`}>
+      <motion.div
+        className={`w-8 h-8 rounded-xl shrink-0 flex items-center justify-center ${isAI ? "bg-[#1E3A5F]" : "bg-[#7C5CFC]/20"}`}
+        whileHover={{ scale: 1.1 }}
+      >
         {isAI ? <Bot size={15} className="text-[#4F9DFF]" /> : <User size={15} className="text-[#7C5CFC]" />}
-      </div>
+      </motion.div>
       <div className={`max-w-[80%] ${isAI ? "" : "items-end flex flex-col"}`}>
-        <div className={`rounded-2xl px-4 py-3 text-[13px] leading-relaxed ${
-          isAI ? "bg-[#16263D] border border-[#1E3A5F] text-[#8BA3C7]" : "text-white"
-        }`}
-          style={!isAI ? { background: "linear-gradient(135deg, #7C5CFC, #4F9DFF)" } : {}}>
+        <div
+          className={`rounded-2xl px-4 py-3 text-[13px] leading-relaxed ${
+            isAI ? "bg-[#16263D] border border-[#1E3A5F] text-[#8BA3C7]" : "text-white"
+          }`}
+          style={!isAI ? { background: "linear-gradient(135deg, #7C5CFC, #4F9DFF)" } : {}}
+        >
           {isAI ? (
             <>
               {msg.text}
               {msg.highlight && <span className="text-[#34D399] font-semibold">{msg.highlight}</span>}
               {msg.text2 && <span className="whitespace-pre-line">{msg.text2}</span>}
+              {msg.confidence && (
+                <div className="mt-3">
+                  <div className="flex items-center justify-between text-[10px] mb-1">
+                    <span className="text-[#4A6080]">AI Confidence</span>
+                    <span className="text-[#34D399] font-semibold">{msg.confidence}%</span>
+                  </div>
+                  <div className="h-1 rounded-full bg-[#1E3A5F] overflow-hidden">
+                    <motion.div
+                      className="h-full rounded-full"
+                      style={{ background: "linear-gradient(90deg, #34D399, #4F9DFF)" }}
+                      initial={{ width: 0 }}
+                      animate={{ width: `${msg.confidence}%` }}
+                      transition={{ duration: 1, delay: 0.3, ease: "easeOut" }}
+                    />
+                  </div>
+                </div>
+              )}
               {msg.actions && (
                 <div className="flex gap-2 mt-3 flex-wrap">
                   {msg.actions.map((a) => (
-                    <button key={a} className="px-3 py-1.5 rounded-lg text-[11px] font-semibold text-[#4F9DFF] border border-[#4F9DFF]/30 hover:bg-[#4F9DFF]/10 transition-all">
+                    <motion.button
+                      key={a}
+                      className="px-3 py-1.5 rounded-lg text-[11px] font-semibold text-[#4F9DFF] border border-[#4F9DFF]/30 hover:bg-[#4F9DFF]/10 transition-all"
+                      whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.96 }}
+                    >
                       {a}
-                    </button>
+                    </motion.button>
                   ))}
-                  {msg.confidence && (
-                    <span className="px-3 py-1.5 rounded-lg text-[11px] font-semibold text-[#34D399] border border-[#34D399]/30 bg-[#34D399]/8">
-                      {msg.confidence}% confidence
-                    </span>
-                  )}
                 </div>
               )}
             </>
@@ -115,67 +154,71 @@ export default function AICopilot() {
 
   return (
     <PageShell topbarPlaceholder="Search knowledge base...">
-      <div className="flex h-full" style={{ background: "#07111F" }}>
+      <div className="flex h-full" style={{ background: "transparent" }}>
 
         {/* History sidebar */}
         <div className="w-48 shrink-0 border-r border-[#1E3A5F] p-3 space-y-1 hidden lg:block">
           <p className="ib-label mb-3">HISTORY</p>
           {HISTORY.map((h, i) => (
-            <button key={i} className="w-full text-left flex items-center gap-2 px-2.5 py-2 rounded-lg text-[12px] text-[#4A6080] hover:text-[#8BA3C7] hover:bg-[#1E3A5F]/60 transition-all">
+            <motion.button
+              key={i}
+              initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.06 }}
+              className="w-full text-left flex items-center gap-2 px-2.5 py-2 rounded-lg text-[12px] text-[#4A6080] hover:text-[#8BA3C7] hover:bg-[#1E3A5F]/60 transition-all"
+              whileHover={{ x: 2 }}
+            >
               <Clock size={11} className="shrink-0" />
               <span className="truncate">{h}</span>
-            </button>
+            </motion.button>
           ))}
         </div>
 
         {/* Chat area */}
         <div className="flex-1 flex flex-col min-w-0">
           <div className="flex-1 overflow-y-auto p-5 space-y-5">
-            {/* Welcome */}
             {messages.length === 0 && (
               <div className="flex flex-col items-center justify-center h-full gap-4 text-center">
-                <div className="w-16 h-16 rounded-2xl bg-[#16263D] border border-[#1E3A5F] flex items-center justify-center">
+                <motion.div
+                  className="w-16 h-16 rounded-2xl bg-[#16263D] border border-[#1E3A5F] flex items-center justify-center"
+                  animate={{ y: [0, -6, 0] }}
+                  transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+                >
                   <Bot size={28} className="text-[#4F9DFF]" />
-                </div>
+                </motion.div>
                 <div>
                   <p className="text-lg font-bold text-white font-sora">Precision AI Copilot</p>
-                  <p className="text-[13px] text-[#4A6080] mt-1 max-w-xs">Access the collective intelligence of your facility. Query documentation, analyze P&IDs, and predict maintenance cycles.</p>
+                  <p className="text-[13px] text-[#4A6080] mt-1 max-w-xs">Access the collective intelligence of your facility.</p>
                 </div>
               </div>
             )}
             {messages.map((m) => <Message key={m.id} msg={m} />)}
-            {loading && (
-              <div className="flex gap-3">
-                <div className="w-8 h-8 rounded-xl bg-[#1E3A5F] flex items-center justify-center shrink-0">
-                  <Bot size={15} className="text-[#4F9DFF]" />
-                </div>
-                <div className="ib-card px-4 py-3 flex gap-1.5 items-center">
-                  {[0, 1, 2].map((i) => (
-                    <motion.div key={i} className="w-1.5 h-1.5 rounded-full bg-[#4F9DFF]"
-                      animate={{ opacity: [0.3, 1, 0.3] }} transition={{ duration: 1, repeat: Infinity, delay: i * 0.2 }} />
-                  ))}
-                </div>
-              </div>
-            )}
+            {loading && <TypingIndicator />}
             <div ref={bottomRef} />
           </div>
 
           {/* Suggested prompts */}
           <div className="px-5 pb-2 flex gap-2 overflow-x-auto">
             {SUGGESTED.map((s, i) => (
-              <button key={i} onClick={() => setInput(s)}
-                className="shrink-0 px-3 py-1.5 rounded-full text-[11px] text-[#8BA3C7] border border-[#1E3A5F] hover:border-[#4F9DFF]/40 hover:text-[#4F9DFF] transition-all whitespace-nowrap">
+              <motion.button
+                key={i}
+                initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}
+                onClick={() => setInput(s)}
+                className="shrink-0 px-3 py-1.5 rounded-full text-[11px] text-[#8BA3C7] border border-[#1E3A5F] hover:border-[#4F9DFF]/40 hover:text-[#4F9DFF] transition-all whitespace-nowrap"
+                whileHover={{ scale: 1.03 }}
+              >
                 {s}
-              </button>
+              </motion.button>
             ))}
           </div>
 
           {/* Input */}
           <div className="p-4 border-t border-[#1E3A5F]">
             <div className="flex items-center gap-2 ib-card px-3 py-2" style={{ borderRadius: "0.875rem" }}>
-              <button className="w-7 h-7 rounded-lg flex items-center justify-center text-[#4A6080] hover:text-[#8BA3C7] hover:bg-[#1E3A5F] transition-all">
+              <motion.button
+                className="w-7 h-7 rounded-lg flex items-center justify-center text-[#4A6080] hover:text-[#8BA3C7] hover:bg-[#1E3A5F] transition-all"
+                whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}
+              >
                 <Mic size={14} />
-              </button>
+              </motion.button>
               <input
                 className="flex-1 bg-transparent text-[13px] text-[#F0F6FF] placeholder-[#4A6080] outline-none font-jakarta"
                 placeholder="Ask IndustrialBrain about your plant..."
@@ -183,13 +226,15 @@ export default function AICopilot() {
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && send()}
               />
-              <button
+              <motion.button
                 onClick={send}
                 className="w-8 h-8 rounded-xl flex items-center justify-center transition-all"
                 style={{ background: input.trim() ? "linear-gradient(135deg, #4F9DFF, #7C5CFC)" : "#1E3A5F" }}
+                whileHover={input.trim() ? { scale: 1.1, boxShadow: "0 0 16px rgba(79,157,255,0.4)" } : {}}
+                whileTap={{ scale: 0.9 }}
               >
                 <Send size={13} className="text-white" />
-              </button>
+              </motion.button>
             </div>
           </div>
         </div>
@@ -203,11 +248,16 @@ export default function AICopilot() {
                 <Zap size={13} className="text-[#7C5CFC]" />
                 <p className="ib-label">ACTIVE CONTEXT</p>
               </div>
-              <span className="ib-badge ib-badge-healthy text-[9px]">LIVE</span>
+              <motion.span
+                className="ib-badge ib-badge-healthy text-[9px]"
+                animate={{ opacity: [1, 0.5, 1] }}
+                transition={{ duration: 2, repeat: Infinity }}
+              >
+                LIVE
+              </motion.span>
             </div>
             <div className="ib-card p-0 overflow-hidden">
-              <div className="h-24 bg-gradient-to-br from-[#0F1C2E] to-[#16263D] flex items-end p-3"
-                style={{ background: "linear-gradient(135deg, #0a1520 0%, #1a2d47 100%)" }}>
+              <div className="h-24 flex items-end p-3" style={{ background: "linear-gradient(135deg, #0a1520 0%, #1a2d47 100%)" }}>
                 <div>
                   <p className="text-[13px] font-bold text-white font-sora">{CONTEXT.name}</p>
                   <p className="text-[10px] text-[#4A6080]">{CONTEXT.sub}</p>
@@ -221,7 +271,7 @@ export default function AICopilot() {
                       <span className="text-white font-semibold">{m.value}{m.max ? ` / ${m.max}` : ""}</span>
                     </div>
                     <div className="h-1 rounded-full bg-[#1E3A5F] overflow-hidden">
-                      <motion.div className="h-full rounded-full" style={{ background: m.color, width: `${m.pct}%` }}
+                      <motion.div className="h-full rounded-full" style={{ background: m.color }}
                         initial={{ width: 0 }} animate={{ width: `${m.pct}%` }} transition={{ duration: 1, delay: 0.3 }} />
                     </div>
                   </div>
@@ -240,15 +290,19 @@ export default function AICopilot() {
               <button className="text-[10px] text-[#4F9DFF] hover:underline">FULL GRAPH</button>
             </div>
             <div className="ib-card p-3 h-36 flex items-center justify-center relative overflow-hidden">
-              {/* Mini graph visualization */}
               <svg width="100%" height="100%" viewBox="0 0 200 120">
-                <line x1="100" y1="60" x2="50" y2="30" stroke="#4F9DFF" strokeWidth="1" strokeOpacity="0.4" />
-                <line x1="100" y1="60" x2="160" y2="40" stroke="#7C5CFC" strokeWidth="1" strokeOpacity="0.4" />
-                <line x1="100" y1="60" x2="140" y2="95" stroke="#34D399" strokeWidth="1" strokeOpacity="0.4" />
-                <circle cx="100" cy="60" r="14" fill="#1E3A5F" stroke="#4F9DFF" strokeWidth="1.5" />
-                <circle cx="50" cy="30" r="9" fill="#1E3A5F" stroke="#7C5CFC" strokeWidth="1" />
-                <circle cx="160" cy="40" r="9" fill="#1E3A5F" stroke="#4F9DFF" strokeWidth="1" />
-                <circle cx="140" cy="95" r="9" fill="#1E3A5F" stroke="#34D399" strokeWidth="1" />
+                {[[100,60,50,30,"#4F9DFF"],[100,60,160,40,"#7C5CFC"],[100,60,140,95,"#34D399"]].map(([x1,y1,x2,y2,c],i) => (
+                  <motion.line key={i} x1={x1} y1={y1} x2={x2} y2={y2} stroke={c} strokeWidth="1"
+                    initial={{ pathLength: 0, opacity: 0 }} animate={{ pathLength: 1, opacity: 0.5 }}
+                    transition={{ duration: 0.8, delay: i * 0.2 }} />
+                ))}
+                {[[100,60,14,"#4F9DFF",true],[50,30,9,"#7C5CFC",false],[160,40,9,"#4F9DFF",false],[140,95,9,"#34D399",false]].map(([cx,cy,r,c,pulse],i) => (
+                  <motion.circle key={i} cx={cx} cy={cy} r={r} fill="#1E3A5F" stroke={c} strokeWidth={pulse ? 1.5 : 1}
+                    animate={pulse ? { r: [r, r+2, r] } : {}}
+                    transition={{ duration: 2, repeat: Infinity }}
+                    style={{ filter: `drop-shadow(0 0 4px ${c}80)` }}
+                  />
+                ))}
                 <text x="100" y="64" textAnchor="middle" fill="#4F9DFF" fontSize="8">⚙</text>
               </svg>
               <p className="absolute bottom-2 left-0 right-0 text-center text-[10px] text-[#4A6080]">Click nodes to expand</p>
