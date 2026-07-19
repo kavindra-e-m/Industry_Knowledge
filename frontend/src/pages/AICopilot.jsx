@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Send, Mic, Bot, User, Zap, Share2, Clock, Sparkles } from "lucide-react";
 import PageShell from "../components/shared/PageShell";
@@ -108,7 +108,8 @@ function Message({ msg, isNew }) {
                   {msg.actions.map((a) => (
                     <motion.button
                       key={a}
-                      className="px-3 py-1.5 rounded-lg text-[11px] font-semibold text-[#4F9DFF] border border-[#4F9DFF]/30 hover:bg-[#4F9DFF]/10 transition-all"
+                      onClick={() => sendQuery(a)}
+                      className="px-3 py-1.5 rounded-lg text-[11px] font-semibold text-[#2563EB] border border-[#2563EB]/30 hover:bg-[#2563EB]/10 transition-all"
                       whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.96 }}
                     >
                       {a}
@@ -127,10 +128,18 @@ function Message({ msg, isNew }) {
 
 export default function AICopilot() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [messages, setMessages] = useState(INITIAL_MESSAGES);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const bottomRef = useRef(null);
+
+  useEffect(() => {
+    if (location.state?.initialPrompt) {
+      sendQuery(location.state.initialPrompt);
+      navigate(location.pathname, { replace: true, state: {} });
+    }
+  }, [location.state]);
 
   useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: "smooth" }); }, [messages]);
 

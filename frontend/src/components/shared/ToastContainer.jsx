@@ -3,19 +3,19 @@ import { CheckCircle, AlertTriangle, Info, X, Zap } from "lucide-react";
 import { useToastStore } from "../../store/toastStore";
 
 const ICONS = {
-  success: <CheckCircle size={14} className="text-[#34D399]" />,
-  error: <AlertTriangle size={14} className="text-[#FF5C5C]" />,
-  warning: <AlertTriangle size={14} className="text-[#FBBF24]" />,
-  info: <Info size={14} className="text-[#4F9DFF]" />,
-  ai: <Zap size={14} className="text-[#7C5CFC]" />,
+  success: <CheckCircle size={14} className="text-[#059669]" />,
+  error: <AlertTriangle size={14} className="text-[#DC2626]" />,
+  warning: <AlertTriangle size={14} className="text-[#D97706]" />,
+  info: <Info size={14} className="text-[#2563EB]" />,
+  ai: <Zap size={14} className="text-[#7C3AED]" />,
 };
 
 const COLORS = {
-  success: { border: "rgba(52,211,153,0.3)", bg: "rgba(52,211,153,0.06)" },
-  error:   { border: "rgba(255,92,92,0.3)",  bg: "rgba(255,92,92,0.06)" },
-  warning: { border: "rgba(251,191,36,0.3)", bg: "rgba(251,191,36,0.06)" },
-  info:    { border: "rgba(79,157,255,0.3)", bg: "rgba(79,157,255,0.06)" },
-  ai:      { border: "rgba(124,92,252,0.3)", bg: "rgba(124,92,252,0.06)" },
+  success: { border: "rgba(5,150,105,0.2)", bg: "rgba(5,150,105,0.04)" },
+  error:   { border: "rgba(220,38,38,0.2)",  bg: "rgba(220,38,38,0.04)" },
+  warning: { border: "rgba(217,119,6,0.2)",  bg: "rgba(217,119,6,0.04)" },
+  info:    { border: "rgba(37,99,235,0.2)",  bg: "rgba(37,99,235,0.04)" },
+  ai:      { border: "rgba(124,58,237,0.2)", bg: "rgba(124,58,237,0.04)" },
 };
 
 export default function ToastContainer() {
@@ -33,20 +33,19 @@ export default function ToastContainer() {
               animate={{ opacity: 1, x: 0, scale: 1 }}
               exit={{ opacity: 0, x: 60, scale: 0.92 }}
               transition={{ type: "spring", stiffness: 380, damping: 30 }}
-              className="pointer-events-auto flex items-start gap-3 px-4 py-3 rounded-xl min-w-[260px] max-w-[340px]"
+              className="pointer-events-auto flex items-start gap-3 px-4 py-3 rounded-xl min-w-[260px] max-w-[340px] border shadow-lg"
               style={{
-                background: `rgba(15,28,46,0.92)`,
+                background: `rgba(255, 255, 255, 0.95)`,
                 backdropFilter: "blur(16px)",
-                border: `1px solid ${c.border}`,
-                boxShadow: `0 8px 32px rgba(0,0,0,0.5), 0 0 0 1px ${c.border}`,
+                borderColor: c.border,
               }}
             >
               <div className="mt-0.5 shrink-0">{ICONS[t.type] ?? ICONS.info}</div>
               <div className="flex-1 min-w-0">
-                {t.title && <p className="text-[12px] font-semibold text-white font-sora">{t.title}</p>}
-                {t.message && <p className="text-[11px] text-[#8BA3C7] mt-0.5 leading-relaxed">{t.message}</p>}
+                {t.title && <p className="text-[12px] font-bold text-[#0F172A] font-sora">{t.title}</p>}
+                {t.message && <p className="text-[11px] text-[#475569] mt-0.5 leading-relaxed">{t.message}</p>}
               </div>
-              <button onClick={() => remove(t.id)} className="text-[#4A6080] hover:text-[#8BA3C7] transition-colors shrink-0 mt-0.5">
+              <button onClick={() => remove(t.id)} className="text-[#64748B] hover:text-[#0F172A] transition-colors shrink-0 mt-0.5">
                 <X size={12} />
               </button>
             </motion.div>

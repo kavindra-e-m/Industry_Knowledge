@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Search, Bell, Radio, BarChart2, X } from "lucide-react";
 import { useAlertStore } from "../../store/alertStore";
@@ -12,6 +13,7 @@ const SUGGESTIONS = [
 ];
 
 export default function Topbar({ placeholder = "Query plant data..." }) {
+  const navigate = useNavigate();
   const [time, setTime] = useState(new Date());
   const [searchOpen, setSearchOpen] = useState(false);
   const [query, setQuery] = useState("");
@@ -119,9 +121,11 @@ export default function Topbar({ placeholder = "Query plant data..." }) {
 
         {/* Icons */}
         <motion.button
+          onClick={() => navigate("/")}
           className="w-7 h-7 rounded-lg flex items-center justify-center text-[#475569] hover:text-[#0F172A] hover:bg-[#F1F5F9] transition-all"
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
+          title="Dashboard"
         >
           <BarChart2 size={14} />
         </motion.button>
@@ -165,10 +169,12 @@ export default function Topbar({ placeholder = "Query plant data..." }) {
 
         {/* Avatar */}
         <motion.div
+          onClick={() => navigate("/settings")}
           className="w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-bold text-white cursor-pointer"
           style={{ background: "linear-gradient(135deg, #2563EB, #7C3AED)" }}
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
+          title="Settings"
         >
           A
         </motion.div>

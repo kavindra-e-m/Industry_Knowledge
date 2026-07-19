@@ -25,9 +25,9 @@ const LEGEND = [
 ];
 
 const RELATIONS = [
-  { icon: FileText, color: "#7C3AED", label: "Standard Operating Proc.", sub: "Associated Document" },
-  { icon: AlertTriangle, color: "#DC2626", label: "Thermal Anomaly Detected", sub: "Linked Incident" },
-  { icon: ShieldCheck, color: "#10B981", label: "Environment Safety Regs", sub: "Compliance Rule" },
+  { icon: FileText, color: "#7C3AED", label: "Standard Operating Proc.", sub: "Associated Document", to: "/documents" },
+  { icon: AlertTriangle, color: "#DC2626", label: "Thermal Anomaly Detected", sub: "Linked Incident", to: "/maintenance" },
+  { icon: ShieldCheck, color: "#10B981", label: "Environment Safety Regs", sub: "Compliance Rule", to: "/compliance" },
 ];
 
 const getNode = (id) => NODES.find((n) => n.id === id);
@@ -137,7 +137,7 @@ export default function KnowledgeGraph() {
               <p className="ib-label mb-3">SEMANTIC RELATIONSHIPS</p>
               <div className="space-y-2 font-jakarta">
                 {RELATIONS.map((r, i) => (
-                  <button key={i} className="w-full flex items-center gap-3 p-3 rounded-xl border border-[#E2E8F0] hover:border-[#2563EB] hover:bg-[#F8FAFC] transition-all text-left">
+                  <button onClick={() => navigate(r.to)} key={i} className="w-full flex items-center gap-3 p-3 rounded-xl border border-[#E2E8F0] hover:border-[#2563EB] hover:bg-[#F8FAFC] transition-all text-left">
                     <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" style={{ background: `${r.color}10` }}>
                       <r.icon size={14} style={{ color: r.color }} />
                     </div>
