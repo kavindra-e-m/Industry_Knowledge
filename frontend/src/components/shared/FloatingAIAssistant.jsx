@@ -4,11 +4,11 @@ import { Bot, X, Zap, GitBranch, Package, FileSearch, Activity } from "lucide-re
 import { useToastStore } from "../../store/toastStore";
 
 const ACTIONS = [
-  { label: "Ask AI", icon: Bot, color: "#7C5CFC" },
-  { label: "Generate RCA", icon: GitBranch, color: "#FF5C5C" },
-  { label: "Generate Audit", icon: Package, color: "#4F9DFF" },
-  { label: "Search Documents", icon: FileSearch, color: "#34D399" },
-  { label: "Predict Failure", icon: Activity, color: "#FBBF24" },
+  { label: "Ask AI", icon: Bot, color: "#7C3AED" },
+  { label: "Generate RCA", icon: GitBranch, color: "#DC2626" },
+  { label: "Generate Audit", icon: Package, color: "#2563EB" },
+  { label: "Search Documents", icon: FileSearch, color: "#059669" },
+  { label: "Predict Failure", icon: Activity, color: "#D97706" },
 ];
 
 export default function FloatingAIAssistant() {
@@ -39,17 +39,17 @@ export default function FloatingAIAssistant() {
                 exit={{ opacity: 0, x: 20 }}
                 transition={{ delay: i * 0.04 }}
                 onClick={() => handleAction(label)}
-                className="flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-[12px] font-semibold text-white whitespace-nowrap"
+                className="flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-[12px] font-semibold text-[#0F172A] whitespace-nowrap border"
                 style={{
-                  background: "rgba(15,28,46,0.95)",
+                  background: "rgba(255, 255, 255, 0.95)",
                   backdropFilter: "blur(16px)",
-                  border: `1px solid ${color}35`,
-                  boxShadow: `0 4px 20px rgba(0,0,0,0.4), 0 0 0 1px ${color}20`,
+                  borderColor: `${color}30`,
+                  boxShadow: `0 10px 25px rgba(0, 0, 0, 0.06), 0 0 0 1px ${color}10`,
                 }}
-                whileHover={{ x: -3, boxShadow: `0 6px 24px rgba(0,0,0,0.5), 0 0 12px ${color}30` }}
+                whileHover={{ x: -3, boxShadow: `0 12px 30px rgba(0, 0, 0, 0.08), 0 0 12px ${color}20` }}
               >
                 <Icon size={13} style={{ color }} />
-                {label}
+                <span>{label}</span>
               </motion.button>
             ))}
           </motion.div>
@@ -59,23 +59,23 @@ export default function FloatingAIAssistant() {
       {/* Main FAB */}
       <motion.button
         onClick={() => setOpen((o) => !o)}
-        className="w-12 h-12 rounded-2xl flex items-center justify-center relative"
+        className="w-12 h-12 rounded-2xl flex items-center justify-center relative border border-transparent"
         style={{
           background: open
-            ? "linear-gradient(135deg, #1E3A5F, #16263D)"
-            : "linear-gradient(135deg, #7C5CFC, #4F9DFF)",
+            ? "#F1F5F9"
+            : "linear-gradient(135deg, #2563EB, #7C3AED)",
           boxShadow: open
-            ? "0 4px 20px rgba(0,0,0,0.4)"
-            : "0 4px 24px rgba(124,92,252,0.45), 0 0 0 1px rgba(124,92,252,0.3)",
+            ? "0 4px 20px rgba(0,0,0,0.06), inset 0 0 0 1px rgba(0,0,0,0.05)"
+            : "0 4px 24px rgba(37,99,235,0.2), 0 0 0 1px rgba(37,99,235,0.15)",
         }}
-        animate={{ scale: [1, 1.04, 1] }}
+        animate={{ scale: [1, 1.02, 1] }}
         transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-        whileHover={{ scale: 1.1 }}
-        whileTap={{ scale: 0.93 }}
+        whileHover={{ scale: 1.08 }}
+        whileTap={{ scale: 0.95 }}
       >
         <AnimatePresence mode="wait">
           {open
-            ? <motion.div key="x" initial={{ rotate: -90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: 90, opacity: 0 }} transition={{ duration: 0.18 }}><X size={18} className="text-white" /></motion.div>
+            ? <motion.div key="x" initial={{ rotate: -90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: 90, opacity: 0 }} transition={{ duration: 0.18 }}><X size={18} className="text-[#0F172A]" /></motion.div>
             : <motion.div key="bot" initial={{ rotate: 90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: -90, opacity: 0 }} transition={{ duration: 0.18 }}><Bot size={18} className="text-white" /></motion.div>
           }
         </AnimatePresence>
@@ -83,8 +83,8 @@ export default function FloatingAIAssistant() {
         {!open && (
           <motion.span
             className="absolute inset-0 rounded-2xl"
-            style={{ border: "2px solid rgba(124,92,252,0.5)" }}
-            animate={{ scale: [1, 1.5], opacity: [0.6, 0] }}
+            style={{ border: "2px solid rgba(37, 99, 235, 0.4)" }}
+            animate={{ scale: [1, 1.4], opacity: [0.5, 0] }}
             transition={{ duration: 2, repeat: Infinity, ease: "easeOut" }}
           />
         )}
