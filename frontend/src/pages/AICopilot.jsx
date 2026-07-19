@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Send, Mic, Bot, User, Zap, Share2, Clock, Sparkles } from "lucide-react";
 import PageShell from "../components/shared/PageShell";
@@ -127,10 +127,18 @@ function Message({ msg, isNew }) {
 
 export default function AICopilot() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [messages, setMessages] = useState(INITIAL_MESSAGES);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const bottomRef = useRef(null);
+
+  useEffect(() => {
+    if (location.state?.initialPrompt) {
+      sendQuery(location.state.initialPrompt);
+      navigate(location.pathname, { replace: true, state: {} });
+    }
+  }, [location.state]);
 
   useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: "smooth" }); }, [messages]);
 
