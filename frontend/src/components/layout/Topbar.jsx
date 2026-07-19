@@ -1,9 +1,10 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Search, Bell, Radio, BarChart2, X } from "lucide-react";
+import { Search, Bell, Radio, BarChart2, X, Moon, Sun } from "lucide-react";
 import { useAlertStore } from "../../store/alertStore";
 import { useUiStore } from "../../store/uiStore";
+import { useThemeStore } from "../../store/themeStore";
 
 const SUGGESTIONS = [
   "Turbine-04 thermal deviation",
@@ -22,6 +23,8 @@ export default function Topbar({ placeholder = "Query plant data..." }) {
   const alerts = useAlertStore((s) => s.alerts);
   const criticalCount = alerts.filter((a) => a.severity === "critical").length;
   const openTab = useUiStore((s) => s.openTab);
+  const theme = useThemeStore((s) => s.theme);
+  const toggleTheme = useThemeStore((s) => s.toggleTheme);
 
   useEffect(() => {
     const t = setInterval(() => setTime(new Date()), 1000);
@@ -104,6 +107,39 @@ export default function Topbar({ placeholder = "Query plant data..." }) {
       </div>
 
       <div className="flex items-center gap-2 ml-auto">
+        {/* Theme Toggle */}
+        <motion.button
+          onClick={toggleTheme}
+          className="w-7 h-7 rounded-lg flex items-center justify-center text-[#475569] hover:text-[#0F172A] hover:bg-[#F1F5F9] dark:text-[#94A3B8] dark:hover:text-[#F1F5F9] dark:hover:bg-[#1E293B] transition-all"
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
+          title={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
+        >
+          <AnimatePresence mode="wait">
+            {theme === "dark" ? (
+              <motion.div
+                key="sun"
+                initial={{ rotate: -90, opacity: 0 }}
+                animate={{ rotate: 0, opacity: 1 }}
+                exit={{ rotate: 90, opacity: 0 }}
+                transition={{ duration: 0.2 }}
+              >
+                <Sun size={14} />
+              </motion.div>
+            ) : (
+              <motion.div
+                key="moon"
+                initial={{ rotate: 90, opacity: 0 }}
+                animate={{ rotate: 0, opacity: 1 }}
+                exit={{ rotate: -90, opacity: 0 }}
+                transition={{ duration: 0.2 }}
+              >
+                <Moon size={14} />
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </motion.button>
+
         {/* AI Active badge */}
         <motion.div
           className="flex items-center gap-1.5 px-2.5 py-1 rounded-full border cursor-default ai-active-badge"

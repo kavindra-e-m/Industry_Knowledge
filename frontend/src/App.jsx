@@ -1,4 +1,4 @@
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useEffect } from "react";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import Sidebar from "./components/layout/Sidebar";
@@ -7,6 +7,7 @@ import SlidingDrawer from "./components/layout/SlidingDrawer";
 import AnimatedBackground from "./components/shared/AnimatedBackground";
 import FloatingAIAssistant from "./components/shared/FloatingAIAssistant";
 import ToastContainer from "./components/shared/ToastContainer";
+import { useThemeStore } from "./store/themeStore";
 
 const Dashboard             = lazy(() => import("./pages/Dashboard"));
 const AICopilot             = lazy(() => import("./pages/AICopilot"));
@@ -48,6 +49,12 @@ function PageLoader() {
 
 function MainContent() {
   const location = useLocation();
+  const initTheme = useThemeStore((s) => s.initTheme);
+  
+  useEffect(() => {
+    initTheme();
+  }, [initTheme]);
+  
   return (
     <div className="flex h-screen overflow-hidden relative w-full" style={{ background: "#F8F9FC" }}>
       {/* Background Mesh Glows */}
