@@ -44,8 +44,8 @@ export default function Topbar({ placeholder = "Query plant data..." }) {
 
   return (
     <header
-      className="h-12 shrink-0 flex items-center gap-3 px-4 border-b border-[#1C1C22] relative z-20"
-      style={{ background: "rgba(8,8,10,0.85)", backdropFilter: "blur(16px)" }}
+      className="h-12 shrink-0 flex items-center gap-3 px-4 border-b border-[#E2E8F0] relative z-20"
+      style={{ background: "rgba(255, 255, 255, 0.8)", backdropFilter: "blur(16px)" }}
     >
       {/* Search */}
       <div className="relative">
@@ -54,7 +54,7 @@ export default function Topbar({ placeholder = "Query plant data..." }) {
           transition={{ type: "spring", stiffness: 320, damping: 28 }}
           className="relative"
         >
-          <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#71717A] z-10" />
+          <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#64748B] z-10" />
           <input
             ref={inputRef}
             className="ib-input w-full pl-8 pr-8 py-1.5 text-xs"
@@ -65,7 +65,7 @@ export default function Topbar({ placeholder = "Query plant data..." }) {
             onChange={(e) => setQuery(e.target.value)}
           />
           {query && (
-            <button onClick={() => setQuery("")} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[#71717A] hover:text-white">
+            <button onClick={() => setQuery("")} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[#64748B] hover:text-[#0F172A]">
               <X size={11} />
             </button>
           )}
@@ -80,7 +80,7 @@ export default function Topbar({ placeholder = "Query plant data..." }) {
               exit={{ opacity: 0, y: -6, scale: 0.97 }}
               transition={{ duration: 0.15 }}
               className="absolute top-full mt-1.5 left-0 w-72 ib-glass rounded-xl overflow-hidden z-50"
-              style={{ boxShadow: "0 16px 48px rgba(0,0,0,0.8)" }}
+              style={{ boxShadow: "0 10px 30px rgba(0,0,0,0.05)" }}
             >
               <p className="ib-label px-3 pt-2.5 pb-1">RECENT SEARCHES</p>
               {filtered.map((s, i) => (
@@ -90,9 +90,9 @@ export default function Topbar({ placeholder = "Query plant data..." }) {
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: i * 0.04 }}
                   onMouseDown={() => setQuery(s)}
-                  className="w-full text-left flex items-center gap-2 px-3 py-2 text-[12px] text-[#A1A1AA] hover:text-white hover:bg-[#14141A] transition-colors"
+                  className="w-full text-left flex items-center gap-2 px-3 py-2 text-[12px] text-[#475569] hover:text-[#0F172A] hover:bg-[#F1F5F9] transition-colors"
                 >
-                  <Search size={10} className="text-[#CCFF00] shrink-0" />
+                  <Search size={10} className="text-[#2563EB] shrink-0" />
                   {s}
                 </motion.button>
               ))}
@@ -105,21 +105,21 @@ export default function Topbar({ placeholder = "Query plant data..." }) {
         {/* AI Active badge */}
         <motion.div
           className="flex items-center gap-1.5 px-2.5 py-1 rounded-full border cursor-default ai-active-badge"
-          style={{ borderColor: "rgba(204,255,0,0.3)", background: "rgba(204,255,0,0.05)" }}
+          style={{ borderColor: "rgba(37, 99, 235, 0.2)", background: "rgba(37, 99, 235, 0.05)" }}
           animate={heartbeat ? { scale: [1, 1.06, 1] } : {}}
           transition={{ duration: 0.4 }}
         >
           <motion.span
-            className="w-1.5 h-1.5 rounded-full bg-[#CCFF00]"
+            className="w-1.5 h-1.5 rounded-full bg-[#2563EB]"
             animate={{ scale: [1, 1.4, 1], opacity: [1, 0.5, 1] }}
             transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
           />
-          <span className="text-[10px] font-bold text-[#CCFF00] font-mono">AI ACTIVE</span>
+          <span className="text-[10px] font-bold text-[#2563EB] font-mono">AI ACTIVE</span>
         </motion.div>
 
         {/* Icons */}
         <motion.button
-          className="w-7 h-7 rounded-lg flex items-center justify-center text-[#71717A] hover:text-white hover:bg-[#14141A] transition-all"
+          className="w-7 h-7 rounded-lg flex items-center justify-center text-[#475569] hover:text-[#0F172A] hover:bg-[#F1F5F9] transition-all"
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
         >
@@ -128,7 +128,7 @@ export default function Topbar({ placeholder = "Query plant data..." }) {
 
         <motion.button
           onClick={() => openTab("telemetry")}
-          className="w-7 h-7 rounded-lg flex items-center justify-center text-[#71717A] hover:text-white hover:bg-[#14141A] transition-all"
+          className="w-7 h-7 rounded-lg flex items-center justify-center text-[#475569] hover:text-[#0F172A] hover:bg-[#F1F5F9] transition-all"
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
           title="Telemetry Stream"
@@ -139,7 +139,7 @@ export default function Topbar({ placeholder = "Query plant data..." }) {
         {/* Notifications (triggers sliding drawer alerts tab) */}
         <motion.button
           onClick={() => openTab("alerts")}
-          className="w-7 h-7 rounded-lg flex items-center justify-center text-[#71717A] hover:text-white hover:bg-[#14141A] transition-all relative"
+          className="w-7 h-7 rounded-lg flex items-center justify-center text-[#475569] hover:text-[#0F172A] hover:bg-[#F1F5F9] transition-all relative"
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
           title="Active Alerts"
@@ -152,7 +152,7 @@ export default function Topbar({ placeholder = "Query plant data..." }) {
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
                 exit={{ scale: 0 }}
-                className="absolute -top-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-[#B100FF] text-white text-[8px] font-bold flex items-center justify-center animate-bounce"
+                className="absolute -top-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-[#DC2626] text-white text-[8px] font-bold flex items-center justify-center animate-bounce"
               >
                 {criticalCount}
               </motion.span>
@@ -161,12 +161,12 @@ export default function Topbar({ placeholder = "Query plant data..." }) {
         </motion.button>
 
         {/* Time */}
-        <span className="text-[11px] font-mono text-[#71717A] tabular-nums">{fmt}</span>
+        <span className="text-[11px] font-mono text-[#64748B] tabular-nums">{fmt}</span>
 
         {/* Avatar */}
         <motion.div
-          className="w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-bold text-black cursor-pointer"
-          style={{ background: "linear-gradient(135deg, #CCFF00, #B100FF)" }}
+          className="w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-bold text-white cursor-pointer"
+          style={{ background: "linear-gradient(135deg, #2563EB, #7C3AED)" }}
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
         >

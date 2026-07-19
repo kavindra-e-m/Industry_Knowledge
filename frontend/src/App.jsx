@@ -23,20 +23,20 @@ const Settings              = lazy(() => import("./pages/Settings"));
 
 function PageLoader() {
   return (
-    <div className="flex-1 flex flex-col items-center justify-center gap-4 relative z-10" style={{ background: "#060B14" }}>
+    <div className="flex-1 flex flex-col items-center justify-center gap-4 relative z-10" style={{ background: "#F8F9FC" }}>
       <motion.div
         className="w-12 h-12 rounded-2xl flex items-center justify-center"
-        style={{ background: "linear-gradient(135deg, #4F9DFF22, #7C5CFC22)", border: "1px solid rgba(79,157,255,0.2)" }}
+        style={{ background: "linear-gradient(135deg, #2563EB22, #7C3AED22)", border: "1px solid rgba(37,99,235,0.2)" }}
         animate={{ scale: [1, 1.08, 1], opacity: [0.7, 1, 0.7] }}
         transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut" }}
       >
-        <div className="w-5 h-5 rounded-lg" style={{ background: "linear-gradient(135deg, #4F9DFF, #7C5CFC)" }} />
+        <div className="w-5 h-5 rounded-lg" style={{ background: "linear-gradient(135deg, #2563EB, #7C3AED)" }} />
       </motion.div>
       <div className="flex gap-1.5">
         {[0, 1, 2].map((i) => (
           <motion.div
             key={i}
-            className="w-1.5 h-1.5 rounded-full bg-[#4F9DFF]"
+            className="w-1.5 h-1.5 rounded-full bg-[#2563EB]"
             animate={{ opacity: [0.3, 1, 0.3], y: [0, -4, 0] }}
             transition={{ duration: 0.9, repeat: Infinity, delay: i * 0.18 }}
           />
@@ -49,7 +49,7 @@ function PageLoader() {
 function MainContent() {
   const location = useLocation();
   return (
-    <div className="flex h-screen overflow-hidden relative w-full" style={{ background: "#060B14" }}>
+    <div className="flex h-screen overflow-hidden relative w-full" style={{ background: "#F8F9FC" }}>
       {/* Background Mesh Glows */}
       <BackgroundGlows />
       <AnimatedBackground />
