@@ -2,6 +2,8 @@ import { lazy, Suspense } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import Sidebar from "./components/layout/Sidebar";
+import BackgroundGlows from "./components/layout/BackgroundGlows";
+import SlidingDrawer from "./components/layout/SlidingDrawer";
 import AnimatedBackground from "./components/shared/AnimatedBackground";
 import FloatingAIAssistant from "./components/shared/FloatingAIAssistant";
 import ToastContainer from "./components/shared/ToastContainer";
@@ -21,7 +23,7 @@ const Settings              = lazy(() => import("./pages/Settings"));
 
 function PageLoader() {
   return (
-    <div className="flex-1 flex flex-col items-center justify-center gap-4" style={{ background: "#07111F" }}>
+    <div className="flex-1 flex flex-col items-center justify-center gap-4 relative z-10" style={{ background: "#060B14" }}>
       <motion.div
         className="w-12 h-12 rounded-2xl flex items-center justify-center"
         style={{ background: "linear-gradient(135deg, #4F9DFF22, #7C5CFC22)", border: "1px solid rgba(79,157,255,0.2)" }}
@@ -47,11 +49,14 @@ function PageLoader() {
 export default function App() {
   return (
     <BrowserRouter>
-      <div className="flex h-screen overflow-hidden relative" style={{ background: "#07111F" }}>
+      <div className="flex h-screen overflow-hidden relative" style={{ background: "#060B14" }}>
+        {/* Background Mesh Glows */}
+        <BackgroundGlows />
         <AnimatedBackground />
+
         <div className="relative z-10 flex w-full h-full">
           <Sidebar />
-          <main className="flex-1 flex flex-col overflow-hidden">
+          <main className="flex-1 flex flex-col overflow-hidden relative z-10">
             <Suspense fallback={<PageLoader />}>
               <Routes>
                 <Route path="/"                element={<Dashboard />} />
@@ -70,6 +75,10 @@ export default function App() {
             </Suspense>
           </main>
         </div>
+
+        {/* Global Operations Console Sliding Drawer */}
+        <SlidingDrawer />
+
         <FloatingAIAssistant />
         <ToastContainer />
       </div>

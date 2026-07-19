@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Search, Bell, Radio, BarChart2, X } from "lucide-react";
 import { useAlertStore } from "../../store/alertStore";
+import { useUiStore } from "../../store/uiStore";
 
 const SUGGESTIONS = [
   "Turbine-04 thermal deviation",
@@ -14,11 +15,11 @@ export default function Topbar({ placeholder = "Query plant data..." }) {
   const [time, setTime] = useState(new Date());
   const [searchOpen, setSearchOpen] = useState(false);
   const [query, setQuery] = useState("");
-  const [notifOpen, setNotifOpen] = useState(false);
   const [heartbeat, setHeartbeat] = useState(false);
   const inputRef = useRef(null);
   const alerts = useAlertStore((s) => s.alerts);
   const criticalCount = alerts.filter((a) => a.severity === "critical").length;
+  const openTab = useUiStore((s) => s.openTab);
 
   useEffect(() => {
     const t = setInterval(() => setTime(new Date()), 1000);
@@ -44,7 +45,7 @@ export default function Topbar({ placeholder = "Query plant data..." }) {
   return (
     <header
       className="h-12 shrink-0 flex items-center gap-3 px-4 border-b border-[#1E3A5F] relative z-20"
-      style={{ background: "rgba(10,20,34,0.96)", backdropFilter: "blur(16px)" }}
+      style={{ background: "rgba(10,20,34,0.9)", backdropFilter: "blur(16px)" }}
     >
       {/* Search */}
       <div className="relative">
@@ -117,74 +118,47 @@ export default function Topbar({ placeholder = "Query plant data..." }) {
         </motion.div>
 
         {/* Icons */}
-        {[BarChart2, Radio].map((Icon, i) => (
-          <motion.button
-            key={i}
-            className="w-7 h-7 rounded-lg flex items-center justify-center text-[#4A6080] hover:text-[#8BA3C7] hover:bg-[#1E3A5F] transition-all"
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
-          >
-            <Icon size={14} />
-          </motion.button>
-        ))}
+        <motion.button
+          className="w-7 h-7 rounded-lg flex items-center justify-center text-[#4A6080] hover:text-[#8BA3C7] hover:bg-[#1E3A5F] transition-all"
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
+        >
+          <BarChart2 size={14} />
+        </motion.button>
 
-        {/* Notifications */}
-        <div className="relative">
-          <motion.button
-            className="w-7 h-7 rounded-lg flex items-center justify-center text-[#4A6080] hover:text-[#8BA3C7] hover:bg-[#1E3A5F] transition-all relative"
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
-            onClick={() => setNotifOpen((o) => !o)}
-          >
-            <Bell size={14} />
-            <AnimatePresence>
-              {criticalCount > 0 && (
-                <motion.span
-                  key="badge"
-                  initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }}
-                  className="absolute -top-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-[#FF5C5C] text-white text-[8px] font-bold flex items-center justify-center"
-                >
-                  {criticalCount}
-                </motion.span>
-              )}
-            </AnimatePresence>
-          </motion.button>
+        <motion.button
+          onClick={() => openTab("telemetry")}
+          className="w-7 h-7 rounded-lg flex items-center justify-center text-[#4A6080] hover:text-[#8BA3C7] hover:bg-[#1E3A5F] transition-all"
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
+          title="Telemetry Stream"
+        >
+          <Radio size={14} />
+        </motion.button>
 
+        {/* Notifications (triggers sliding drawer alerts tab) */}
+        <motion.button
+          onClick={() => openTab("alerts")}
+          className="w-7 h-7 rounded-lg flex items-center justify-center text-[#4A6080] hover:text-[#8BA3C7] hover:bg-[#1E3A5F] transition-all relative"
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
+          title="Active Alerts"
+        >
+          <Bell size={14} />
           <AnimatePresence>
-            {notifOpen && (
-              <motion.div
-                initial={{ opacity: 0, y: -8, scale: 0.95 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: -8, scale: 0.95 }}
-                transition={{ type: "spring", stiffness: 380, damping: 28 }}
-                className="absolute right-0 top-full mt-2 w-72 ib-glass rounded-xl overflow-hidden z-50"
-                style={{ boxShadow: "0 16px 48px rgba(0,0,0,0.6)" }}
+            {criticalCount > 0 && (
+              <motion.span
+                key="badge"
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                exit={{ scale: 0 }}
+                className="absolute -top-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-[#FF5C5C] text-white text-[8px] font-bold flex items-center justify-center animate-bounce"
               >
-                <div className="flex items-center justify-between px-3 py-2.5 border-b border-[#1E3A5F]">
-                  <p className="text-[12px] font-semibold text-white font-sora">Notifications</p>
-                  {criticalCount > 0 && <span className="ib-badge ib-badge-critical">{criticalCount} critical</span>}
-                </div>
-                <div className="max-h-64 overflow-y-auto">
-                  {alerts.slice(0, 5).map((a, i) => (
-                    <motion.div
-                      key={a.equipment_id + i}
-                      initial={{ opacity: 0, x: -8 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: i * 0.05 }}
-                      className="flex items-start gap-2.5 px-3 py-2.5 border-b border-[#1E3A5F]/50 hover:bg-[#1E3A5F]/40 transition-colors cursor-pointer"
-                    >
-                      <span className={`mt-1 w-1.5 h-1.5 rounded-full shrink-0 ${a.severity === "critical" ? "bg-[#FF5C5C]" : "bg-[#FBBF24]"}`} />
-                      <div>
-                        <p className="text-[11px] font-semibold text-white">{a.tag}</p>
-                        <p className="text-[10px] text-[#4A6080] mt-0.5">{a.predicted_component} · {a.rul_days}d RUL</p>
-                      </div>
-                    </motion.div>
-                  ))}
-                </div>
-              </motion.div>
+                {criticalCount}
+              </motion.span>
             )}
           </AnimatePresence>
-        </div>
+        </motion.button>
 
         {/* Time */}
         <span className="text-[11px] font-mono text-[#4A6080] tabular-nums">{fmt}</span>
