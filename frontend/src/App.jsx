@@ -7,6 +7,8 @@ import SlidingDrawer from "./components/layout/SlidingDrawer";
 import AnimatedBackground from "./components/shared/AnimatedBackground";
 import FloatingAIAssistant from "./components/shared/FloatingAIAssistant";
 import ToastContainer from "./components/shared/ToastContainer";
+import LoginPage from "./pages/LoginPage";
+import { useAuthStore } from "./store/authStore";
 
 const Dashboard             = lazy(() => import("./pages/Dashboard"));
 const AICopilot             = lazy(() => import("./pages/AICopilot"));
@@ -88,6 +90,12 @@ function MainContent() {
 }
 
 export default function App() {
+  const { user, login } = useAuthStore();
+
+  if (!user) {
+    return <LoginPage onLoginSuccess={(data) => login(data.user, data.access_token)} />;
+  }
+
   return (
     <BrowserRouter>
       <MainContent />

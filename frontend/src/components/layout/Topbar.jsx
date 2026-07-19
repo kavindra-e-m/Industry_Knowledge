@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Search, Bell, Radio, BarChart2, X } from "lucide-react";
 import { useAlertStore } from "../../store/alertStore";
 import { useUiStore } from "../../store/uiStore";
+import { useAuthStore } from "../../store/authStore";
 
 const SUGGESTIONS = [
   "Turbine-04 thermal deviation",
@@ -18,8 +19,12 @@ export default function Topbar({ placeholder = "Query plant data..." }) {
   const [searchOpen, setSearchOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [heartbeat, setHeartbeat] = useState(false);
+  const [showNotifications, setShowNotifications] = useState(false);
   const inputRef = useRef(null);
   const alerts = useAlertStore((s) => s.alerts);
+  const { user } = useAuthStore();
+  
+  const initials = user?.full_name ? user.full_name.charAt(0).toUpperCase() : "U";
   const criticalCount = alerts.filter((a) => a.severity === "critical").length;
   const openTab = useUiStore((s) => s.openTab);
 
@@ -130,6 +135,7 @@ export default function Topbar({ placeholder = "Query plant data..." }) {
           <BarChart2 size={14} />
         </motion.button>
 
+<<<<<<< HEAD
         <motion.button
           onClick={() => openTab("telemetry")}
           className="w-7 h-7 rounded-lg flex items-center justify-center text-[#475569] hover:text-[#0F172A] hover:bg-[#F1F5F9] transition-all"
@@ -174,9 +180,9 @@ export default function Topbar({ placeholder = "Query plant data..." }) {
           style={{ background: "linear-gradient(135deg, #2563EB, #7C3AED)" }}
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
-          title="Settings"
+          title={user?.full_name || "Settings"}
         >
-          A
+          {initials}
         </motion.div>
       </div>
     </header>

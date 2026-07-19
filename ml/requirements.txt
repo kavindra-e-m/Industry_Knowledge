@@ -10,7 +10,7 @@ pandas==2.1.4
 extract-msg==0.48.0
 
 # OCR (PaddleOCR for CPU, pytesseract as fallback)
-paddlepaddle==2.6.1
+paddlepaddle==2.6.2
 paddleocr==2.7.3
 # pytesseract==0.3.10       # uncomment if PaddleOCR install fails on Windows
 

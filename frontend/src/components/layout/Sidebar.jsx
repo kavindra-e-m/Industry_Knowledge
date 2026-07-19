@@ -4,8 +4,9 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   LayoutDashboard, Bot, Share2, FileSearch, Wrench,
   GitBranch, ShieldCheck, Package, BookOpen, Workflow,
-  Settings, ChevronLeft, ChevronRight, Cpu
+  Settings, ChevronLeft, ChevronRight, Cpu, Zap, LogOut
 } from "lucide-react";
+import { useAuthStore } from "../../store/authStore";
 
 const MAIN_NAV = [
   { to: "/", label: "Dashboard", icon: LayoutDashboard },
@@ -26,6 +27,9 @@ const BOTTOM_NAV = [
 
 export default function Sidebar() {
   const [collapsed, setCollapsed] = useState(false);
+  const { user, logout } = useAuthStore();
+  
+  const initials = user?.full_name ? user.full_name.charAt(0).toUpperCase() : "U";
 
   return (
     <motion.aside
@@ -135,22 +139,34 @@ export default function Sidebar() {
         ))}
 
         {/* User profile */}
-        <div className="flex items-center gap-2.5 px-3 py-2.5 mt-1 rounded-xl hover:bg-[#F1F5F9] cursor-pointer transition-all">
-          <div className="w-7 h-7 rounded-full shrink-0 flex items-center justify-center text-xs font-bold text-white"
-            style={{ background: "linear-gradient(135deg, #2563EB 0%, #7C3AED 100%)" }}>
-            A
+        <div className="flex items-center justify-between px-2.5 py-2.5 mt-1 rounded-xl hover:bg-[#F1F5F9] transition-all group">
+          <div className="flex items-center gap-2.5 min-w-0">
+            <div className="w-7 h-7 rounded-full shrink-0 flex items-center justify-center text-xs font-bold text-white"
+              style={{ background: "linear-gradient(135deg, #2563EB 0%, #7C3AED 100%)" }}>
+              {initials}
+            </div>
+            <AnimatePresence>
+              {!collapsed && (
+                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }} className="min-w-0">
+                  <p className="text-[12px] font-semibold text-[#0F172A] whitespace-nowrap font-jakarta truncate">{user?.full_name || "Admin Shell"}</p>
+                  <div className="flex items-center gap-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#10B981]" />
+                    <p className="text-[10px] text-[#64748B] whitespace-nowrap truncate">{user?.role || "Secure Connection"}</p>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
-          <AnimatePresence>
-            {!collapsed && (
-              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }} className="min-w-0">
-                <p className="text-[12px] font-semibold text-[#0F172A] whitespace-nowrap font-jakarta">Admin Shell</p>
-                <div className="flex items-center gap-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#10B981]" />
-                  <p className="text-[10px] text-[#64748B] whitespace-nowrap">Secure Connection</p>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
+          {!collapsed && (
+            <button 
+              onClick={logout}
+              className="text-[#64748B] hover:text-[#EF4444] opacity-0 group-hover:opacity-100 transition-opacity p-1"
+              title="Logout"
+            >
+              <LogOut size={14} />
+            </button>
+          )}
+        </div>
         </div>
       </div>
     </motion.aside>

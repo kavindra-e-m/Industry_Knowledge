@@ -13,7 +13,7 @@ export default function LoginPage({ onLoginSuccess }) {
     setLoading(true);
     try {
       const data = await login(username, password);
-      onLoginSuccess(data.user);
+      onLoginSuccess(data);
     } catch (err) {
       setError(err.message || "Failed to authenticate");
     } finally {
