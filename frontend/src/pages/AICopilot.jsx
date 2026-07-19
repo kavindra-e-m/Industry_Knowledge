@@ -108,7 +108,8 @@ function Message({ msg, isNew }) {
                   {msg.actions.map((a) => (
                     <motion.button
                       key={a}
-                      className="px-3 py-1.5 rounded-lg text-[11px] font-semibold text-[#4F9DFF] border border-[#4F9DFF]/30 hover:bg-[#4F9DFF]/10 transition-all"
+                      onClick={() => sendQuery(a)}
+                      className="px-3 py-1.5 rounded-lg text-[11px] font-semibold text-[#2563EB] border border-[#2563EB]/30 hover:bg-[#2563EB]/10 transition-all"
                       whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.96 }}
                     >
                       {a}

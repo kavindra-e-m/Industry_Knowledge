@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { AlertTriangle, Zap, Calendar, TrendingUp, Activity } from "lucide-react";
 import {
@@ -63,6 +64,7 @@ function KpiTile({ label, value, unit = "", color = "#4F9DFF", icon: Icon, loadi
 }
 
 export default function Dashboard() {
+  const navigate = useNavigate();
   const { alerts, loading: aLoading } = useAlerts();
   const { averageScore, nonCompliantCount, loading: cLoading } = useCompliance();
   const [trendRange, setTrendRange] = useState("24h");
@@ -260,7 +262,8 @@ export default function Dashboard() {
                 ))}
               </div>
               <motion.button
-                className="w-full mt-3 py-2.5 rounded-xl text-[12px] font-semibold text-[#4F9DFF] border border-[#4F9DFF]/20 hover:bg-[#4F9DFF]/8 transition-all font-jakarta"
+                onClick={() => navigate("/copilot")}
+                className="w-full mt-3 py-2.5 rounded-xl text-[12px] font-semibold text-[#2563EB] border border-[#2563EB]/20 hover:bg-[#2563EB]/8 transition-all font-jakarta"
                 whileHover={{ scale: 1.01 }}
                 whileTap={{ scale: 0.98 }}
               >

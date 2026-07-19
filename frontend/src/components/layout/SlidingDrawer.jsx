@@ -1,11 +1,15 @@
 import { useEffect, useState, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, AlertTriangle, Activity, Bot, Send, Terminal, CheckSquare, Bell, Zap } from "lucide-react";
 import { useUiStore } from "../../store/uiStore";
 import { useAlertStore } from "../../store/alertStore";
+import { useToastStore } from "../../store/toastStore";
 import { createWebSocketStream } from "../../services/api";
 
 export default function SlidingDrawer() {
+  const navigate = useNavigate();
+  const push = useToastStore((s) => s.push);
   const { drawerOpen, drawerTab, setDrawerOpen, setDrawerTab } = useUiStore();
   const { alerts, loading, pushAlert } = useAlertStore();
 
@@ -239,11 +243,11 @@ export default function SlidingDrawer() {
                               {a.suggested_work_order}
                             </p>
                           </div>
-                          <div className="flex gap-2 mt-1">
-                            <button className="ib-btn ib-btn-critical text-[10px] px-3 py-1.5 rounded-lg flex-1 text-center justify-center font-bold">
+                           <div className="flex gap-2 mt-1">
+                            <button onClick={() => { push({ type: "success", title: "Work Order Dispatched", message: `AI-optimized inspection dispatched to field crew for ${a.tag}.`, duration: 3000 }); setDrawerOpen(false); }} className="ib-btn ib-btn-critical text-[10px] px-3 py-1.5 rounded-lg flex-1 text-center justify-center font-bold">
                               DISPATCH WORK ORDER
                             </button>
-                            <button className="ib-btn ib-btn-ghost text-[10px] px-3 py-1.5 rounded-lg border-[#CBD5E1]">
+                            <button onClick={() => push({ type: "info", title: "Alert Acknowledged", message: `Critical anomaly ticket for ${a.tag} flagged as acknowledged.`, duration: 2500 })} className="ib-btn ib-btn-ghost text-[10px] px-3 py-1.5 rounded-lg border-[#CBD5E1]">
                               ACK
                             </button>
                           </div>

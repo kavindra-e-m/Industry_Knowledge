@@ -1,8 +1,11 @@
+import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { AlertTriangle, Plus, Filter, CheckSquare, ExternalLink, TrendingUp } from "lucide-react";
 import PageShell from "../components/shared/PageShell";
 import StatRing from "../components/shared/StatRing";
 import { useAlerts } from "../hooks/useAlerts";
+import { useToastStore } from "../store/toastStore";
+import { useUiStore } from "../store/uiStore";
 
 const EQUIPMENT_CARDS = [
   { name: "Generator Unit G-7",  status: "Operational",         statusColor: "#34D399", rul: "1,248h", failProb: "4.2%",  health: 92, healthColor: "#34D399", img: "⚡" },
@@ -24,6 +27,9 @@ const stagger = { hidden: {}, show: { transition: { staggerChildren: 0.09 } } };
 const fadeUp  = { hidden: { opacity: 0, y: 14 }, show: { opacity: 1, y: 0, transition: { duration: 0.32, ease: "easeOut" } } };
 
 export default function PredictiveMaintenance() {
+  const navigate = useNavigate();
+  const push = useToastStore((s) => s.push);
+  const openTab = useUiStore((s) => s.openTab);
   const { alerts, loading } = useAlerts();
   const critical = alerts.filter((a) => a.severity === "critical");
 
@@ -102,8 +108,8 @@ export default function PredictiveMaintenance() {
                       <p className="text-[11px] text-[#8BA3C7] mb-3 leading-relaxed">{a.suggested_work_order.slice(0, 70)}...</p>
                       {i === 0 && (
                         <div className="flex gap-2">
-                          <motion.button className="ib-btn ib-btn-critical text-[10px] px-3 py-1.5" whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.96 }}>DISPATCH</motion.button>
-                          <motion.button className="ib-btn ib-btn-ghost text-[10px] px-3 py-1.5" whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.96 }}>DETAILS</motion.button>
+                          <motion.button onClick={() => push({ type: "success", title: "Work Order Dispatched", message: `AI-optimized inspection order dispatched for ${a.tag}.`, duration: 3000 })} className="ib-btn ib-btn-critical text-[10px] px-3 py-1.5" whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.96 }}>DISPATCH</motion.button>
+                          <motion.button onClick={() => navigate(`/equipment/${a.equipment_id || "pump-a1"}`)} className="ib-btn ib-btn-ghost text-[10px] px-3 py-1.5" whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.96 }}>DETAILS</motion.button>
                         </div>
                       )}
                     </>
@@ -111,7 +117,7 @@ export default function PredictiveMaintenance() {
                 </motion.div>
               ))}
             </div>
-            <button className="w-full mt-3 text-[11px] text-[#4F9DFF] hover:underline text-center">View all alerts →</button>
+            <button onClick={() => openTab("alerts")} className="w-full mt-3 text-[11px] text-[#2563EB] font-bold hover:underline text-center">View all alerts →</button>
           </motion.div>
 
           {/* Equipment Cards */}
