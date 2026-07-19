@@ -129,7 +129,7 @@ export default function SlidingDrawer() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={() => setDrawerOpen(false)}
-            className="fixed inset-0 bg-[#060B14]/60 backdrop-blur-sm z-40 cursor-pointer pointer-events-auto"
+            className="fixed inset-0 bg-slate-900/30 backdrop-blur-sm z-40 cursor-pointer pointer-events-auto"
           />
 
           {/* Drawer container */}
@@ -138,30 +138,30 @@ export default function SlidingDrawer() {
             animate={{ x: 0 }}
             exit={{ x: "100%" }}
             transition={{ type: "spring", stiffness: 350, damping: 30 }}
-            className="fixed top-0 right-0 h-screen w-96 max-w-full z-50 flex flex-col pointer-events-auto shadow-2xl border-l border-[#1E3A5F]"
+            className="fixed top-0 right-0 h-screen w-96 max-w-full z-50 flex flex-col pointer-events-auto shadow-2xl border-l border-[#E2E8F0]"
             style={{
-              background: "linear-gradient(180deg, rgba(15, 28, 46, 0.95) 0%, rgba(7, 17, 31, 0.98) 100%)",
+              background: "rgba(255, 255, 255, 0.95)",
               backdropFilter: "blur(20px)",
             }}
           >
             {/* Header */}
-            <div className="flex items-center justify-between p-4 border-b border-[#1E3A5F] shrink-0">
+            <div className="flex items-center justify-between p-4 border-b border-[#E2E8F0] shrink-0">
               <div className="flex items-center gap-2">
-                <span className="w-2.5 h-2.5 rounded-full bg-[#7C5CFC] animate-pulse" />
-                <h3 className="text-sm font-bold text-white font-sora tracking-wide">
+                <span className="w-2.5 h-2.5 rounded-full bg-[#2563EB] animate-pulse" />
+                <h3 className="text-sm font-bold text-[#0F172A] font-sora tracking-wide">
                   OPERATIONS CONSOLE
                 </h3>
               </div>
               <button
                 onClick={() => setDrawerOpen(false)}
-                className="w-7 h-7 rounded-lg flex items-center justify-center text-[#4A6080] hover:text-[#8BA3C7] hover:bg-[#1E3A5F] transition-all"
+                className="w-7 h-7 rounded-lg flex items-center justify-center text-[#64748B] hover:text-[#0F172A] hover:bg-[#F1F5F9] transition-all"
               >
                 <X size={15} />
               </button>
             </div>
 
             {/* Tabs */}
-            <div className="flex p-2 gap-1 bg-[#0F1C2E]/60 border-b border-[#1E3A5F] shrink-0">
+            <div className="flex p-2 gap-1 bg-[#F1F5F9] border-b border-[#E2E8F0] shrink-0">
               {[
                 { id: "alerts", label: "Alerts", count: criticalAlerts.length, icon: Bell },
                 { id: "telemetry", label: "Telemetry", icon: Terminal },
@@ -174,20 +174,20 @@ export default function SlidingDrawer() {
                     key={tab.id}
                     onClick={() => setDrawerTab(tab.id)}
                     className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-lg text-xs font-semibold transition-all relative ${
-                      isActive ? "text-white" : "text-[#4A6080] hover:text-[#8BA3C7]"
+                      isActive ? "text-[#2563EB]" : "text-[#64748B] hover:text-[#0F172A]"
                     }`}
                   >
                     {isActive && (
                       <motion.div
                         layoutId="activeDrawerTab"
-                        className="absolute inset-0 bg-[#1E3A5F]/60 border border-[#4F9DFF]/30 rounded-lg"
+                        className="absolute inset-0 bg-[#FFFFFF] border border-[#E2E8F0] rounded-lg shadow-sm"
                         transition={{ type: "spring", stiffness: 380, damping: 30 }}
                       />
                     )}
                     <Icon size={12} className="relative z-10" />
                     <span className="relative z-10">{tab.label}</span>
                     {tab.count !== undefined && tab.count > 0 && (
-                      <span className="relative z-10 px-1.5 py-0.5 rounded-full bg-[#FF5C5C] text-white text-[9px] font-bold">
+                      <span className="relative z-10 px-1.5 py-0.5 rounded-full bg-[#DC2626] text-white text-[9px] font-bold">
                         {tab.count}
                       </span>
                     )}
@@ -209,8 +209,8 @@ export default function SlidingDrawer() {
                     className="space-y-3"
                   >
                     {criticalAlerts.length === 0 ? (
-                      <div className="text-center py-12 text-[#4A6080]">
-                        <CheckSquare size={36} className="mx-auto text-[#34D399] opacity-40 mb-3" />
+                      <div className="text-center py-12 text-[#64748B]">
+                        <CheckSquare size={36} className="mx-auto text-[#10B981] opacity-40 mb-3" />
                         <p className="text-xs font-semibold">All Systems Normal</p>
                         <p className="text-[10px] opacity-70 mt-1">No active critical anomalies detected.</p>
                       </div>
@@ -218,25 +218,24 @@ export default function SlidingDrawer() {
                       criticalAlerts.map((a) => (
                         <div
                           key={a.equipment_id}
-                          className="p-3.5 rounded-xl border border-[#FF5C5C]/30 bg-[#FF5C5C]/5 hover:border-[#FF5C5C]/50 hover:bg-[#FF5C5C]/10 transition-all flex flex-col gap-2 relative overflow-hidden"
+                          className="p-3.5 rounded-xl border border-[#FCA5A5] bg-[#FEF2F2] hover:bg-[#FEE2E2] transition-all flex flex-col gap-2 relative overflow-hidden"
                           style={{
-                            boxShadow: "0 4px 12px rgba(255, 92, 92, 0.05)"
+                            boxShadow: "0 2px 8px rgba(220, 38, 38, 0.03)"
                           }}
                         >
-                          <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-[#FF5C5C]/10 to-transparent pointer-events-none rounded-bl-full" />
                           <div className="flex items-center justify-between">
                             <span className="ib-badge ib-badge-critical text-[9px]">
                               {a.tag}
                             </span>
-                            <span className="text-[10px] text-[#FF5C5C] font-mono font-bold">
+                            <span className="text-[10px] text-[#DC2626] font-mono font-bold">
                               RUL: {a.rul_days}d
                             </span>
                           </div>
                           <div>
-                            <h4 className="text-[12px] font-bold text-white font-sora">
+                            <h4 className="text-[12px] font-bold text-[#991B1B] font-sora">
                               {a.predicted_component}
                             </h4>
-                            <p className="text-[11px] text-[#8BA3C7] leading-relaxed mt-1">
+                            <p className="text-[11px] text-[#7F1D1D] leading-relaxed mt-1">
                               {a.suggested_work_order}
                             </p>
                           </div>
@@ -244,7 +243,7 @@ export default function SlidingDrawer() {
                             <button className="ib-btn ib-btn-critical text-[10px] px-3 py-1.5 rounded-lg flex-1 text-center justify-center font-bold">
                               DISPATCH WORK ORDER
                             </button>
-                            <button className="ib-btn ib-btn-ghost text-[10px] px-3 py-1.5 rounded-lg border-[#1E3A5F] hover:border-[#2a4a6b]">
+                            <button className="ib-btn ib-btn-ghost text-[10px] px-3 py-1.5 rounded-lg border-[#CBD5E1]">
                               ACK
                             </button>
                           </div>
@@ -263,10 +262,10 @@ export default function SlidingDrawer() {
                     transition={{ duration: 0.15 }}
                     className="space-y-2 font-mono text-[11px]"
                   >
-                    <div className="flex items-center justify-between mb-3 border-b border-[#1E3A5F] pb-2 text-[#4A6080]">
+                    <div className="flex items-center justify-between mb-3 border-b border-[#E2E8F0] pb-2 text-[#64748B]">
                       <span>LIVE TELEMETRY STREAM</span>
-                      <span className="flex items-center gap-1">
-                        <span className="w-1.5 h-1.5 rounded-full bg-[#34D399] animate-pulse" />
+                      <span className="flex items-center gap-1 text-[#10B981] font-bold">
+                        <span className="w-1.5 h-1.5 rounded-full bg-[#10B981] animate-pulse" />
                         listening
                       </span>
                     </div>
@@ -277,15 +276,15 @@ export default function SlidingDrawer() {
                           key={idx}
                           className={`p-2.5 rounded-lg border transition-all ${
                             log.anomaly
-                              ? "bg-[#FF5C5C]/8 border-[#FF5C5C]/30 text-[#FF5C5C]"
-                              : "bg-[#0F1C2E]/40 border-[#1E3A5F]/40 text-[#8BA3C7]"
+                              ? "bg-[#FEF2F2] border-[#FCA5A5] text-[#DC2626]"
+                              : "bg-[#F8F9FC] border-[#E2E8F0] text-[#475569]"
                           }`}
                         >
                           <div className="flex items-center justify-between font-bold text-[9px] mb-1">
                             <span>[{log.time}] {log.tag}</span>
                             <span
                               className={`px-1 rounded ${
-                                log.anomaly ? "bg-[#FF5C5C]/20 text-[#FF5C5C]" : "bg-[#4A6080]/20 text-[#8BA3C7]"
+                                log.anomaly ? "bg-[#FCA5A5]/30 text-[#B91C1C]" : "bg-slate-200 text-slate-700"
                               }`}
                             >
                               {log.type}
@@ -320,14 +319,14 @@ export default function SlidingDrawer() {
                           >
                             <div
                               className={`w-6 h-6 rounded-lg shrink-0 flex items-center justify-center text-[10px] font-bold ${
-                                isAI ? "bg-[#1E3A5F] text-[#4F9DFF]" : "bg-[#7C5CFC]/20 text-[#7C5CFC]"
+                                isAI ? "bg-slate-100 text-blue-600" : "bg-blue-50 text-blue-600"
                               }`}
                             >
                               {isAI ? <Bot size={11} /> : "U"}
                             </div>
                             <div
                               className={`rounded-xl px-3 py-2 text-[11px] leading-relaxed max-w-[80%] ${
-                                isAI ? "bg-[#16263D] border border-[#1E3A5F] text-[#8BA3C7]" : "text-white bg-gradient-to-r from-[#7C5CFC] to-[#4F9DFF]"
+                                isAI ? "bg-[#F8F9FC] border border-[#E2E8F0] text-[#334155]" : "text-white bg-gradient-to-r from-blue-600 to-indigo-600"
                               }`}
                             >
                               {msg.text}
@@ -337,14 +336,14 @@ export default function SlidingDrawer() {
                       })}
                       {isTyping && (
                         <div className="flex gap-2">
-                          <div className="w-6 h-6 rounded-lg bg-[#1E3A5F] text-[#4F9DFF] flex items-center justify-center text-[10px]">
+                          <div className="w-6 h-6 rounded-lg bg-slate-100 text-blue-600 flex items-center justify-center text-[10px]">
                             <Bot size={11} />
                           </div>
-                          <div className="bg-[#16263D] border border-[#1E3A5F] px-3 py-2 rounded-xl flex gap-1 items-center">
+                          <div className="bg-[#F8F9FC] border border-[#E2E8F0] px-3 py-2 rounded-xl flex gap-1 items-center">
                             {[0, 1, 2].map((i) => (
                               <motion.div
                                 key={i}
-                                className="w-1.5 h-1.5 rounded-full bg-[#4F9DFF]"
+                                className="w-1.5 h-1.5 rounded-full bg-[#2563EB]"
                                 animate={{ opacity: [0.3, 1, 0.3] }}
                                 transition={{ duration: 1, repeat: Infinity, delay: i * 0.2 }}
                               />
@@ -356,7 +355,7 @@ export default function SlidingDrawer() {
                     </div>
 
                     {/* Chat Input */}
-                    <div className="border-t border-[#1E3A5F] pt-3 mt-auto flex gap-1.5">
+                    <div className="border-t border-[#E2E8F0] pt-3 mt-auto flex gap-1.5 font-jakarta">
                       <input
                         type="text"
                         className="flex-1 ib-input py-2 text-xs"
@@ -367,7 +366,7 @@ export default function SlidingDrawer() {
                       />
                       <button
                         onClick={handleSendChat}
-                        className="w-8 h-8 rounded-xl bg-gradient-to-r from-[#4F9DFF] to-[#7C5CFC] flex items-center justify-center text-white shrink-0 hover:opacity-90 active:scale-95 transition-all"
+                        className="w-8 h-8 rounded-xl bg-[#2563EB] flex items-center justify-center text-white shrink-0 hover:opacity-90 active:scale-95 transition-all"
                       >
                         <Send size={12} />
                       </button>
