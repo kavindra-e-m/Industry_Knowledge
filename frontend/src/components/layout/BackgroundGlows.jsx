@@ -7,8 +7,8 @@ export default function BackgroundGlows() {
       <motion.div
         className="absolute top-[-10%] right-[-10%] w-[500px] h-[500px] rounded-full"
         style={{
-          background: "radial-gradient(circle, rgba(124,92,252,0.1) 0%, rgba(124,92,252,0) 70%)",
-          filter: "blur(60px)",
+          background: "radial-gradient(circle, rgba(177,0,255,0.06) 0%, rgba(177,0,255,0) 70%)",
+          filter: "blur(80px)",
         }}
         animate={{
           scale: [1, 1.15, 1],
@@ -20,12 +20,12 @@ export default function BackgroundGlows() {
           ease: "easeInOut",
         }}
       />
-      {/* Bottom Left Blue Glow */}
+      {/* Bottom Left Lime Glow */}
       <motion.div
         className="absolute bottom-[-10%] left-[-10%] w-[600px] h-[600px] rounded-full"
         style={{
-          background: "radial-gradient(circle, rgba(79,157,255,0.08) 0%, rgba(79,157,255,0) 70%)",
-          filter: "blur(70px)",
+          background: "radial-gradient(circle, rgba(204,255,0,0.05) 0%, rgba(204,255,0,0) 70%)",
+          filter: "blur(90px)",
         }}
         animate={{
           scale: [1.1, 0.95, 1.1],
@@ -33,23 +33,6 @@ export default function BackgroundGlows() {
         }}
         transition={{
           duration: 15,
-          repeat: Infinity,
-          ease: "easeInOut",
-        }}
-      />
-      {/* Center Cyan Glow */}
-      <motion.div
-        className="absolute top-[30%] left-[25%] w-[400px] h-[400px] rounded-full"
-        style={{
-          background: "radial-gradient(circle, rgba(56,189,248,0.05) 0%, rgba(56,189,248,0) 70%)",
-          filter: "blur(50px)",
-        }}
-        animate={{
-          scale: [0.9, 1.1, 0.9],
-          opacity: [0.6, 0.8, 0.6],
-        }}
-        transition={{
-          duration: 10,
           repeat: Infinity,
           ease: "easeInOut",
         }}

@@ -1,5 +1,5 @@
 import { lazy, Suspense } from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import Sidebar from "./components/layout/Sidebar";
 import BackgroundGlows from "./components/layout/BackgroundGlows";
@@ -46,19 +46,20 @@ function PageLoader() {
   );
 }
 
-export default function App() {
+function MainContent() {
+  const location = useLocation();
   return (
-    <BrowserRouter>
-      <div className="flex h-screen overflow-hidden relative" style={{ background: "#060B14" }}>
-        {/* Background Mesh Glows */}
-        <BackgroundGlows />
-        <AnimatedBackground />
+    <div className="flex h-screen overflow-hidden relative w-full" style={{ background: "#060B14" }}>
+      {/* Background Mesh Glows */}
+      <BackgroundGlows />
+      <AnimatedBackground />
 
-        <div className="relative z-10 flex w-full h-full">
-          <Sidebar />
-          <main className="flex-1 flex flex-col overflow-hidden relative z-10">
-            <Suspense fallback={<PageLoader />}>
-              <Routes>
+      <div className="relative z-10 flex w-full h-full">
+        <Sidebar />
+        <main className="flex-1 flex flex-col overflow-hidden relative z-10">
+          <Suspense fallback={<PageLoader />}>
+            <AnimatePresence mode="wait">
+              <Routes location={location} key={location.pathname}>
                 <Route path="/"                element={<Dashboard />} />
                 <Route path="/copilot"         element={<AICopilot />} />
                 <Route path="/knowledge-graph" element={<KnowledgeGraph />} />
@@ -72,16 +73,24 @@ export default function App() {
                 <Route path="/equipment/:id"   element={<EquipmentDetails />} />
                 <Route path="/settings"        element={<Settings />} />
               </Routes>
-            </Suspense>
-          </main>
-        </div>
-
-        {/* Global Operations Console Sliding Drawer */}
-        <SlidingDrawer />
-
-        <FloatingAIAssistant />
-        <ToastContainer />
+            </AnimatePresence>
+          </Suspense>
+        </main>
       </div>
+
+      {/* Global Operations Console Sliding Drawer */}
+      <SlidingDrawer />
+
+      <FloatingAIAssistant />
+      <ToastContainer />
+    </div>
+  );
+}
+
+export default function App() {
+  return (
+    <BrowserRouter>
+      <MainContent />
     </BrowserRouter>
   );
 }
