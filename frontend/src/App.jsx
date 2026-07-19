@@ -2,9 +2,10 @@ import { lazy, Suspense } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import Sidebar from "./components/layout/Sidebar";
-import AnimatedBackground from "./components/shared/AnimatedBackground";
+import AuroraBackground from "./components/shared/AuroraBackground";
 import FloatingAIAssistant from "./components/shared/FloatingAIAssistant";
 import ToastContainer from "./components/shared/ToastContainer";
+import CommandPalette from "./components/shared/CommandPalette";
 
 const Dashboard             = lazy(() => import("./pages/Dashboard"));
 const AICopilot             = lazy(() => import("./pages/AICopilot"));
@@ -48,7 +49,7 @@ export default function App() {
   return (
     <BrowserRouter>
       <div className="flex h-screen overflow-hidden relative" style={{ background: "#07111F" }}>
-        <AnimatedBackground />
+        <AuroraBackground />
         <div className="relative z-10 flex w-full h-full">
           <Sidebar />
           <main className="flex-1 flex flex-col overflow-hidden">
@@ -72,6 +73,7 @@ export default function App() {
         </div>
         <FloatingAIAssistant />
         <ToastContainer />
+        <CommandPalette />
       </div>
     </BrowserRouter>
   );

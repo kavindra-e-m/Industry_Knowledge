@@ -32,15 +32,26 @@ export default function Sidebar() {
       animate={{ width: collapsed ? 64 : 220 }}
       transition={{ duration: 0.25, ease: "easeInOut" }}
       className="shrink-0 flex flex-col h-screen sticky top-0 overflow-hidden z-30"
-      style={{ background: "linear-gradient(180deg, #0F1C2E 0%, #0a1520 100%)", borderRight: "1px solid #1E3A5F" }}
+      style={{
+        background: "rgba(15, 28, 46, 0.8)",
+        backdropFilter: "blur(20px)",
+        borderRight: "1px solid rgba(79, 157, 255, 0.15)",
+        boxShadow: "inset -1px 0 0 rgba(79, 157, 255, 0.1)",
+      }}
     >
       {/* Logo */}
       <div className="flex items-center justify-between px-4 py-4 border-b border-[#1E3A5F] shrink-0">
         <div className="flex items-center gap-2.5 min-w-0">
-          <div className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0"
-            style={{ background: "linear-gradient(135deg, #4F9DFF 0%, #7C5CFC 100%)" }}>
+          <motion.div
+            className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0"
+            style={{
+              background: "linear-gradient(135deg, #4F9DFF 0%, #7C5CFC 100%)",
+              boxShadow: "0 0 16px rgba(79, 157, 255, 0.4)",
+            }}
+            whileHover={{ scale: 1.05 }}
+          >
             <Cpu size={16} className="text-white" />
-          </div>
+          </motion.div>
           <AnimatePresence>
             {!collapsed && (
               <motion.div
@@ -56,12 +67,14 @@ export default function Sidebar() {
             )}
           </AnimatePresence>
         </div>
-        <button
+        <motion.button
           onClick={() => setCollapsed(!collapsed)}
           className="w-6 h-6 rounded-md flex items-center justify-center text-[#4A6080] hover:text-[#8BA3C7] hover:bg-[#1E3A5F] transition-all shrink-0"
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.95 }}
         >
           {collapsed ? <ChevronRight size={13} /> : <ChevronLeft size={13} />}
-        </button>
+        </motion.button>
       </div>
 
       {/* Main Nav */}
@@ -89,11 +102,20 @@ export default function Sidebar() {
                   <motion.div
                     layoutId="nav-indicator"
                     className="absolute inset-0 rounded-xl"
-                    style={{ background: "linear-gradient(135deg, rgba(124,92,252,0.2) 0%, rgba(79,157,255,0.1) 100%)", border: "1px solid rgba(124,92,252,0.35)" }}
+                    style={{
+                      background: "linear-gradient(135deg, rgba(124, 92, 252, 0.2) 0%, rgba(79, 157, 255, 0.1) 100%)",
+                      border: "1px solid rgba(124, 92, 252, 0.35)",
+                      boxShadow: "0 0 12px rgba(124, 92, 252, 0.2)",
+                    }}
                     transition={{ duration: 0.2 }}
                   />
                 )}
-                <Icon size={16} className={`shrink-0 relative z-10 ${isActive ? "text-[#7C5CFC]" : "text-[#4A6080] group-hover:text-[#8BA3C7]"}`} />
+                <Icon
+                  size={16}
+                  className={`shrink-0 relative z-10 transition-all ${
+                    isActive ? "text-[#7C5CFC]" : "text-[#4A6080] group-hover:text-[#8BA3C7]"
+                  }`}
+                />
                 <AnimatePresence>
                   {!collapsed && (
                     <motion.span
@@ -129,8 +151,13 @@ export default function Sidebar() {
             <Icon size={16} className="shrink-0" />
             <AnimatePresence>
               {!collapsed && (
-                <motion.span initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }}
-                  className="whitespace-nowrap font-jakarta text-[13px]">
+                <motion.span
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.15 }}
+                  className="whitespace-nowrap font-jakarta text-[13px]"
+                >
                   {label}
                 </motion.span>
               )}
@@ -139,23 +166,41 @@ export default function Sidebar() {
         ))}
 
         {/* User profile */}
-        <div className="flex items-center gap-2.5 px-2.5 py-2.5 mt-1 rounded-xl hover:bg-[#1E3A5F]/60 cursor-pointer transition-all">
-          <div className="w-7 h-7 rounded-full shrink-0 flex items-center justify-center text-xs font-bold text-white"
-            style={{ background: "linear-gradient(135deg, #4F9DFF, #7C5CFC)" }}>
+        <motion.div
+          className="flex items-center gap-2.5 px-2.5 py-2.5 mt-1 rounded-xl hover:bg-[#1E3A5F]/60 cursor-pointer transition-all"
+          whileHover={{ x: 2 }}
+        >
+          <motion.div
+            className="w-7 h-7 rounded-full shrink-0 flex items-center justify-center text-xs font-bold text-white"
+            style={{
+              background: "linear-gradient(135deg, #4F9DFF, #7C5CFC)",
+              boxShadow: "0 0 12px rgba(79, 157, 255, 0.3)",
+            }}
+          >
             A
-          </div>
+          </motion.div>
           <AnimatePresence>
             {!collapsed && (
-              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }} className="min-w-0">
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.15 }}
+                className="min-w-0"
+              >
                 <p className="text-[12px] font-semibold text-[#F0F6FF] whitespace-nowrap font-jakarta">Admin Shell</p>
                 <div className="flex items-center gap-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#34D399]" />
-                  <p className="text-[10px] text-[#4A6080] whitespace-nowrap">Secure Connection</p>
+                  <motion.span
+                    className="w-1.5 h-1.5 rounded-full bg-[#34D399]"
+                    animate={{ scale: [1, 1.2, 1] }}
+                    transition={{ duration: 2, repeat: Infinity }}
+                  />
+                  <p className="text-[10px] text-[#4A6080] whitespace-nowrap">Live</p>
                 </div>
               </motion.div>
             )}
           </AnimatePresence>
-        </div>
+        </motion.div>
       </div>
     </motion.aside>
   );
