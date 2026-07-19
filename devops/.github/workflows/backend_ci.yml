@@ -1,27 +1,80 @@
-name: CI
+name: Backend CI
 
 on:
   push:
-    branches: [dev, main]
+    branches: [ main, develop, 'feature/**' ]
+    paths:
+      - 'backend/**'
+      - '.github/workflows/backend_ci.yml'
   pull_request:
-    branches: [dev, main]
+    branches: [ main, develop ]
+    paths:
+      - 'backend/**'
 
 jobs:
-  backend-test:
+  lint-and-test:
     runs-on: ubuntu-latest
+    
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-      - run: pip install -r backend/requirements.txt
-      - run: echo "TODO: pytest backend/"
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-  frontend-build:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v4
         with:
-          node-version: "20"
-      - run: cd frontend/web-dashboard && npm install && npm run build
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r backend/requirements.txt
+          pip install flake8 black pytest pytest-cov
+
+      - name: Lint with flake8
+        run: |
+          # Stop the build if there are Python syntax errors or undefined names
+          flake8 backend/ --count --select=E9,F63,F7,F82 --show-source --statistics
+          # Warnings for line length, complexity
+          flake8 backend/ --count --max-line-length=120 --statistics
+
+      - name: Format check with black
+        run: |
+          black --check backend/
+
+      - name: Run tests with pytest
+        run: |
+          pytest backend/ --cov=backend --cov-report=xml --cov-report=term
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          files: ./coverage.xml
+          flags: backend
+          name: backend-coverage
+
+  security-scan:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install bandit
+        run: pip install bandit[toml]
+
+      - name: Run bandit security scan
+        run: |
+          bandit -r backend/ -f json -o bandit-report.json || true
+          bandit -r backend/ -f txt
+
+      - name: Upload bandit results
+        uses: actions/upload-artifact@v3
+        with:
+          name: bandit-security-report
+          path: bandit-report.json
