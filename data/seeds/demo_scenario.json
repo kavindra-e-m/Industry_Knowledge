@@ -1,1 +1,166 @@
-{}
+{
+  "scenario_name": "IndustrialBrain PS08 — Clean Demo Scenario",
+  "scenario_version": "1.0.0",
+  "description": "Pre-configured demo scenario for showcasing all 6 agents with realistic industrial data",
+  "created_by": "Member 4 — Data & DevOps Lead",
+  "created_date": "2025-07-19",
+  "demo_narrative": {
+    "situation": "Plant manager preparing for quarterly management review and upcoming statutory audit",
+    "key_concerns": [
+      "Pump P-104 showing high vibration — predict failure probability",
+      "Heat exchanger E-104 due for inspection — what are compliance requirements?",
+      "Recent bearing failure on P-201 — has this happened before?",
+      "Compressor C-101 shutdown planned — what is the isolation sequence?",
+      "Pressure vessel V-103 certificate expiring in 30 days — auto-generate audit package"
+    ]
+  },
+  "demo_queries": [
+    {
+      "query_id": "Q1",
+      "agent": "Agent 2 — Copilot",
+      "query": "What is the recommended maintenance procedure for centrifugal pump mechanical seal replacement?",
+      "expected_sources": ["OEM Manual — P-101", "SOP-0012 Pump Maintenance", "OISD-STD-118 Isolation Procedure"],
+      "expected_response_type": "Step-by-step procedure with citations"
+    },
+    {
+      "query_id": "Q2",
+      "agent": "Agent 3 — Maintenance",
+      "query": "Predict failure probability for pump P-104 over the next 90 days",
+      "expected_output": {
+        "equipment_id": "P-104",
+        "failure_probability": 0.87,
+        "failure_mode": "Bearing degradation",
+        "recommended_action": "Schedule bearing replacement within 30 days",
+        "auto_work_order": "WO-100987 — Bearing replacement P-104"
+      }
+    },
+    {
+      "query_id": "Q3",
+      "agent": "Agent 4 — Compliance",
+      "query": "Check compliance status for pressure vessel V-103 against PESO and IBR requirements",
+      "expected_output": {
+        "equipment_id": "V-103",
+        "compliance_score": 72.5,
+        "gaps": [
+          {
+            "clause_id": "PESO-GAS-COND-5.4",
+            "issue": "Pressure test due in 30 days — certificate expiring 2025-08-18",
+            "action": "Schedule hydraulic test before expiry"
+          },
+          {
+            "clause_id": "IBR-1950-RULE-6",
+            "issue": "Internal inspection overdue by 15 days",
+            "action": "Notify PESO inspector and schedule inspection"
+          }
+        ]
+      }
+    },
+    {
+      "query_id": "Q4",
+      "agent": "Agent 5 — Lessons Learned",
+      "query": "Show me all historical bearing failures on centrifugal pumps in Unit-01",
+      "expected_output": {
+        "pattern_detected": true,
+        "incident_count": 8,
+        "common_root_cause": "Inadequate lubrication — oil contamination with water",
+        "warning": "Current conditions on P-101 match pre-failure state from INC-2023-0042",
+        "recommendation": "Check seal flush system on P-101 immediately"
+      }
+    },
+    {
+      "query_id": "Q5",
+      "agent": "Agent 6 — P&ID",
+      "query": "If compressor C-101 fails, what equipment is affected downstream?",
+      "expected_output": {
+        "equipment_id": "C-101",
+        "affected_equipment": ["R-101", "E-104", "SP-102", "CV-102"],
+        "isolation_sequence": [
+          "Close upstream block valve XV-301",
+          "Close downstream block valve XV-302",
+          "Depressurize via bleed valve BV-303",
+          "Lock out electrical supply at MCC-03 Panel 2"
+        ],
+        "estimated_downtime_impact": "Unit-03 shutdown required — 12 hours minimum"
+      }
+    },
+    {
+      "query_id": "Q6",
+      "agent": "Agent 4 — Compliance",
+      "query": "Generate audit evidence package for V-103 pressure vessel",
+      "expected_output": {
+        "audit_package_id": "AUDIT-V103-2025-07",
+        "equipment_id": "V-103",
+        "included_documents": [
+          "Design datasheet and GA drawing",
+          "Pressure test certificates (last 3 cycles)",
+          "Internal inspection reports (2020, 2022, 2024)",
+          "Thickness measurement survey reports",
+          "IBR registration certificate",
+          "PESO approval certificate",
+          "Maintenance work orders (last 5 years)"
+        ],
+        "compliance_status": "Partial — 1 gap identified",
+        "export_format": "PDF bundle with index"
+      }
+    }
+  ],
+  "demo_equipment_spotlight": [
+    {
+      "equipment_id": "P-104",
+      "name": "Centrifugal Pump P-104",
+      "criticality": "Critical",
+      "current_health_score": 62,
+      "alerts": [
+        {
+          "alert_type": "Predictive",
+          "severity": "High",
+          "message": "87% failure probability — bearing degradation detected",
+          "raised_at": "2025-07-18T14:30:00Z"
+        }
+      ],
+      "recent_maintenance": [
+        {
+          "date": "2025-01-15",
+          "type": "Preventive Maintenance",
+          "findings": "Vibration 8.2 mm/s RMS — elevated but within alarm limit"
+        }
+      ]
+    },
+    {
+      "equipment_id": "V-103",
+      "name": "Pressure Vessel V-103",
+      "criticality": "Critical",
+      "current_health_score": 78,
+      "compliance_gaps": [
+        {
+          "clause": "PESO-GAS-COND-5.4",
+          "issue": "Pressure test certificate expiring in 30 days",
+          "due_date": "2025-08-18"
+        }
+      ]
+    },
+    {
+      "equipment_id": "E-104",
+      "name": "Heat Exchanger E-104",
+      "criticality": "Critical",
+      "current_health_score": 85,
+      "next_pm_due": "2025-09-25",
+      "recent_inspection": {
+        "date": "2024-11-10",
+        "result": "Pass",
+        "findings": "Tube fouling detected — cleaning recommended at next shutdown"
+      }
+    }
+  ],
+  "demo_data_stats": {
+    "total_equipment": 120,
+    "maintenance_logs": "~4800 records (5 years)",
+    "work_orders": "~2400 records",
+    "incidents": 180,
+    "inspection_records": "~600 records",
+    "compliance_procedures": 24,
+    "regulation_clauses": 12,
+    "users": 10
+  },
+  "demo_reset_instructions": "Run: ./devops/scripts/reset_demo.sh to restore this clean state"
+}

@@ -1,76 +1,56 @@
-import { useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { AlertCircle, CheckCircle, Info, AlertTriangle, X } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
+import { CheckCircle, AlertTriangle, Info, X, Zap } from "lucide-react";
 import { useToastStore } from "../../store/toastStore";
 
 const ICONS = {
-  success: CheckCircle,
-  error: AlertCircle,
-  warning: AlertTriangle,
-  info: Info,
-  ai: Info,
+  success: <CheckCircle size={14} className="text-[#059669]" />,
+  error: <AlertTriangle size={14} className="text-[#DC2626]" />,
+  warning: <AlertTriangle size={14} className="text-[#D97706]" />,
+  info: <Info size={14} className="text-[#2563EB]" />,
+  ai: <Zap size={14} className="text-[#7C3AED]" />,
 };
 
 const COLORS = {
-  success: { bg: "rgba(52, 211, 153, 0.1)", border: "rgba(52, 211, 153, 0.3)", icon: "#34D399" },
-  error: { bg: "rgba(255, 92, 92, 0.1)", border: "rgba(255, 92, 92, 0.3)", icon: "#FF5C5C" },
-  warning: { bg: "rgba(251, 191, 36, 0.1)", border: "rgba(251, 191, 36, 0.3)", icon: "#FBBF24" },
-  info: { bg: "rgba(79, 157, 255, 0.1)", border: "rgba(79, 157, 255, 0.3)", icon: "#4F9DFF" },
-  ai: { bg: "rgba(124, 92, 252, 0.1)", border: "rgba(124, 92, 252, 0.3)", icon: "#7C5CFC" },
+  success: { border: "rgba(5,150,105,0.2)", bg: "rgba(5,150,105,0.04)" },
+  error:   { border: "rgba(220,38,38,0.2)",  bg: "rgba(220,38,38,0.04)" },
+  warning: { border: "rgba(217,119,6,0.2)",  bg: "rgba(217,119,6,0.04)" },
+  info:    { border: "rgba(37,99,235,0.2)",  bg: "rgba(37,99,235,0.04)" },
+  ai:      { border: "rgba(124,58,237,0.2)", bg: "rgba(124,58,237,0.04)" },
 };
 
-function Toast({ toast, onRemove }) {
-  useEffect(() => {
-    if (toast.duration) {
-      const timer = setTimeout(() => onRemove(toast.id), toast.duration);
-      return () => clearTimeout(timer);
-    }
-  }, [toast, onRemove]);
-
-  const Icon = ICONS[toast.type] || Info;
-  const color = COLORS[toast.type] || COLORS.info;
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, x: 400, y: 0 }}
-      animate={{ opacity: 1, x: 0, y: 0 }}
-      exit={{ opacity: 0, x: 400, y: 0 }}
-      transition={{ type: "spring", stiffness: 300, damping: 30 }}
-      className="flex items-start gap-3 p-4 rounded-xl"
-      style={{
-        background: color.bg,
-        border: `1px solid ${color.border}`,
-        backdropFilter: "blur(12px)",
-        boxShadow: "0 8px 24px rgba(0, 0, 0, 0.3)",
-      }}
-    >
-      <Icon size={18} style={{ color: color.icon, flexShrink: 0, marginTop: 2 }} />
-      <div className="flex-1 min-w-0">
-        {toast.title && <p className="text-sm font-semibold text-white">{toast.title}</p>}
-        {toast.message && <p className="text-xs text-[#8BA3C7] mt-0.5">{toast.message}</p>}
-      </div>
-      <button
-        onClick={() => onRemove(toast.id)}
-        className="text-[#4A6080] hover:text-[#8BA3C7] transition-colors flex-shrink-0"
-      >
-        <X size={16} />
-      </button>
-    </motion.div>
-  );
-}
-
 export default function ToastContainer() {
-  const toasts = useToastStore((s) => s.toasts);
-  const remove = useToastStore((s) => s.remove);
+  const { toasts, remove } = useToastStore();
 
   return (
-    <div className="fixed bottom-6 right-6 z-[9980] flex flex-col gap-2 pointer-events-none">
-      <AnimatePresence mode="popLayout">
-        {toasts.map((toast) => (
-          <div key={toast.id} className="pointer-events-auto">
-            <Toast toast={toast} onRemove={remove} />
-          </div>
-        ))}
+    <div className="fixed bottom-6 right-6 z-[9999] flex flex-col gap-2 pointer-events-none">
+      <AnimatePresence>
+        {toasts.map((t) => {
+          const c = COLORS[t.type] ?? COLORS.info;
+          return (
+            <motion.div
+              key={t.id}
+              initial={{ opacity: 0, x: 60, scale: 0.92 }}
+              animate={{ opacity: 1, x: 0, scale: 1 }}
+              exit={{ opacity: 0, x: 60, scale: 0.92 }}
+              transition={{ type: "spring", stiffness: 380, damping: 30 }}
+              className="pointer-events-auto flex items-start gap-3 px-4 py-3 rounded-xl min-w-[260px] max-w-[340px] border shadow-lg"
+              style={{
+                background: `rgba(255, 255, 255, 0.95)`,
+                backdropFilter: "blur(16px)",
+                borderColor: c.border,
+              }}
+            >
+              <div className="mt-0.5 shrink-0">{ICONS[t.type] ?? ICONS.info}</div>
+              <div className="flex-1 min-w-0">
+                {t.title && <p className="text-[12px] font-bold text-[#0F172A] font-sora">{t.title}</p>}
+                {t.message && <p className="text-[11px] text-[#475569] mt-0.5 leading-relaxed">{t.message}</p>}
+              </div>
+              <button onClick={() => remove(t.id)} className="text-[#64748B] hover:text-[#0F172A] transition-colors shrink-0 mt-0.5">
+                <X size={12} />
+              </button>
+            </motion.div>
+          );
+        })}
       </AnimatePresence>
     </div>
   );

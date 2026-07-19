@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Send, Mic, Bot, User, Zap, Share2, Clock, Sparkles } from "lucide-react";
 import PageShell from "../components/shared/PageShell";
@@ -107,7 +108,8 @@ function Message({ msg, isNew }) {
                   {msg.actions.map((a) => (
                     <motion.button
                       key={a}
-                      className="px-3 py-1.5 rounded-lg text-[11px] font-semibold text-[#4F9DFF] border border-[#4F9DFF]/30 hover:bg-[#4F9DFF]/10 transition-all"
+                      onClick={() => sendQuery(a)}
+                      className="px-3 py-1.5 rounded-lg text-[11px] font-semibold text-[#2563EB] border border-[#2563EB]/30 hover:bg-[#2563EB]/10 transition-all"
                       whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.96 }}
                     >
                       {a}
@@ -125,16 +127,25 @@ function Message({ msg, isNew }) {
 }
 
 export default function AICopilot() {
+  const navigate = useNavigate();
+  const location = useLocation();
   const [messages, setMessages] = useState(INITIAL_MESSAGES);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const bottomRef = useRef(null);
 
+  useEffect(() => {
+    if (location.state?.initialPrompt) {
+      sendQuery(location.state.initialPrompt);
+      navigate(location.pathname, { replace: true, state: {} });
+    }
+  }, [location.state]);
+
   useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: "smooth" }); }, [messages]);
 
-  const send = () => {
-    if (!input.trim()) return;
-    const userMsg = { id: Date.now(), role: "user", text: input, time: new Date().toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" }) };
+  const sendQuery = (queryText) => {
+    if (!queryText.trim()) return;
+    const userMsg = { id: Date.now(), role: "user", text: queryText, time: new Date().toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" }) };
     setMessages((m) => [...m, userMsg]);
     setInput("");
     setLoading(true);
@@ -150,6 +161,10 @@ export default function AICopilot() {
       }]);
       setLoading(false);
     }, 1800);
+  };
+
+  const send = () => {
+    sendQuery(input);
   };
 
   return (
@@ -201,7 +216,7 @@ export default function AICopilot() {
               <motion.button
                 key={i}
                 initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}
-                onClick={() => setInput(s)}
+                onClick={() => sendQuery(s)}
                 className="shrink-0 px-3 py-1.5 rounded-full text-[11px] text-[#8BA3C7] border border-[#1E3A5F] hover:border-[#4F9DFF]/40 hover:text-[#4F9DFF] transition-all whitespace-nowrap"
                 whileHover={{ scale: 1.03 }}
               >
@@ -240,12 +255,12 @@ export default function AICopilot() {
         </div>
 
         {/* Right panel */}
-        <div className="w-64 shrink-0 border-l border-[#1E3A5F] p-4 space-y-4 hidden xl:block overflow-y-auto">
+        <div className="w-64 shrink-0 border-l border-[#E2E8F0] p-4 space-y-4 hidden xl:block overflow-y-auto bg-white">
           {/* Active Context */}
           <div>
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
-                <Zap size={13} className="text-[#7C5CFC]" />
+                <Zap size={13} className="text-[#2563EB]" />
                 <p className="ib-label">ACTIVE CONTEXT</p>
               </div>
               <motion.span
@@ -257,20 +272,20 @@ export default function AICopilot() {
               </motion.span>
             </div>
             <div className="ib-card p-0 overflow-hidden">
-              <div className="h-24 flex items-end p-3" style={{ background: "linear-gradient(135deg, #0a1520 0%, #1a2d47 100%)" }}>
+              <div className="h-24 flex items-end p-3" style={{ background: "linear-gradient(135deg, #F1F5F9 0%, #E2E8F0 100%)" }}>
                 <div>
-                  <p className="text-[13px] font-bold text-white font-sora">{CONTEXT.name}</p>
-                  <p className="text-[10px] text-[#4A6080]">{CONTEXT.sub}</p>
+                  <p className="text-[13px] font-bold text-[#0F172A] font-sora">{CONTEXT.name}</p>
+                  <p className="text-[10px] text-[#475569]">{CONTEXT.sub}</p>
                 </div>
               </div>
               <div className="p-3 space-y-3">
                 {CONTEXT.metrics.map((m) => (
                   <div key={m.label}>
                     <div className="flex justify-between text-[11px] mb-1">
-                      <span className="text-[#4A6080]">{m.label}</span>
-                      <span className="text-white font-semibold">{m.value}{m.max ? ` / ${m.max}` : ""}</span>
+                      <span className="text-[#475569]">{m.label}</span>
+                      <span className="text-[#0F172A] font-semibold">{m.value}{m.max ? ` / ${m.max}` : ""}</span>
                     </div>
-                    <div className="h-1 rounded-full bg-[#1E3A5F] overflow-hidden">
+                    <div className="h-1 rounded-full bg-[#E2E8F0] overflow-hidden">
                       <motion.div className="h-full rounded-full" style={{ background: m.color }}
                         initial={{ width: 0 }} animate={{ width: `${m.pct}%` }} transition={{ duration: 1, delay: 0.3 }} />
                     </div>
@@ -284,28 +299,31 @@ export default function AICopilot() {
           <div>
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
-                <Share2 size={13} className="text-[#4F9DFF]" />
+                <Share2 size={13} className="text-[#2563EB]" />
                 <p className="ib-label">ENTITY RELATIONS</p>
               </div>
-              <button className="text-[10px] text-[#4F9DFF] hover:underline">FULL GRAPH</button>
+              <button onClick={() => navigate("/knowledge-graph")} className="text-[10px] text-[#2563EB] font-bold hover:underline">FULL GRAPH</button>
             </div>
-            <div className="ib-card p-3 h-36 flex items-center justify-center relative overflow-hidden">
+            <div
+              onClick={() => navigate("/knowledge-graph")}
+              className="ib-card p-3 h-36 flex items-center justify-center relative overflow-hidden cursor-pointer hover:border-[#2563EB]"
+            >
               <svg width="100%" height="100%" viewBox="0 0 200 120">
-                {[[100,60,50,30,"#4F9DFF"],[100,60,160,40,"#7C5CFC"],[100,60,140,95,"#34D399"]].map(([x1,y1,x2,y2,c],i) => (
+                {[[100,60,50,30,"#2563EB"],[100,60,160,40,"#7C3AED"],[100,60,140,95,"#10B981"]].map(([x1,y1,x2,y2,c],i) => (
                   <motion.line key={i} x1={x1} y1={y1} x2={x2} y2={y2} stroke={c} strokeWidth="1"
                     initial={{ pathLength: 0, opacity: 0 }} animate={{ pathLength: 1, opacity: 0.5 }}
                     transition={{ duration: 0.8, delay: i * 0.2 }} />
                 ))}
-                {[[100,60,14,"#4F9DFF",true],[50,30,9,"#7C5CFC",false],[160,40,9,"#4F9DFF",false],[140,95,9,"#34D399",false]].map(([cx,cy,r,c,pulse],i) => (
-                  <motion.circle key={i} cx={cx} cy={cy} r={r} fill="#1E3A5F" stroke={c} strokeWidth={pulse ? 1.5 : 1}
+                {[[100,60,14,"#2563EB",true],[50,30,9,"#7C3AED",false],[160,40,9,"#2563EB",false],[140,95,9,"#10B981",false]].map(([cx,cy,r,c,pulse],i) => (
+                  <motion.circle key={i} cx={cx} cy={cy} r={r} fill="#F8FAFC" stroke={c} strokeWidth={pulse ? 1.5 : 1}
                     animate={pulse ? { r: [r, r+2, r] } : {}}
                     transition={{ duration: 2, repeat: Infinity }}
                     style={{ filter: `drop-shadow(0 0 4px ${c}80)` }}
                   />
                 ))}
-                <text x="100" y="64" textAnchor="middle" fill="#4F9DFF" fontSize="8">⚙</text>
+                <text x="100" y="64" textAnchor="middle" fill="#2563EB" fontSize="8">⚙</text>
               </svg>
-              <p className="absolute bottom-2 left-0 right-0 text-center text-[10px] text-[#4A6080]">Click nodes to expand</p>
+              <p className="absolute bottom-2 left-0 right-0 text-center text-[10px] text-[#64748B]">Click nodes to view full graph</p>
             </div>
           </div>
         </div>

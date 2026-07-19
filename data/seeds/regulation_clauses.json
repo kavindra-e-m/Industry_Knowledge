@@ -1,1 +1,98 @@
-{}
+[
+  {
+    "clause_id": "OISD-STD-116-4.2",
+    "regulation": "OISD-STD-116",
+    "title": "Pre-startup safety review checklist",
+    "requirement": "A formal pre-startup safety review (PSSR) shall be documented and signed off before any equipment returns to service after maintenance.",
+    "category": "Process Safety",
+    "applicable_equipment_types": ["*"]
+  },
+  {
+    "clause_id": "OISD-STD-118-6.1",
+    "regulation": "OISD-STD-118",
+    "title": "Isolation and lockout/tagout",
+    "requirement": "Energy isolation (LOTO) procedure must be documented with step-by-step valve numbers, electrical isolation points and responsible persons.",
+    "category": "Safety Procedure",
+    "applicable_equipment_types": ["*"]
+  },
+  {
+    "clause_id": "OISD-STD-105-3.3",
+    "regulation": "OISD-STD-105",
+    "title": "Work permit system",
+    "requirement": "All non-routine work shall be covered under a formal work permit (hot work / cold work / confined space entry) signed by a competent authority.",
+    "category": "Work Permit",
+    "applicable_equipment_types": ["*"]
+  },
+  {
+    "clause_id": "FACTORIES-ACT-SEC41B",
+    "regulation": "Factories Act 1948 — Section 41B",
+    "title": "Compulsory disclosure of hazards",
+    "requirement": "Occupier shall maintain an up-to-date inventory of hazardous chemicals and their Material Safety Data Sheets (MSDS) accessible at point of use.",
+    "category": "Hazard Management",
+    "applicable_equipment_types": ["*"]
+  },
+  {
+    "clause_id": "FACTORIES-ACT-SEC36A",
+    "regulation": "Factories Act 1948 — Section 36A",
+    "title": "Precautions against dangerous fumes",
+    "requirement": "No person shall enter any confined space containing dangerous fumes without breathing apparatus and a standby person stationed outside.",
+    "category": "Confined Space Entry",
+    "applicable_equipment_types": ["Pressure Vessel", "Storage Tank", "Heat Exchanger", "Column", "Reactor"]
+  },
+  {
+    "clause_id": "PESO-GAS-COND-5.4",
+    "regulation": "PESO Gas Cylinder Rules 2016 — Condition 5.4",
+    "title": "Pressure vessel periodic testing",
+    "requirement": "Pressure vessels shall undergo hydraulic testing at 1.5× design pressure every 5 years and be certified by a competent person.",
+    "category": "Statutory Testing",
+    "applicable_equipment_types": ["Pressure Vessel", "Boiler", "Heat Exchanger", "Storage Tank"]
+  },
+  {
+    "clause_id": "OISD-STD-116-7.1",
+    "regulation": "OISD-STD-116",
+    "title": "Management of change procedure",
+    "requirement": "Any change to equipment, process parameters, or operating procedures shall go through a formal Management of Change (MOC) review.",
+    "category": "Change Management",
+    "applicable_equipment_types": ["*"]
+  },
+  {
+    "clause_id": "OISD-STD-189-4.5",
+    "regulation": "OISD-STD-189",
+    "title": "Emergency response plan",
+    "requirement": "Each unit must have a documented Emergency Response Plan (ERP) with roles, escalation matrix, and evacuation routes updated annually.",
+    "category": "Emergency Preparedness",
+    "applicable_equipment_types": ["*"]
+  },
+  {
+    "clause_id": "FACTORIES-ACT-SEC41C",
+    "regulation": "Factories Act 1948 — Section 41C",
+    "title": "Trained personnel for hazardous processes",
+    "requirement": "Persons operating hazardous process equipment shall have documented training records and a valid competency certificate.",
+    "category": "Training & Competency",
+    "applicable_equipment_types": ["Fired Heater", "Boiler", "Reactor", "Compressor", "Pressure Vessel"]
+  },
+  {
+    "clause_id": "OISD-GDN-206-3.1",
+    "regulation": "OISD-GDN-206",
+    "title": "Safety instrumented systems testing",
+    "requirement": "All safety instrumented functions (SIF) shall be proof-tested at the frequency specified in the SIL determination study.",
+    "category": "Safety Instrumentation",
+    "applicable_equipment_types": ["Control Valve", "Safety Relief Valve", "Compressor", "Fired Heater", "Boiler"]
+  },
+  {
+    "clause_id": "IBR-1950-RULE-6",
+    "regulation": "Indian Boiler Regulations 1950 — Rule 6",
+    "title": "Statutory boiler inspection",
+    "requirement": "Every boiler shall be inspected internally and externally at least once in every 14 months by a competent inspector and a certificate of fitness issued.",
+    "category": "Statutory Testing",
+    "applicable_equipment_types": ["Boiler", "Pressure Vessel"]
+  },
+  {
+    "clause_id": "OISD-STD-144-5.2",
+    "regulation": "OISD-STD-144",
+    "title": "Rotating equipment vibration monitoring",
+    "requirement": "Critical rotating equipment shall have continuous vibration monitoring with alarm and trip settings per ISO 10816 standards.",
+    "category": "Predictive Maintenance",
+    "applicable_equipment_types": ["Centrifugal Pump", "Reciprocating Pump", "Compressor", "Electric Motor"]
+  }
+]
