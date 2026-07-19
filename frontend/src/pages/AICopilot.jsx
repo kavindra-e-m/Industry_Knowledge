@@ -132,9 +132,9 @@ export default function AICopilot() {
 
   useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: "smooth" }); }, [messages]);
 
-  const send = () => {
-    if (!input.trim()) return;
-    const userMsg = { id: Date.now(), role: "user", text: input, time: new Date().toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" }) };
+  const sendQuery = (queryText) => {
+    if (!queryText.trim()) return;
+    const userMsg = { id: Date.now(), role: "user", text: queryText, time: new Date().toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" }) };
     setMessages((m) => [...m, userMsg]);
     setInput("");
     setLoading(true);
@@ -150,6 +150,10 @@ export default function AICopilot() {
       }]);
       setLoading(false);
     }, 1800);
+  };
+
+  const send = () => {
+    sendQuery(input);
   };
 
   return (
@@ -201,7 +205,7 @@ export default function AICopilot() {
               <motion.button
                 key={i}
                 initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}
-                onClick={() => setInput(s)}
+                onClick={() => sendQuery(s)}
                 className="shrink-0 px-3 py-1.5 rounded-full text-[11px] text-[#8BA3C7] border border-[#1E3A5F] hover:border-[#4F9DFF]/40 hover:text-[#4F9DFF] transition-all whitespace-nowrap"
                 whileHover={{ scale: 1.03 }}
               >
