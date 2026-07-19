@@ -20,6 +20,8 @@ chromadb==0.4.22
 redis==5.0.1
 
 # AI / RAG
+--extra-index-url https://download.pytorch.org/whl/cpu
+torch==2.2.0+cpu
 langchain
 langchain-google-genai
 google-generativeai
