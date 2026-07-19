@@ -259,3 +259,36 @@
 .animate-spin-slow { animation: spin-slow 12s linear infinite; }
 .animate-fade-in   { animation: fade-in 0.2s ease forwards; }
 .animate-shake     { animation: shake 0.4s ease; }
+
+/* ── Light Mode High Contrast Overrides ───────────────────────────────────── */
+.text-\[\#8BA3C7\] { color: #334155 !important; }
+.text-\[\#4A6080\] { color: #57687C !important; }
+.text-\[\#A1A1AA\] { color: #334155 !important; }
+.text-\[\#71717A\] { color: #475569 !important; }
+
+.border-\[\#1E3A5F\] { border-color: #E2E8F0 !important; }
+.border-\[\#1C1C22\] { border-color: #E2E8F0 !important; }
+.border-\[\#27272A\] { border-color: #E2E8F0 !important; }
+
+.bg-\[\#16263D\] { background-color: #F8FAFC !important; }
+.bg-\[\#0F1C2E\] { background-color: #F1F5F9 !important; }
+.bg-\[\#0B0B0E\] { background-color: #FFFFFF !important; }
+.bg-\[\#0E0E12\] { background-color: #FFFFFF !important; }
+.bg-\[\#14141A\] { background-color: #F8FAFC !important; }
+.bg-\[\#1E3A5F\] { background-color: #F1F5F9 !important; }
+
+.bg-\[\#14141A\]\/60 { background-color: rgba(248, 250, 252, 0.6) !important; }
+.bg-\[\#1E3A5F\]\/60 { background-color: rgba(241, 245, 249, 0.6) !important; }
+.bg-\[\#0F1C2E\]\/60 { background-color: rgba(241, 245, 249, 0.6) !important; }
+
+.hover\:border-\[\#2a4a6b\]:hover { border-color: #CBD5E1 !important; }
+.hover\:border-\[\#CCFF00\]:hover { border-color: #2563EB !important; }
+.hover\:text-\[\#CCFF00\]:hover { color: #2563EB !important; }
+.hover\:bg-\[\#1E3A5F\]\/60:hover { background-color: #F1F5F9 !important; }
+.hover\:bg-\[\#14141A\]:hover { background-color: #F1F5F9 !important; }
+
+.text-\[\#CCFF00\] { color: #2563EB !important; }
+.text-\[\#B100FF\] { color: #7C3AED !important; }
+.bg-\[\#CCFF00\] { background-color: #2563EB !important; }
+.bg-\[\#B100FF\] { background-color: #7C3AED !important; }
+
