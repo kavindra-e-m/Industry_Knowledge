@@ -94,7 +94,7 @@ function ActionSetting({ label, description }) {
   );
 }
 
-function SettingsSection({ section }) {
+function SettingsSection({ section, onToggle }) {
   return (
     <motion.div
       className="ib-card overflow-hidden"
@@ -117,7 +117,7 @@ function SettingsSection({ section }) {
               description={setting.description}
               enabled={setting.enabled}
               disabled={setting.disabled}
-              onChange={() => {}}
+              onChange={() => onToggle && onToggle(idx)}
             />
           )
         ))}
@@ -127,6 +127,22 @@ function SettingsSection({ section }) {
 }
 
 export default function Settings() {
+  const [sections, setSections] = useState(SETTINGS_SECTIONS);
+
+  const toggleSetting = (sectionId, settingIdx) => {
+    setSections(prev => prev.map(section => {
+      if (section.id === sectionId) {
+        const newSettings = [...section.settings];
+        newSettings[settingIdx] = {
+          ...newSettings[settingIdx],
+          enabled: !newSettings[settingIdx].enabled
+        };
+        return { ...section, settings: newSettings };
+      }
+      return section;
+    }));
+  };
+
   return (
     <PageShell topbarPlaceholder="Search settings...">
       <div className="p-5 space-y-4 min-h-full" style={{ background: "transparent" }}>
@@ -142,14 +158,14 @@ export default function Settings() {
           </motion.div>
 
           <div className="space-y-4">
-            {SETTINGS_SECTIONS.map((section, idx) => (
+            {sections.map((section, idx) => (
               <motion.div
                 key={section.id}
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: idx * 0.08 }}
               >
-                <SettingsSection section={section} />
+                <SettingsSection section={section} onToggle={(settingIdx) => toggleSetting(section.id, settingIdx)} />
               </motion.div>
             ))}
 
