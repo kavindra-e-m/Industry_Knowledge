@@ -35,7 +35,7 @@ const CONTEXT = {
   sub: "Stage 3 Compressor Unit",
   metrics: [
     { label: "Operating Temp", value: "184°C", max: "220°C", pct: 84, color: "#FBBF24" },
-    { label: "Throughput",     value: "9,420 m³/h", pct: 72, color: "#34D399" },
+    { label: "Throughput", value: "9,420 m³/h", pct: 72, color: "#34D399" },
   ],
 };
 
@@ -77,11 +77,10 @@ function Message({ msg, sendQuery }) {
       </motion.div>
       <div className={`max-w-[80%] ${isAI ? "" : "items-end flex flex-col"}`}>
         <div
-          className={`rounded-2xl px-4 py-3 text-[13px] leading-relaxed transition-colors duration-250 ${
-            isAI ? "border" : ""
-          }`}
-          style={!isAI 
-            ? { background: "linear-gradient(135deg, var(--accent-secondary), var(--accent-primary))", color: "#FFFFFF" } 
+          className={`rounded-2xl px-4 py-3 text-[13px] leading-relaxed transition-colors duration-250 ${isAI ? "border" : ""
+            }`}
+          style={!isAI
+            ? { background: "linear-gradient(135deg, var(--accent-secondary), var(--accent-primary))", color: "#FFFFFF" }
             : { background: "var(--surface-secondary)", borderColor: "var(--border-primary)", color: "var(--text-secondary)" }
           }
         >
@@ -319,14 +318,14 @@ export default function AICopilot() {
               className="ib-card p-3 h-36 flex items-center justify-center relative overflow-hidden cursor-pointer hover:border-[var(--accent-primary)]"
             >
               <svg width="100%" height="100%" viewBox="0 0 200 120">
-                {[[100,60,50,30,"var(--accent-primary)"],[100,60,160,40,"var(--accent-secondary)"],[100,60,140,95,"var(--success)"]].map(([x1,y1,x2,y2,c],i) => (
+                {[[100, 60, 50, 30, "var(--accent-primary)"], [100, 60, 160, 40, "var(--accent-secondary)"], [100, 60, 140, 95, "var(--success)"]].map(([x1, y1, x2, y2, c], i) => (
                   <motion.line key={i} x1={x1} y1={y1} x2={x2} y2={y2} stroke={c} strokeWidth="1"
                     initial={{ pathLength: 0, opacity: 0 }} animate={{ pathLength: 1, opacity: 0.5 }}
                     transition={{ duration: 0.8, delay: i * 0.2 }} />
                 ))}
-                {[[100,60,14,"var(--accent-primary)",true],[50,30,9,"var(--accent-secondary)",false],[160,40,9,"var(--accent-primary)",false],[140,95,9,"var(--success)",false]].map(([cx,cy,r,c,pulse],i) => (
+                {[[100, 60, 14, "var(--accent-primary)", true], [50, 30, 9, "var(--accent-secondary)", false], [160, 40, 9, "var(--accent-primary)", false], [140, 95, 9, "var(--success)", false]].map(([cx, cy, r, c, pulse], i) => (
                   <motion.circle key={i} cx={cx} cy={cy} r={r} fill="var(--surface-primary)" stroke={c} strokeWidth={pulse ? 1.5 : 1}
-                    animate={pulse ? { r: [r, r+2, r] } : {}}
+                    animate={pulse ? { r: [r, r + 2, r] } : {}}
                     transition={{ duration: 2, repeat: Infinity }}
                     style={{ filter: `drop-shadow(0 0 4px ${c}80)` }}
                   />

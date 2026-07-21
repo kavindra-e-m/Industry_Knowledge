@@ -15,7 +15,7 @@ services:
       - ./devops/database/init_postgres.sql:/docker-entrypoint-initdb.d/1-init.sql
       - ./data/seeds/users.sql:/docker-entrypoint-initdb.d/2-users.sql
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U industrialbrain"]
+      test: [ "CMD-SHELL", "pg_isready -U industrialbrain" ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -33,7 +33,7 @@ services:
     volumes:
       - neo4j_data:/data
     healthcheck:
-      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:7474 || exit 1"]
+      test: [ "CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:7474 || exit 1" ]
       interval: 15s
       timeout: 10s
       retries: 5
@@ -49,7 +49,7 @@ services:
     volumes:
       - chroma_data:/chroma/chroma
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:8000/api/v1/heartbeat || exit 1"]
+      test: [ "CMD-SHELL", "curl -f http://localhost:8000/api/v1/heartbeat || exit 1" ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -63,7 +63,7 @@ services:
       - redis_data:/data
     command: redis-server --save 60 1 --loglevel warning
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+      test: [ "CMD", "redis-cli", "ping" ]
       interval: 10s
       timeout: 5s
       retries: 5
