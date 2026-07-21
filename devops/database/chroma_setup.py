@@ -10,7 +10,7 @@ from chromadb.config import Settings
 # ── Configuration ─────────────────────────────────────────────────────────────
 CHROMA_HOST = "chromadb"  # Docker service name
 CHROMA_PORT = 8000
-COLLECTION_NAME = "industrial_knowledge"
+COLLECTION_NAME = "industrial_documents"
 
 # Distance metrics: "l2" (Euclidean), "ip" (inner product), "cosine"
 DISTANCE_METRIC = "cosine"

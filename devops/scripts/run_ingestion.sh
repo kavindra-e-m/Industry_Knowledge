@@ -56,7 +56,7 @@ with open('data/seeds/maintenance_logs.json') as f:
     logs = json.load(f)
 
 client = get_chroma_client()
-collection = client.get_collection('industrial_knowledge')
+collection = client.get_collection('industrial_documents')
 embed_fn = get_embedding_function()
 
 ids, docs, metadatas = [], [], []
