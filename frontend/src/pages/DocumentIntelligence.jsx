@@ -8,13 +8,13 @@ import { useToastStore } from "../store/toastStore";
 const FILE_TYPES = [".PDF", ".DWG", ".CSV", ".JSON", ".TIFF"];
 
 const INITIAL_UPLOADS = [
-  { name: "Turbine_Specs_B2.pdf", time: "2m ago", size: "4.2 MB", status: "extracting", progress: 79, color: "#DC2626", icon: FileText },
-  { name: "Main_Loop_PID_Map.dwg", time: "15m ago", size: "12.6 MB", status: "extracted", progress: 100, color: "#059669", icon: FileText },
-  { name: "Sensor_Calibration_Log_v3.csv", time: "1h ago", size: "840 KB", status: "archived", progress: 100, color: "#64748B", icon: Archive },
+  { name: "Turbine_Specs_B2.pdf", time: "2m ago", size: "4.2 MB", status: "extracting", progress: 79, color: "var(--error)", icon: FileText },
+  { name: "Main_Loop_PID_Map.dwg", time: "15m ago", size: "12.6 MB", status: "extracted", progress: 100, color: "var(--success)", icon: FileText },
+  { name: "Sensor_Calibration_Log_v3.csv", time: "1h ago", size: "840 KB", status: "archived", progress: 100, color: "var(--text-tertiary)", icon: Archive },
 ];
 
 const ENTITIES = ["#PUMP-402", "Temp_Threshold", "Voltage_Delta", "Critical_Fail", "Flow_Controller", "Emergency_Stop"];
-const ENTITY_COLORS = ["#2563EB", "#059669", "#D97706", "#DC2626", "#7C3AED", "#0ea5e9"];
+const ENTITY_COLORS = ["var(--accent-primary)", "var(--success)", "var(--warning)", "var(--error)", "var(--accent-secondary)", "var(--info)"];
 
 const CONFIDENCE_BARS = [85, 92, 78, 95, 88];
 
@@ -85,15 +85,15 @@ export default function DocumentIntelligence() {
 
   return (
     <PageShell topbarPlaceholder="Search industrial assets, documents, or tags...">
-      <div className="flex h-full" style={{ background: "#F8F9FC" }}>
+      <div className="flex h-full" style={{ background: "transparent" }}>
 
         {/* Main */}
-        <div className="flex-1 p-6 space-y-5 overflow-y-auto min-w-0 bg-[#F8F9FC]">
+        <div className="flex-1 p-6 space-y-5 overflow-y-auto min-w-0 bg-transparent">
           {/* Header */}
           <div className="flex items-start justify-between">
             <div>
-              <p className="text-xl font-bold text-[#0F172A] font-sora">Document Intelligence</p>
-              <p className="text-[13px] text-[#475569] mt-1">
+              <p className="text-xl font-bold font-sora" style={{ color: "var(--text-primary)" }}>Document Intelligence</p>
+              <p className="text-[13px] mt-1" style={{ color: "var(--text-tertiary)" }}>
                 Upload, extract, and map industrial telemetry data from legacy documents.
               </p>
             </div>
@@ -105,22 +105,22 @@ export default function DocumentIntelligence() {
 
           {/* Drop zone */}
           <motion.div
-            className={`ib-card p-10 flex flex-col items-center justify-center gap-4 cursor-pointer transition-all ${dragging ? "border-[#2563EB] bg-[#2563EB]/5" : ""}`}
-            style={{ borderStyle: "dashed", borderWidth: 2, borderColor: dragging ? "#2563EB" : "#CBD5E1" }}
+            className={`ib-card p-10 flex flex-col items-center justify-center gap-4 cursor-pointer transition-all ${dragging ? "bg-[var(--accent-primary)]/5" : ""}`}
+            style={{ borderStyle: "dashed", borderWidth: 2, borderColor: dragging ? "var(--accent-primary)" : "var(--border-primary)" }}
             onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
             onDragLeave={() => setDragging(false)}
             onDrop={(e) => { e.preventDefault(); setDragging(false); simulateUpload(".PDF"); }}
             onClick={() => simulateUpload(".PDF")}
-            whileHover={{ borderColor: "#2563EB" }}
+            whileHover={{ borderColor: "var(--accent-primary)" }}
           >
-            <div className="w-14 h-14 rounded-2xl bg-slate-100 flex items-center justify-center">
-              <Upload size={24} className="text-[#2563EB]" />
+            <div className="w-14 h-14 rounded-2xl flex items-center justify-center" style={{ background: "var(--surface-secondary)" }}>
+              <Upload size={24} style={{ color: "var(--accent-primary)" }} />
             </div>
             <div className="text-center">
-              <p className="text-base font-semibold text-[#0F172A] font-sora">Drag & Drop Legacy Assets</p>
-              <p className="text-[12px] text-[#64748B] mt-1">Securely upload P&IDs, sensor logs, or technical manuals for automated AI extraction.</p>
+              <p className="text-base font-semibold font-sora" style={{ color: "var(--text-primary)" }}>Drag & Drop Legacy Assets</p>
+              <p className="text-[12px] mt-1" style={{ color: "var(--text-tertiary)" }}>Securely upload P&IDs, sensor logs, or technical manuals for automated AI extraction.</p>
             </div>
-            <div className="flex gap-2 flex-wrap justify-center">
+            <div className="flex gap-2 flex-wrap justify-center font-jakarta">
               {FILE_TYPES.map((t) => (
                 <button
                   key={t}
@@ -128,7 +128,8 @@ export default function DocumentIntelligence() {
                     e.stopPropagation();
                     simulateUpload(t);
                   }}
-                  className="px-3 py-1 rounded-lg text-[11px] font-bold text-[#475569] border border-[#E2E8F0] bg-white hover:border-[#2563EB] hover:text-[#2563EB] transition-all"
+                  className="px-3 py-1 rounded-lg text-[11px] font-bold border transition-all"
+                  style={{ color: "var(--text-secondary)", borderColor: "var(--border-primary)", background: "var(--surface-primary)" }}
                 >
                   {t}
                 </button>
@@ -140,37 +141,37 @@ export default function DocumentIntelligence() {
           <div className="ib-card p-4">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
-                <Upload size={13} className="text-[#2563EB]" />
-                <p className="text-sm font-semibold text-[#0F172A] font-sora">Recent Uploads</p>
+                <Upload size={13} style={{ color: "var(--accent-primary)" }} />
+                <p className="text-sm font-semibold font-sora" style={{ color: "var(--text-primary)" }}>Recent Uploads</p>
               </div>
-              <button onClick={() => push({ type: "info", title: "Active Queue", message: "Parser Queue Status: 0 pending, 3 complete", duration: 2500 })} className="text-[11px] text-[#2563EB] font-bold hover:underline">View Queue</button>
+              <button onClick={() => push({ type: "info", title: "Active Queue", message: "Parser Queue Status: 0 pending, 3 complete", duration: 2500 })} className="text-[11px] font-bold hover:underline bg-transparent border-0 cursor-pointer" style={{ color: "var(--accent-primary)" }}>View Queue</button>
             </div>
             <div className="space-y-3">
               {uploads.map((f, i) => (
-                <div key={i} className="flex items-center gap-3 p-3 rounded-xl border border-[#E2E8F0] hover:border-[#2563EB] hover:bg-[#F8FAFC] transition-all">
-                  <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0" style={{ background: `${f.color}10` }}>
+                <div key={i} className="flex items-center gap-3 p-3 rounded-xl border transition-all" style={{ borderColor: "var(--border-primary)", background: "var(--surface-secondary)" }}>
+                  <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0" style={{ background: `${f.color}15` }}>
                     <f.icon size={16} style={{ color: f.color }} />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-[12px] font-semibold text-[#0F172A] truncate">{f.name}</p>
-                    <p className="text-[10px] text-[#64748B]">Upload: {f.time} · {f.size}</p>
+                    <p className="text-[12px] font-semibold truncate" style={{ color: "var(--text-primary)" }}>{f.name}</p>
+                    <p className="text-[10px]" style={{ color: "var(--text-tertiary)" }}>Upload: {f.time} · {f.size}</p>
                   </div>
                   <div className="text-right shrink-0">
                     {f.status === "extracting" ? (
                       <div className="flex flex-col items-end gap-1">
-                        <span className="text-[10px] font-bold text-[#D97706] uppercase">Extracting Metadata ({f.progress}%)</span>
-                        <div className="w-24 h-1 rounded-full bg-[#E2E8F0] overflow-hidden">
-                          <motion.div className="h-full rounded-full bg-[#D97706]"
+                        <span className="text-[10px] font-bold uppercase" style={{ color: "var(--warning)" }}>Extracting Metadata ({f.progress}%)</span>
+                        <div className="w-24 h-1 rounded-full overflow-hidden" style={{ background: "var(--surface-tertiary)" }}>
+                          <motion.div className="h-full rounded-full bg-amber-500"
                             animate={{ width: `${f.progress}%` }} transition={{ duration: 0.2 }} />
                         </div>
                       </div>
                     ) : f.status === "extracted" ? (
                       <div className="flex items-center gap-1.5">
-                        <CheckCircle size={12} className="text-[#059669]" />
-                        <span className="text-[10px] font-bold text-[#059669] uppercase">Extracted</span>
+                        <CheckCircle size={12} className="text-emerald-500" />
+                        <span className="text-[10px] font-bold uppercase text-emerald-500">Extracted</span>
                       </div>
                     ) : (
-                      <span className="text-[10px] font-bold text-[#64748B] uppercase">Archived</span>
+                      <span className="text-[10px] font-bold uppercase" style={{ color: "var(--text-tertiary)" }}>Archived</span>
                     )}
                   </div>
                 </div>
@@ -180,7 +181,7 @@ export default function DocumentIntelligence() {
         </div>
 
         {/* Right panel */}
-        <div className="w-64 shrink-0 border-l border-[#E2E8F0] p-4 space-y-5 overflow-y-auto hidden lg:block bg-white">
+        <div className="w-64 shrink-0 border-l p-4 space-y-5 overflow-y-auto hidden lg:block transition-colors duration-250" style={{ borderColor: "var(--border-primary)", background: "var(--surface-primary)" }}>
           {/* Extracted Entities */}
           <div>
             <div className="flex items-center justify-between mb-3">
@@ -195,7 +196,7 @@ export default function DocumentIntelligence() {
                   transition={{ delay: i * 0.08 }}
                   onClick={() => handleEntityClick(e)}
                   className="px-2.5 py-1.5 rounded-lg text-[11px] font-semibold cursor-pointer hover:opacity-85 hover:scale-[1.03] transition-all border"
-                  style={{ background: `${ENTITY_COLORS[i]}10`, color: ENTITY_COLORS[i], borderColor: `${ENTITY_COLORS[i]}30` }}
+                  style={{ background: `${ENTITY_COLORS[i]}15`, color: ENTITY_COLORS[i], borderColor: `${ENTITY_COLORS[i]}30` }}
                 >
                   {e}
                 </motion.span>
@@ -212,13 +213,13 @@ export default function DocumentIntelligence() {
                   <motion.div
                     key={i}
                     className="flex-1 rounded-t-sm"
-                    style={{ background: i === 4 ? "#059669" : "#E2E8F0" }}
+                    style={{ background: i === 4 ? "var(--success)" : "var(--border-secondary)" }}
                     initial={{ height: 0 }} animate={{ height: `${h}%` }}
                     transition={{ duration: 0.6, delay: i * 0.1 }}
                   />
                 ))}
               </div>
-              <p className="text-[10px] text-[#64748B] text-center">94.8% AVG CONFIDENCE</p>
+              <p className="text-[10px] text-center" style={{ color: "var(--text-tertiary)" }}>94.8% AVG CONFIDENCE</p>
             </div>
           </div>
 
@@ -227,19 +228,19 @@ export default function DocumentIntelligence() {
             <p className="ib-label mb-3">DOCUMENT RELATIONSHIPS</p>
             <div
               onClick={() => navigate("/knowledge-graph")}
-              className="ib-card p-3 h-40 flex items-center justify-center relative cursor-pointer hover:border-[#2563EB]"
+              className="ib-card p-3 h-40 flex items-center justify-center relative cursor-pointer hover:border-[var(--accent-primary)]"
             >
               <svg width="100%" height="100%" viewBox="0 0 200 140">
-                <line x1="100" y1="70" x2="50" y2="30" stroke="#2563EB" strokeWidth="1" strokeOpacity="0.4" />
-                <line x1="100" y1="70" x2="150" y2="30" stroke="#7C3AED" strokeWidth="1" strokeOpacity="0.4" />
-                <line x1="100" y1="70" x2="100" y2="115" stroke="#059669" strokeWidth="1" strokeOpacity="0.4" />
-                <circle cx="100" cy="70" r="14" fill="#F8FAFC" stroke="#2563EB" strokeWidth="1.5" />
-                <circle cx="50" cy="30" r="9" fill="#F8FAFC" stroke="#7C3AED" strokeWidth="1" />
-                <circle cx="150" cy="30" r="9" fill="#F8FAFC" stroke="#2563EB" strokeWidth="1" />
-                <circle cx="100" cy="115" r="9" fill="#F8FAFC" stroke="#059669" strokeWidth="1" />
-                <text x="50" y="50" textAnchor="middle" fontSize="7" fill="#7C3AED">PUMP_SCHEMATIC</text>
-                <text x="150" y="50" textAnchor="middle" fontSize="7" fill="#2563EB">MAINT_LOG</text>
-                <text x="100" y="133" textAnchor="middle" fontSize="7" fill="#059669">ISO_CERT</text>
+                <line x1="100" y1="70" x2="50" y2="30" stroke="var(--accent-primary)" strokeWidth="1" strokeOpacity="0.4" />
+                <line x1="100" y1="70" x2="150" y2="30" stroke="var(--accent-secondary)" strokeWidth="1" strokeOpacity="0.4" />
+                <line x1="100" y1="70" x2="100" y2="115" stroke="var(--success)" strokeWidth="1" strokeOpacity="0.4" />
+                <circle cx="100" cy="70" r="14" fill="var(--surface-primary)" stroke="var(--accent-primary)" strokeWidth="1.5" />
+                <circle cx="50" cy="30" r="9" fill="var(--surface-primary)" stroke="var(--accent-secondary)" strokeWidth="1" />
+                <circle cx="150" cy="30" r="9" fill="var(--surface-primary)" stroke="var(--accent-primary)" strokeWidth="1" />
+                <circle cx="100" cy="115" r="9" fill="var(--surface-primary)" stroke="var(--success)" strokeWidth="1" />
+                <text x="50" y="50" textAnchor="middle" fontSize="7" fill="var(--accent-secondary)">PUMP_SCHEMATIC</text>
+                <text x="150" y="50" textAnchor="middle" fontSize="7" fill="var(--accent-primary)">MAINT_LOG</text>
+                <text x="100" y="133" textAnchor="middle" fontSize="7" fill="var(--success)">ISO_CERT</text>
               </svg>
             </div>
           </div>

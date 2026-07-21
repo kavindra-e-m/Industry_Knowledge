@@ -24,7 +24,7 @@ const Settings              = lazy(() => import("./pages/Settings"));
 
 function PageLoader() {
   return (
-    <div className="flex-1 flex flex-col items-center justify-center gap-4 relative z-10" style={{ background: "#F8F9FC" }}>
+    <div className="flex-1 flex flex-col items-center justify-center gap-4 relative z-10" style={{ background: "var(--bg-primary)" }}>
       <motion.div
         className="w-12 h-12 rounded-2xl flex items-center justify-center"
         style={{ background: "linear-gradient(135deg, #2563EB22, #7C3AED22)", border: "1px solid rgba(37,99,235,0.2)" }}
@@ -56,7 +56,7 @@ function MainContent() {
   }, [initTheme]);
   
   return (
-    <div className="flex h-screen overflow-hidden relative w-full" style={{ background: "#F8F9FC" }}>
+    <div className="flex h-screen overflow-hidden relative w-full" style={{ background: "var(--bg-primary)" }}>
       {/* Background Mesh Glows */}
       <BackgroundGlows />
       <AnimatedBackground />

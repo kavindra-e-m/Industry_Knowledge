@@ -39,14 +39,12 @@ export default function FloatingAIAssistant() {
                 exit={{ opacity: 0, x: 20 }}
                 transition={{ delay: i * 0.04 }}
                 onClick={() => handleAction(label)}
-                className="flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-[12px] font-semibold text-[#0F172A] whitespace-nowrap border"
+                className="flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-[12px] font-semibold whitespace-nowrap border ib-glass shadow-md"
                 style={{
-                  background: "rgba(255, 255, 255, 0.95)",
-                  backdropFilter: "blur(16px)",
-                  borderColor: `${color}30`,
-                  boxShadow: `0 10px 25px rgba(0, 0, 0, 0.06), 0 0 0 1px ${color}10`,
+                  color: "var(--text-primary)",
+                  borderColor: `${color}40`,
                 }}
-                whileHover={{ x: -3, boxShadow: `0 12px 30px rgba(0, 0, 0, 0.08), 0 0 12px ${color}20` }}
+                whileHover={{ x: -3 }}
               >
                 <Icon size={13} style={{ color }} />
                 <span>{label}</span>
@@ -59,14 +57,11 @@ export default function FloatingAIAssistant() {
       {/* Main FAB */}
       <motion.button
         onClick={() => setOpen((o) => !o)}
-        className="w-12 h-12 rounded-2xl flex items-center justify-center relative border border-transparent"
+        className="w-12 h-12 rounded-2xl flex items-center justify-center relative border border-transparent shadow-lg"
         style={{
           background: open
-            ? "#F1F5F9"
+            ? "var(--surface-tertiary)"
             : "linear-gradient(135deg, #2563EB, #7C3AED)",
-          boxShadow: open
-            ? "0 4px 20px rgba(0,0,0,0.06), inset 0 0 0 1px rgba(0,0,0,0.05)"
-            : "0 4px 24px rgba(37,99,235,0.2), 0 0 0 1px rgba(37,99,235,0.15)",
         }}
         animate={{ scale: [1, 1.02, 1] }}
         transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
@@ -75,7 +70,7 @@ export default function FloatingAIAssistant() {
       >
         <AnimatePresence mode="wait">
           {open
-            ? <motion.div key="x" initial={{ rotate: -90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: 90, opacity: 0 }} transition={{ duration: 0.18 }}><X size={18} className="text-[#0F172A]" /></motion.div>
+            ? <motion.div key="x" initial={{ rotate: -90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: 90, opacity: 0 }} transition={{ duration: 0.18 }}><X size={18} style={{ color: "var(--text-primary)" }} /></motion.div>
             : <motion.div key="bot" initial={{ rotate: 90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: -90, opacity: 0 }} transition={{ duration: 0.18 }}><Bot size={18} className="text-white" /></motion.div>
           }
         </AnimatePresence>

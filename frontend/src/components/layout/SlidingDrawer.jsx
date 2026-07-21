@@ -76,7 +76,6 @@ export default function SlidingDrawer() {
 
         setSimLogs((prev) => [newLog, ...prev].slice(0, 30));
 
-        // Proactively insert random alerts into global alert store if anomaly is simulated
         if (isAnomaly) {
           pushAlert({
             equipment_id: tag.toLowerCase(),
@@ -142,30 +141,42 @@ export default function SlidingDrawer() {
             animate={{ x: 0 }}
             exit={{ x: "100%" }}
             transition={{ type: "spring", stiffness: 350, damping: 30 }}
-            className="fixed top-0 right-0 h-screen w-96 max-w-full z-50 flex flex-col pointer-events-auto shadow-2xl border-l border-[#E2E8F0]"
+            className="fixed top-0 right-0 h-screen w-96 max-w-full z-50 flex flex-col pointer-events-auto shadow-2xl border-l transition-colors duration-250"
             style={{
-              background: "rgba(255, 255, 255, 0.95)",
+              background: "var(--glass-bg)",
+              borderColor: "var(--border-primary)",
               backdropFilter: "blur(20px)",
+              color: "var(--text-primary)",
             }}
           >
             {/* Header */}
-            <div className="flex items-center justify-between p-4 border-b border-[#E2E8F0] shrink-0">
+            <div
+              className="flex items-center justify-between p-4 border-b shrink-0 transition-colors duration-250"
+              style={{ borderColor: "var(--border-primary)" }}
+            >
               <div className="flex items-center gap-2">
                 <span className="w-2.5 h-2.5 rounded-full bg-[#2563EB] animate-pulse" />
-                <h3 className="text-sm font-bold text-[#0F172A] font-sora tracking-wide">
+                <h3 className="text-sm font-bold font-sora tracking-wide" style={{ color: "var(--text-primary)" }}>
                   OPERATIONS CONSOLE
                 </h3>
               </div>
               <button
                 onClick={() => setDrawerOpen(false)}
-                className="w-7 h-7 rounded-lg flex items-center justify-center text-[#64748B] hover:text-[#0F172A] hover:bg-[#F1F5F9] transition-all"
+                className="w-7 h-7 rounded-lg flex items-center justify-center transition-all hover:bg-[var(--surface-tertiary)]"
+                style={{ color: "var(--text-tertiary)" }}
               >
                 <X size={15} />
               </button>
             </div>
 
             {/* Tabs */}
-            <div className="flex p-2 gap-1 bg-[#F1F5F9] border-b border-[#E2E8F0] shrink-0">
+            <div
+              className="flex p-2 gap-1 border-b shrink-0 transition-colors duration-250"
+              style={{
+                background: "var(--surface-secondary)",
+                borderColor: "var(--border-primary)",
+              }}
+            >
               {[
                 { id: "alerts", label: "Alerts", count: criticalAlerts.length, icon: Bell },
                 { id: "telemetry", label: "Telemetry", icon: Terminal },
@@ -177,21 +188,26 @@ export default function SlidingDrawer() {
                   <button
                     key={tab.id}
                     onClick={() => setDrawerTab(tab.id)}
-                    className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-lg text-xs font-semibold transition-all relative ${
-                      isActive ? "text-[#2563EB]" : "text-[#64748B] hover:text-[#0F172A]"
-                    }`}
+                    className="flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-lg text-xs font-semibold transition-all relative"
+                    style={{
+                      color: isActive ? "var(--accent-primary)" : "var(--text-tertiary)",
+                    }}
                   >
                     {isActive && (
                       <motion.div
                         layoutId="activeDrawerTab"
-                        className="absolute inset-0 bg-[#FFFFFF] border border-[#E2E8F0] rounded-lg shadow-sm"
+                        className="absolute inset-0 border rounded-lg shadow-sm"
+                        style={{
+                          background: "var(--surface-primary)",
+                          borderColor: "var(--border-primary)",
+                        }}
                         transition={{ type: "spring", stiffness: 380, damping: 30 }}
                       />
                     )}
                     <Icon size={12} className="relative z-10" />
                     <span className="relative z-10">{tab.label}</span>
                     {tab.count !== undefined && tab.count > 0 && (
-                      <span className="relative z-10 px-1.5 py-0.5 rounded-full bg-[#DC2626] text-white text-[9px] font-bold">
+                      <span className="relative z-10 px-1.5 py-0.5 rounded-full bg-red-600 text-white text-[9px] font-bold">
                         {tab.count}
                       </span>
                     )}
@@ -213,8 +229,8 @@ export default function SlidingDrawer() {
                     className="space-y-3"
                   >
                     {criticalAlerts.length === 0 ? (
-                      <div className="text-center py-12 text-[#64748B]">
-                        <CheckSquare size={36} className="mx-auto text-[#10B981] opacity-40 mb-3" />
+                      <div className="text-center py-12" style={{ color: "var(--text-tertiary)" }}>
+                        <CheckSquare size={36} className="mx-auto text-emerald-500 opacity-60 mb-3" />
                         <p className="text-xs font-semibold">All Systems Normal</p>
                         <p className="text-[10px] opacity-70 mt-1">No active critical anomalies detected.</p>
                       </div>
@@ -222,32 +238,54 @@ export default function SlidingDrawer() {
                       criticalAlerts.map((a) => (
                         <div
                           key={a.equipment_id}
-                          className="p-3.5 rounded-xl border border-[#FCA5A5] bg-[#FEF2F2] hover:bg-[#FEE2E2] transition-all flex flex-col gap-2 relative overflow-hidden"
+                          className="p-3.5 rounded-xl border flex flex-col gap-2 relative overflow-hidden transition-all"
                           style={{
-                            boxShadow: "0 2px 8px rgba(220, 38, 38, 0.03)"
+                            background: "rgba(239, 68, 68, 0.08)",
+                            borderColor: "rgba(239, 68, 68, 0.25)",
                           }}
                         >
                           <div className="flex items-center justify-between">
                             <span className="ib-badge ib-badge-critical text-[9px]">
                               {a.tag}
                             </span>
-                            <span className="text-[10px] text-[#DC2626] font-mono font-bold">
+                            <span className="text-[10px] font-mono font-bold text-red-500">
                               RUL: {a.rul_days}d
                             </span>
                           </div>
                           <div>
-                            <h4 className="text-[12px] font-bold text-[#991B1B] font-sora">
+                            <h4 className="text-[12px] font-bold font-sora" style={{ color: "var(--text-primary)" }}>
                               {a.predicted_component}
                             </h4>
-                            <p className="text-[11px] text-[#7F1D1D] leading-relaxed mt-1">
+                            <p className="text-[11px] leading-relaxed mt-1" style={{ color: "var(--text-secondary)" }}>
                               {a.suggested_work_order}
                             </p>
                           </div>
-                           <div className="flex gap-2 mt-1">
-                            <button onClick={() => { push({ type: "success", title: "Work Order Dispatched", message: `AI-optimized inspection dispatched to field crew for ${a.tag}.`, duration: 3000 }); setDrawerOpen(false); }} className="ib-btn ib-btn-critical text-[10px] px-3 py-1.5 rounded-lg flex-1 text-center justify-center font-bold">
+                          <div className="flex gap-2 mt-1">
+                            <button
+                              onClick={() => {
+                                push({
+                                  type: "success",
+                                  title: "Work Order Dispatched",
+                                  message: `AI-optimized inspection dispatched to field crew for ${a.tag}.`,
+                                  duration: 3000,
+                                });
+                                setDrawerOpen(false);
+                              }}
+                              className="ib-btn ib-btn-primary text-[10px] px-3 py-1.5 rounded-lg flex-1 text-center justify-center font-bold"
+                            >
                               DISPATCH WORK ORDER
                             </button>
-                            <button onClick={() => push({ type: "info", title: "Alert Acknowledged", message: `Critical anomaly ticket for ${a.tag} flagged as acknowledged.`, duration: 2500 })} className="ib-btn ib-btn-ghost text-[10px] px-3 py-1.5 rounded-lg border-[#CBD5E1]">
+                            <button
+                              onClick={() =>
+                                push({
+                                  type: "info",
+                                  title: "Alert Acknowledged",
+                                  message: `Critical anomaly ticket for ${a.tag} flagged as acknowledged.`,
+                                  duration: 2500,
+                                })
+                              }
+                              className="ib-btn ib-btn-ghost text-[10px] px-3 py-1.5 rounded-lg"
+                            >
                               ACK
                             </button>
                           </div>
@@ -266,10 +304,13 @@ export default function SlidingDrawer() {
                     transition={{ duration: 0.15 }}
                     className="space-y-2 font-mono text-[11px]"
                   >
-                    <div className="flex items-center justify-between mb-3 border-b border-[#E2E8F0] pb-2 text-[#64748B]">
+                    <div
+                      className="flex items-center justify-between mb-3 border-b pb-2"
+                      style={{ borderColor: "var(--border-primary)", color: "var(--text-tertiary)" }}
+                    >
                       <span>LIVE TELEMETRY STREAM</span>
-                      <span className="flex items-center gap-1 text-[#10B981] font-bold">
-                        <span className="w-1.5 h-1.5 rounded-full bg-[#10B981] animate-pulse" />
+                      <span className="flex items-center gap-1 text-emerald-500 font-bold">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                         listening
                       </span>
                     </div>
@@ -278,18 +319,21 @@ export default function SlidingDrawer() {
                       {simLogs.map((log, idx) => (
                         <div
                           key={idx}
-                          className={`p-2.5 rounded-lg border transition-all ${
-                            log.anomaly
-                              ? "bg-[#FEF2F2] border-[#FCA5A5] text-[#DC2626]"
-                              : "bg-[#F8F9FC] border-[#E2E8F0] text-[#475569]"
-                          }`}
+                          className="p-2.5 rounded-lg border transition-all"
+                          style={{
+                            background: log.anomaly ? "rgba(239, 68, 68, 0.08)" : "var(--surface-secondary)",
+                            borderColor: log.anomaly ? "rgba(239, 68, 68, 0.3)" : "var(--border-primary)",
+                            color: log.anomaly ? "var(--error)" : "var(--text-secondary)",
+                          }}
                         >
                           <div className="flex items-center justify-between font-bold text-[9px] mb-1">
                             <span>[{log.time}] {log.tag}</span>
                             <span
-                              className={`px-1 rounded ${
-                                log.anomaly ? "bg-[#FCA5A5]/30 text-[#B91C1C]" : "bg-slate-200 text-slate-700"
-                              }`}
+                              className="px-1 rounded"
+                              style={{
+                                background: log.anomaly ? "rgba(239, 68, 68, 0.2)" : "var(--surface-tertiary)",
+                                color: log.anomaly ? "var(--error)" : "var(--text-primary)",
+                              }}
                             >
                               {log.type}
                             </span>
@@ -322,16 +366,21 @@ export default function SlidingDrawer() {
                             className={`flex gap-2 ${isAI ? "" : "flex-row-reverse"}`}
                           >
                             <div
-                              className={`w-6 h-6 rounded-lg shrink-0 flex items-center justify-center text-[10px] font-bold ${
-                                isAI ? "bg-slate-100 text-blue-600" : "bg-blue-50 text-blue-600"
-                              }`}
+                              className="w-6 h-6 rounded-lg shrink-0 flex items-center justify-center text-[10px] font-bold shadow-sm"
+                              style={{
+                                background: isAI ? "var(--accent-primary)" : "var(--accent-secondary)",
+                                color: "#FFFFFF",
+                              }}
                             >
                               {isAI ? <Bot size={11} /> : "U"}
                             </div>
                             <div
-                              className={`rounded-xl px-3 py-2 text-[11px] leading-relaxed max-w-[80%] ${
-                                isAI ? "bg-[#F8F9FC] border border-[#E2E8F0] text-[#334155]" : "text-white bg-gradient-to-r from-blue-600 to-indigo-600"
-                              }`}
+                              className="rounded-xl px-3 py-2 text-[11px] leading-relaxed max-w-[80%] border"
+                              style={{
+                                background: isAI ? "var(--surface-secondary)" : "var(--accent-primary)",
+                                borderColor: isAI ? "var(--border-primary)" : "var(--accent-primary)",
+                                color: isAI ? "var(--text-primary)" : "#FFFFFF",
+                              }}
                             >
                               {msg.text}
                             </div>
@@ -340,14 +389,24 @@ export default function SlidingDrawer() {
                       })}
                       {isTyping && (
                         <div className="flex gap-2">
-                          <div className="w-6 h-6 rounded-lg bg-slate-100 text-blue-600 flex items-center justify-center text-[10px]">
+                          <div
+                            className="w-6 h-6 rounded-lg flex items-center justify-center text-[10px] text-white"
+                            style={{ background: "var(--accent-primary)" }}
+                          >
                             <Bot size={11} />
                           </div>
-                          <div className="bg-[#F8F9FC] border border-[#E2E8F0] px-3 py-2 rounded-xl flex gap-1 items-center">
+                          <div
+                            className="px-3 py-2 rounded-xl flex gap-1 items-center border"
+                            style={{
+                              background: "var(--surface-secondary)",
+                              borderColor: "var(--border-primary)",
+                            }}
+                          >
                             {[0, 1, 2].map((i) => (
                               <motion.div
                                 key={i}
-                                className="w-1.5 h-1.5 rounded-full bg-[#2563EB]"
+                                className="w-1.5 h-1.5 rounded-full"
+                                style={{ background: "var(--accent-primary)" }}
                                 animate={{ opacity: [0.3, 1, 0.3] }}
                                 transition={{ duration: 1, repeat: Infinity, delay: i * 0.2 }}
                               />
@@ -359,7 +418,10 @@ export default function SlidingDrawer() {
                     </div>
 
                     {/* Chat Input */}
-                    <div className="border-t border-[#E2E8F0] pt-3 mt-auto flex gap-1.5 font-jakarta">
+                    <div
+                      className="border-t pt-3 mt-auto flex gap-1.5 font-jakarta"
+                      style={{ borderColor: "var(--border-primary)" }}
+                    >
                       <input
                         type="text"
                         className="flex-1 ib-input py-2 text-xs"
@@ -370,7 +432,8 @@ export default function SlidingDrawer() {
                       />
                       <button
                         onClick={handleSendChat}
-                        className="w-8 h-8 rounded-xl bg-[#2563EB] flex items-center justify-center text-white shrink-0 hover:opacity-90 active:scale-95 transition-all"
+                        className="w-8 h-8 rounded-xl flex items-center justify-center text-white shrink-0 hover:opacity-90 active:scale-95 transition-all shadow-sm"
+                        style={{ background: "var(--accent-primary)" }}
                       >
                         <Send size={12} />
                       </button>

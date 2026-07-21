@@ -72,17 +72,17 @@ export default function CommandPalette() {
             className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-2xl z-[10000]"
           >
             <div
-              className="rounded-2xl overflow-hidden"
+              className="rounded-2xl overflow-hidden shadow-2xl border transition-colors duration-250"
               style={{
-                background: "rgba(15, 28, 46, 0.95)",
+                background: "var(--glass-bg)",
+                borderColor: "var(--border-primary)",
                 backdropFilter: "blur(20px)",
-                border: "1px solid rgba(79, 157, 255, 0.2)",
-                boxShadow: "0 20px 60px rgba(0, 0, 0, 0.6), 0 0 40px rgba(79, 157, 255, 0.1)",
+                color: "var(--text-primary)",
               }}
             >
               {/* Search Input */}
-              <div className="flex items-center gap-3 px-5 py-4 border-b border-[#1E3A5F]">
-                <Search size={18} className="text-[#4F9DFF]" />
+              <div className="flex items-center gap-3 px-5 py-4 border-b border-primary-app">
+                <Search size={18} style={{ color: "var(--accent-primary)" }} />
                 <input
                   autoFocus
                   type="text"
@@ -92,11 +92,13 @@ export default function CommandPalette() {
                     setSearch(e.target.value);
                     setSelected(0);
                   }}
-                  className="flex-1 bg-transparent text-white placeholder-[#4A6080] outline-none text-base font-jakarta"
+                  className="flex-1 bg-transparent placeholder-[#4A6080] outline-none text-base font-jakarta"
+                  style={{ color: "var(--text-primary)" }}
                 />
                 <button
                   onClick={() => setOpen(false)}
-                  className="text-[#4A6080] hover:text-[#8BA3C7] transition-colors"
+                  style={{ color: "var(--text-tertiary)" }}
+                  className="hover:opacity-80 transition-colors"
                 >
                   <X size={18} />
                 </button>
@@ -106,12 +108,12 @@ export default function CommandPalette() {
               <div className="max-h-96 overflow-y-auto">
                 {filtered.length === 0 ? (
                   <div className="px-5 py-12 text-center">
-                    <p className="text-[#4A6080] text-sm">No commands found</p>
+                    <p style={{ color: "var(--text-tertiary)" }} className="text-sm">No commands found</p>
                   </div>
                 ) : (
                   Object.entries(grouped).map(([category, commands]) => (
                     <div key={category}>
-                      <div className="px-5 py-2 text-xs font-bold text-[#4A6080] uppercase tracking-wider">
+                      <div className="px-5 py-2 text-xs font-bold uppercase tracking-wider" style={{ color: "var(--text-tertiary)" }}>
                         {category}
                       </div>
                       {commands.map((cmd, idx) => {
@@ -122,15 +124,15 @@ export default function CommandPalette() {
                             onClick={() => handleSelect(cmd)}
                             className="w-full flex items-center gap-3 px-5 py-3 transition-colors"
                             style={{
-                              background: isSelected ? "rgba(79, 157, 255, 0.15)" : "transparent",
+                              background: isSelected ? "var(--surface-tertiary)" : "transparent",
                             }}
                             whileHover={{ x: 4 }}
                           >
-                            <cmd.icon size={16} className="text-[#4F9DFF]" />
+                            <cmd.icon size={16} style={{ color: "var(--accent-primary)" }} />
                             <div className="flex-1 text-left">
-                              <p className="text-sm font-medium text-white">{cmd.label}</p>
+                              <p className="text-sm font-medium" style={{ color: "var(--text-primary)" }}>{cmd.label}</p>
                             </div>
-                            <span className="text-xs text-[#4A6080] font-mono">{cmd.shortcut}</span>
+                            <span className="text-xs font-mono" style={{ color: "var(--text-tertiary)" }}>{cmd.shortcut}</span>
                           </motion.button>
                         );
                       })}
@@ -140,7 +142,7 @@ export default function CommandPalette() {
               </div>
 
               {/* Footer */}
-              <div className="px-5 py-3 border-t border-[#1E3A5F] flex items-center justify-between text-xs text-[#4A6080]">
+              <div className="px-5 py-3 border-t border-primary-app flex items-center justify-between text-xs" style={{ color: "var(--text-tertiary)" }}>
                 <div className="flex gap-3">
                   <span>↑↓ Navigate</span>
                   <span>↵ Select</span>

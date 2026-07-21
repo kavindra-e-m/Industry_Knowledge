@@ -10,33 +10,23 @@ export function PremiumCard({
 }) {
   return (
     <motion.div
-      className={`rounded-xl overflow-hidden transition-all ${className}`}
-      style={{
-        background: "rgba(22, 38, 61, 0.6)",
-        backdropFilter: "blur(12px)",
-        border: "1px solid rgba(79, 157, 255, 0.15)",
-        boxShadow: glow ? "0 0 20px rgba(79, 157, 255, 0.1)" : "0 4px 12px rgba(0, 0, 0, 0.2)",
-      }}
+      className={`ib-card ${className}`}
       whileHover={
         hover
           ? {
               y: -2,
-              boxShadow: glow
-                ? "0 0 30px rgba(79, 157, 255, 0.2)"
-                : "0 8px 24px rgba(0, 0, 0, 0.3)",
-              border: "1px solid rgba(79, 157, 255, 0.25)",
             }
           : {}
       }
       transition={{ duration: 0.2 }}
       {...props}
     >
-      {/* Gradient border on hover */}
+      {/* Gradient border overlay on hover */}
       {gradient && (
         <motion.div
           className="absolute inset-0 rounded-xl pointer-events-none"
           style={{
-            background: "linear-gradient(135deg, rgba(79, 157, 255, 0.2), rgba(124, 92, 252, 0.2))",
+            background: "linear-gradient(135deg, rgba(37, 99, 235, 0.15), rgba(124, 58, 237, 0.15))",
             opacity: 0,
           }}
           whileHover={{ opacity: 1 }}
