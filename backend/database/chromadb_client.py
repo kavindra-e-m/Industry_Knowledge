@@ -2,6 +2,9 @@
 ChromaDB singleton client + embedding wrapper.
 Owner: Member 1 — Backend & RAG Lead
 """
+
+
+# pyrefly: ignore [missing-import]
 import chromadb
 from sentence_transformers import SentenceTransformer
 from loguru import logger
@@ -33,10 +36,16 @@ class ChromaDBClient:
 
     def _init(self):
         logger.info(f"Connecting to ChromaDB at {settings.CHROMA_HOST}:{settings.CHROMA_PORT}...")
-        self.client = chromadb.HttpClient(
-            host=settings.CHROMA_HOST,
-            port=settings.CHROMA_PORT,
-        )
+        try:
+            self.client = chromadb.HttpClient(
+                host=settings.CHROMA_HOST,
+                port=settings.CHROMA_PORT,
+            )
+            self.client.heartbeat()
+        except Exception as e:
+            logger.warning(f"ChromaDB HttpClient connection fallback triggered: {e}")
+            self.client = chromadb.PersistentClient(path="./data/chromadb")
+
         logger.info(f"Loading embedding model: {settings.EMBEDDING_MODEL}")
         self.embedder = SentenceTransformer(settings.EMBEDDING_MODEL)
 
