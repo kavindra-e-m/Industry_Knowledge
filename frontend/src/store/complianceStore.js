@@ -12,10 +12,14 @@ export const useComplianceStore = create((set, get) => ({
     set({ loading: true, error: null });
     try {
       const data = await fetchComplianceReport();
+      const recordsArray = Array.isArray(data) ? data : (data?.results || data?.records || []);
+      const summaryObj = (!Array.isArray(data) && data?.summary) ? data.summary : {};
+      const criticalEq = (!Array.isArray(data) && data?.critical_equipment) ? data.critical_equipment : [];
+      
       set({
-        records: data.results || [],
-        summary: data.summary || {},
-        criticalEquipment: data.critical_equipment || [],
+        records: recordsArray,
+        summary: summaryObj,
+        criticalEquipment: criticalEq,
         loading: false
       });
     } catch (err) {
@@ -24,12 +28,21 @@ export const useComplianceStore = create((set, get) => ({
   },
 
   averageScore: () => {
-    const { summary } = get();
-    return summary?.average_compliance_score || 0;
+    const { summary, records } = get();
+    if (summary && summary.average_compliance_score !== undefined) {
+      return summary.average_compliance_score;
+    }
+    const list = Array.isArray(records) ? records : [];
+    if (!list.length) return 0;
+    return Math.round(list.reduce((sum, r) => sum + (r.overall_score || r.compliance_score || 0), 0) / list.length);
   },
 
   nonCompliantCount: () => {
-    const { summary } = get();
-    return summary?.non_compliant || 0;
+    const { summary, records } = get();
+    if (summary && summary.non_compliant !== undefined) {
+      return summary.non_compliant;
+    }
+    const list = Array.isArray(records) ? records : [];
+    return list.filter((r) => r.status === "non-compliant" || r.status === "expired" || r.overall_status === "non_compliant" || (r.overall_score && r.overall_score < 70) || (r.compliance_score && r.compliance_score < 70)).length;
   },
 }));

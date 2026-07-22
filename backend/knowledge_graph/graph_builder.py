@@ -131,6 +131,9 @@ class GraphBuilder:
 
     def ensure_graph_initialized(self) -> bool:
         """Check if graph has equipment nodes; seed if empty."""
+        if not hasattr(self.neo4j, "driver") or self.neo4j.driver is None:
+            logger.info("Neo4j offline — skipping graph initialization")
+            return False
         stats = self.get_graph_stats()
         equipment_count = stats.get("nodes", {}).get("Equipment", 0)
         if equipment_count == 0:

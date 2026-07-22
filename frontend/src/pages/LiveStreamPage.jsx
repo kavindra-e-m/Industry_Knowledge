@@ -58,7 +58,13 @@ export default function LiveStreamPage() {
     }
 
     return () => {
-      if (wsRef.current) wsRef.current.close();
+      if (wsRef.current) {
+        if (wsRef.current.readyState === WebSocket.CONNECTING) {
+          wsRef.current.onopen = () => wsRef.current?.close();
+        } else if (wsRef.current.readyState === WebSocket.OPEN) {
+          wsRef.current.close();
+        }
+      }
       clearInterval(interval);
     };
   }, []);

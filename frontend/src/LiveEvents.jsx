@@ -30,7 +30,11 @@ export default function LiveEvents() {
     };
 
     return () => {
-      ws.close();
+      if (ws.readyState === WebSocket.CONNECTING) {
+        ws.onopen = () => ws.close();
+      } else if (ws.readyState === WebSocket.OPEN) {
+        ws.close();
+      }
     };
   }, []);
 

@@ -104,7 +104,7 @@ export function createWebSocketStream(onMessage, onError) {
     }
   };
   ws.onerror = (err) => {
-    if (onError) onError(err);
+    if (ws.readyState === WebSocket.OPEN && onError) onError(err);
   };
   return ws;
 }
