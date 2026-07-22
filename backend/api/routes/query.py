@@ -169,46 +169,6 @@ RULES:
 - If you do not know something, say so clearly
 - Format responses with clear sections when helpful"""
 
-            genai.configure(api_key=settings.GEMINI_API_KEY)
-            model_names = [settings.GEMINI_MODEL, "gemini-1.5-flash-latest", "gemini-2.0-flash", "gemini-1.5-flash"]
-            chat = None
-            for m_name in model_names:
-                try:
-                    m = genai.GenerativeModel(m_name, system_instruction=system_prompt)
-                    gemini_history = []
-                    for msg in request.messages[:-1]:
-                        role = "user" if msg.role == "user" else "model"
-                        gemini_history.append({"role": role, "parts": [msg.content]})
-                    chat = m.start_chat(history=gemini_history)
-                    response = chat.send_message(
-                        last_message,
-                        stream=True,
-                        generation_config=genai.GenerationConfig(
-                            max_output_tokens=settings.GEMINI_MAX_TOKENS, temperature=0.2
-                        ),
-                    )
-                    break
-                except Exception as ex:
-                    if "404" in str(ex) or "not found" in str(ex):
-                        continue
-                    raise ex
-            if chat is None:
-                m = genai.GenerativeModel("gemini-1.5-flash-latest", system_instruction=system_prompt)
-                gemini_history = []
-                for msg in request.messages[:-1]:
-                    role = "user" if msg.role == "user" else "model"
-                    gemini_history.append({"role": role, "parts": [msg.content]})
-                chat = m.start_chat(history=gemini_history)
-                response = chat.send_message(
-                    last_message,
-                    stream=True,
-                    generation_config=genai.GenerationConfig(
-                        max_output_tokens=settings.GEMINI_MAX_TOKENS, temperature=0.2
-                    ),
-                )
-            for chunk in response:
-                if chunk.text:
-                    yield f"data: {json_module.dumps({'token': chunk.text, 'done': False})}\n\n"
             sources = (
                 [
                     {
@@ -221,6 +181,61 @@ RULES:
                 if chunks
                 else []
             )
+
+            try:
+                genai.configure(api_key=settings.GEMINI_API_KEY)
+                model_names = [settings.GEMINI_MODEL, "gemini-1.5-flash-latest", "gemini-2.0-flash", "gemini-1.5-flash"]
+                chat = None
+                response = None
+                for m_name in model_names:
+                    try:
+                        m = genai.GenerativeModel(m_name, system_instruction=system_prompt)
+                        gemini_history = []
+                        for msg in request.messages[:-1]:
+                            role = "user" if msg.role == "user" else "model"
+                            gemini_history.append({"role": role, "parts": [msg.content]})
+                        chat = m.start_chat(history=gemini_history)
+                        response = chat.send_message(
+                            last_message,
+                            stream=True,
+                            generation_config=genai.GenerationConfig(
+                                max_output_tokens=settings.GEMINI_MAX_TOKENS, temperature=0.2
+                            ),
+                        )
+                        break
+                    except Exception as ex:
+                        if "404" in str(ex) or "not found" in str(ex):
+                            continue
+                        raise ex
+
+                if response is not None:
+                    for chunk in response:
+                        if chunk.text:
+                            yield f"data: {json_module.dumps({'token': chunk.text, 'done': False})}\n\n"
+                    yield f"data: {json_module.dumps({'token': '', 'done': True, 'sources': sources})}\n\n"
+                    return
+            except Exception as llm_err:
+                logger.warning(f"LLM API limit or error encountered ({llm_err}). Falling back to Local RAG Synthesis Mode.")
+
+            # ---- Local RAG Fallback Synthesis ----
+            fallback_tokens = []
+            fallback_tokens.append(f"### Industrial Knowledge Assistant (Local RAG Mode)\n\n")
+            if context:
+                fallback_tokens.append(f"**Retrieved Knowledge Base Context:**\n{context}\n\n")
+            if equipment_context:
+                fallback_tokens.append(f"**Equipment Context:**\n{equipment_context}\n\n")
+            
+            fallback_tokens.append(f"**Recommendations:**\n")
+            fallback_tokens.append(f"- Perform standard visual & vibration inspections according to plant SOPs.\n")
+            fallback_tokens.append(f"- Verify all safety interlocks and pressure relief settings before executing work orders.\n")
+            fallback_tokens.append(f"- Refer to uploaded OISD/Factory Act documentation for compliance guidelines.\n")
+            
+            full_text = "".join(fallback_tokens)
+            words = full_text.split(" ")
+            for i, word in enumerate(words):
+                space = " " if i < len(words) - 1 else ""
+                yield f"data: {json_module.dumps({'token': word + space, 'done': False})}\n\n"
+            
             yield f"data: {json_module.dumps({'token': '', 'done': True, 'sources': sources})}\n\n"
         except Exception as e:
             logger.error(f"Streaming error: {e}")
