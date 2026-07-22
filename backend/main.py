@@ -140,6 +140,7 @@ app.include_router(system_router,          prefix="/api",              tags=["Sy
 # Health + System
 # ---------------------------------------------------------------------------
 @app.get("/health", tags=["system"])
+@app.get("/api/health", tags=["system"])
 async def health_check():
     """Service health — quick check for load balancer / uptime monitor."""
     return {
