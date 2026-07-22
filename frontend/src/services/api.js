@@ -74,3 +74,38 @@ export const getPIDImpact = (tagId) => fetchWithFallback(`/api/pid/impact/${tagI
 export const getPIDIsolation = (tagId) => fetchWithFallback(`/api/pid/isolation/${tagId}`);
 
 export const getSystemStatus = () => fetchWithFallback("/api/system/status");
+
+export function createWebSocketStream(onMessage, onError) {
+  let wsUrl;
+  if (BASE_URL.startsWith("http")) {
+    wsUrl = BASE_URL.replace(/^http/, "ws") + "/api/stream/ws";
+  } else {
+    const loc = window.location;
+    const proto = loc.protocol === "https:" ? "wss:" : "ws:";
+    wsUrl = `${proto}//${loc.host}/api/stream/ws`;
+  }
+  const ws = new WebSocket(wsUrl);
+  ws.onmessage = (event) => {
+    try {
+      const data = JSON.parse(event.data);
+      if (onMessage) onMessage(data);
+    } catch (e) {
+      if (onMessage) onMessage(event.data);
+    }
+  };
+  ws.onerror = (err) => {
+    if (onError) onError(err);
+  };
+  return ws;
+}
+
+export async function login(username, password) {
+  const formData = new URLSearchParams();
+  formData.append("username", username);
+  formData.append("password", password);
+  return fetchWithFallback("/api/auth/login", {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: formData.toString(),
+  });
+}
