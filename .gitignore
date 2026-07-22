@@ -15,6 +15,7 @@ build/
 *.env.local
 
 # Data
+data/chromadb/
 data-infra/synthetic-data/sample_docs/*
 !data-infra/synthetic-data/sample_docs/.gitkeep
 
