@@ -1,4 +1,4 @@
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useEffect } from "react";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import Sidebar from "./components/layout/Sidebar";
@@ -9,6 +9,7 @@ import FloatingAIAssistant from "./components/shared/FloatingAIAssistant";
 import ToastContainer from "./components/shared/ToastContainer";
 import LoginPage from "./pages/LoginPage";
 import { useAuthStore } from "./store/authStore";
+import { useThemeStore } from "./store/themeStore";
 
 const Dashboard             = lazy(() => import("./pages/Dashboard"));
 const AICopilot             = lazy(() => import("./pages/AICopilot"));
@@ -25,7 +26,7 @@ const Settings              = lazy(() => import("./pages/Settings"));
 
 function PageLoader() {
   return (
-    <div className="flex-1 flex flex-col items-center justify-center gap-4 relative z-10" style={{ background: "#F8F9FC" }}>
+    <div className="flex-1 flex flex-col items-center justify-center gap-4 relative z-10" style={{ background: "var(--bg-primary)" }}>
       <motion.div
         className="w-12 h-12 rounded-2xl flex items-center justify-center"
         style={{ background: "linear-gradient(135deg, #2563EB22, #7C3AED22)", border: "1px solid rgba(37,99,235,0.2)" }}
@@ -50,8 +51,14 @@ function PageLoader() {
 
 function MainContent() {
   const location = useLocation();
+  const initTheme = useThemeStore((s) => s.initTheme);
+  
+  useEffect(() => {
+    initTheme();
+  }, [initTheme]);
+  
   return (
-    <div className="flex h-screen overflow-hidden relative w-full" style={{ background: "#F8F9FC" }}>
+    <div className="flex h-screen overflow-hidden relative w-full" style={{ background: "var(--bg-primary)" }}>
       {/* Background Mesh Glows */}
       <BackgroundGlows />
       <AnimatedBackground />

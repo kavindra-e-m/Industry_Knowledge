@@ -20,7 +20,6 @@ const SETTINGS_SECTIONS = [
     title: "Appearance",
     icon: Palette,
     settings: [
-      { label: "Dark Mode", description: "Use dark theme (currently active)", enabled: true, disabled: true },
       { label: "Compact View", description: "Reduce spacing and font sizes", enabled: false },
       { label: "High Contrast", description: "Increase contrast for better visibility", enabled: false },
     ]
@@ -56,16 +55,16 @@ const SETTINGS_SECTIONS = [
 
 function ToggleSetting({ label, description, enabled, disabled, onChange }) {
   return (
-    <div className="flex items-center justify-between p-4 border-b border-[#1E3A5F] last:border-b-0 hover:bg-[#0A1929]/50 transition-colors">
+    <div className="flex items-center justify-between p-4 border-b last:border-b-0 hover:bg-[var(--surface-tertiary)] transition-colors" style={{ borderColor: "var(--border-primary)" }}>
       <div className="flex-1">
-        <p className="text-sm font-semibold text-white font-jakarta">{label}</p>
-        <p className="text-xs text-[#4A6080] mt-1">{description}</p>
+        <p className="text-sm font-semibold font-jakarta" style={{ color: "var(--text-primary)" }}>{label}</p>
+        <p className="text-xs mt-1" style={{ color: "var(--text-tertiary)" }}>{description}</p>
       </div>
       <motion.button
         onClick={onChange}
         disabled={disabled}
         className={`ml-4 relative w-11 h-6 rounded-full transition-colors ${
-          enabled ? "bg-[#4F9DFF]" : "bg-[#1E3A5F]"
+          enabled ? "bg-[var(--accent-primary)]" : "bg-[var(--border-primary)]"
         } ${disabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
         whileTap={{ scale: 0.95 }}
       >
@@ -82,19 +81,20 @@ function ToggleSetting({ label, description, enabled, disabled, onChange }) {
 function ActionSetting({ label, description }) {
   return (
     <motion.button
-      className="w-full flex items-center justify-between p-4 border-b border-[#1E3A5F] last:border-b-0 hover:bg-[#0A1929]/50 transition-colors text-left group"
+      className="w-full flex items-center justify-between p-4 border-b last:border-b-0 hover:bg-[var(--surface-tertiary)] transition-colors text-left group"
+      style={{ borderColor: "var(--border-primary)" }}
       whileHover={{ x: 2 }}
     >
       <div className="flex-1">
-        <p className="text-sm font-semibold text-white font-jakarta">{label}</p>
-        <p className="text-xs text-[#4A6080] mt-1">{description}</p>
+        <p className="text-sm font-semibold font-jakarta" style={{ color: "var(--text-primary)" }}>{label}</p>
+        <p className="text-xs mt-1" style={{ color: "var(--text-tertiary)" }}>{description}</p>
       </div>
-      <ChevronRight size={16} className="text-[#4A6080] group-hover:text-[#4F9DFF] transition-colors" />
+      <ChevronRight size={16} style={{ color: "var(--text-tertiary)" }} className="group-hover:text-[var(--accent-primary)] transition-colors" />
     </motion.button>
   );
 }
 
-function SettingsSection({ section }) {
+function SettingsSection({ section, onToggle }) {
   return (
     <motion.div
       className="ib-card overflow-hidden"
@@ -102,9 +102,9 @@ function SettingsSection({ section }) {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
     >
-      <div className="flex items-center gap-3 p-4 border-b border-[#1E3A5F] bg-[#0A1929]/50">
-        <section.icon size={18} className="text-[#4F9DFF]" />
-        <h3 className="text-sm font-semibold text-white font-jakarta">{section.title}</h3>
+      <div className="flex items-center gap-3 p-4 border-b transition-colors duration-250" style={{ borderColor: "var(--border-primary)", background: "var(--surface-secondary)" }}>
+        <section.icon size={18} style={{ color: "var(--accent-primary)" }} />
+        <h3 className="text-sm font-semibold font-jakarta" style={{ color: "var(--text-primary)" }}>{section.title}</h3>
       </div>
       <div>
         {section.settings.map((setting, idx) => (
@@ -117,7 +117,7 @@ function SettingsSection({ section }) {
               description={setting.description}
               enabled={setting.enabled}
               disabled={setting.disabled}
-              onChange={() => {}}
+              onChange={() => onToggle && onToggle(idx)}
             />
           )
         ))}
@@ -127,6 +127,22 @@ function SettingsSection({ section }) {
 }
 
 export default function Settings() {
+  const [sections, setSections] = useState(SETTINGS_SECTIONS);
+
+  const toggleSetting = (sectionId, settingIdx) => {
+    setSections(prev => prev.map(section => {
+      if (section.id === sectionId) {
+        const newSettings = [...section.settings];
+        newSettings[settingIdx] = {
+          ...newSettings[settingIdx],
+          enabled: !newSettings[settingIdx].enabled
+        };
+        return { ...section, settings: newSettings };
+      }
+      return section;
+    }));
+  };
+
   return (
     <PageShell topbarPlaceholder="Search settings...">
       <div className="p-5 space-y-4 min-h-full" style={{ background: "transparent" }}>
@@ -137,39 +153,39 @@ export default function Settings() {
             transition={{ duration: 0.3 }}
             className="mb-6"
           >
-            <h1 className="text-3xl font-bold text-white font-sora mb-2">Settings</h1>
-            <p className="text-sm text-[#4A6080]">Manage your preferences and account settings</p>
+            <h1 className="text-3xl font-bold font-sora mb-2" style={{ color: "var(--text-primary)" }}>Settings</h1>
+            <p className="text-sm" style={{ color: "var(--text-tertiary)" }}>Manage your preferences and account settings</p>
           </motion.div>
 
           <div className="space-y-4">
-            {SETTINGS_SECTIONS.map((section, idx) => (
+            {sections.map((section, idx) => (
               <motion.div
                 key={section.id}
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: idx * 0.08 }}
               >
-                <SettingsSection section={section} />
+                <SettingsSection section={section} onToggle={(settingIdx) => toggleSetting(section.id, settingIdx)} />
               </motion.div>
             ))}
 
             {/* Danger Zone */}
             <motion.div
-              className="ib-card overflow-hidden mt-8"
+              className="ib-card overflow-hidden mt-8 shadow-md"
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: SETTINGS_SECTIONS.length * 0.08 }}
             >
-              <div className="flex items-center gap-3 p-4 border-b border-[#FF5C5C]/30 bg-[#FF5C5C]/5">
-                <LogOut size={18} className="text-[#FF5C5C]" />
-                <h3 className="text-sm font-semibold text-[#FF5C5C] font-jakarta">Danger Zone</h3>
+              <div className="flex items-center gap-3 p-4 border-b bg-red-500/5" style={{ borderColor: "rgba(239, 68, 68, 0.3)" }}>
+                <LogOut size={18} className="text-red-500" />
+                <h3 className="text-sm font-semibold font-jakarta text-red-500">Danger Zone</h3>
               </div>
               <motion.button
-                className="w-full p-4 text-left hover:bg-[#FF5C5C]/5 transition-colors group"
+                className="w-full p-4 text-left hover:bg-red-500/5 transition-colors group border-0 bg-transparent outline-none cursor-pointer"
                 whileHover={{ x: 2 }}
               >
-                <p className="text-sm font-semibold text-[#FF5C5C] font-jakarta">Sign Out</p>
-                <p className="text-xs text-[#4A6080] mt-1">End your current session</p>
+                <p className="text-sm font-semibold font-jakarta text-red-500">Sign Out</p>
+                <p className="text-xs mt-1" style={{ color: "var(--text-tertiary)" }}>End your current session</p>
               </motion.button>
             </motion.div>
           </div>
