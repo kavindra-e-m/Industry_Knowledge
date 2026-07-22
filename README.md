@@ -65,7 +65,7 @@ cd ml && pip install -r requirements.txt --break-system-packages
 cd frontend/web-dashboard && npm install && npm run dev
 
 # data / SKAB dataset stream (Member 4)
-python devops/scripts/stream_skab.py --backend-url http://localhost:8080/api/stream/event --delay 1.0
+python devops/scripts/stream_skab.py --backend-url http://localhost:8000/api/stream/event --delay 1.0
 ```
 
 ## Git workflow

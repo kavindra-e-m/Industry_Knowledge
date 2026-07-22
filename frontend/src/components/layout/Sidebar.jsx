@@ -199,7 +199,6 @@ export default function Sidebar() {
             </button>
           )}
         </div>
-        </div>
       </div>
     </motion.aside>
   );

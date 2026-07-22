@@ -85,7 +85,7 @@ services:
       REDIS_PORT: 6379
       PYTHONPATH: /app
     ports:
-      - "8080:8000"
+      - "8000:8000"
     depends_on:
       postgres:
         condition: service_healthy
@@ -106,7 +106,7 @@ services:
     ports:
       - "3000:5173"
     environment:
-      - VITE_API_URL=http://localhost:8080
+      - VITE_API_URL=http://localhost:8000
     depends_on:
       - backend
 

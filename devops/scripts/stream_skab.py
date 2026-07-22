@@ -70,7 +70,7 @@ def main():
     parser = argparse.ArgumentParser(description="Stream SKAB dataset rows as real-time events to the backend.")
     parser.add_argument("--dataset-path", type=Path, default=Path.home() / ".cache" / "kagglehub" / "datasets" / "yuriykatser" / "skoltech-anomaly-benchmark-skab" / "versions" / "1",
                         help="Root path to the downloaded SKAB dataset")
-    parser.add_argument("--backend-url", default="http://localhost:8080/api/stream/event",
+    parser.add_argument("--backend-url", default="http://localhost:8000/api/stream/event",
                         help="Backend event ingestion endpoint")
     parser.add_argument("--delay", type=float, default=1.0,
                         help="Delay in seconds between events")
