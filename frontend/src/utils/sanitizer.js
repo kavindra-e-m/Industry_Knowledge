@@ -25,12 +25,17 @@ export function decodeUnicodeEscapes(text) {
 /**
  * Normalizes page URLs and handles environment-aware base URLs.
  */
-export function normalizeMetadataUrl(url) {
+export function normalizeMetadataUrl(url, fallbackPath = "/copilot") {
   let cleanUrl = stripInternalMarkers(url);
-  const baseUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
+  const baseUrl = (import.meta.env.VITE_API_BASE_URL || "http://localhost:8000").replace(/\/$/, "");
+  
+  if (!cleanUrl) {
+    return `${baseUrl}${fallbackPath}`;
+  }
+
   if (cleanUrl.startsWith("http://localhost/") || cleanUrl.startsWith("http://localhost:8000/")) {
     const path = cleanUrl.replace(/^http:\/\/localhost(:8000)?/, "");
-    cleanUrl = `${baseUrl.replace(/\/$/, "")}${path}`;
+    cleanUrl = `${baseUrl}${path}`;
   }
   return cleanUrl;
 }
@@ -45,8 +50,15 @@ export function sanitizeTabMetadata(tabData = {}) {
   }
 
   const isCurrent = Boolean(tabData.isCurrent);
-  const pageTitle = decodeUnicodeEscapes(stripInternalMarkers(tabData.pageTitle || ""));
-  const pageUrl = normalizeMetadataUrl(tabData.pageUrl || "");
+  
+  // Clean title & url with fallback protection
+  let rawTitle = stripInternalMarkers(tabData.pageTitle || "");
+  let pageTitle = decodeUnicodeEscapes(rawTitle);
+  if (!pageTitle) {
+    pageTitle = "IndustrialBrain — Knowledge & Operational Intelligence";
+  }
+
+  let pageUrl = normalizeMetadataUrl(tabData.pageUrl || "");
 
   return {
     ...tabData,
