@@ -139,6 +139,18 @@ app.include_router(system_router,          prefix="/api",              tags=["Sy
 # ---------------------------------------------------------------------------
 # Health + System
 # ---------------------------------------------------------------------------
+@app.get("/", tags=["system"])
+async def root():
+    """Root endpoint — returns API information and links."""
+    return {
+        "message": "IndustrialBrain API Server is running",
+        "docs_url": "http://localhost:8000/docs",
+        "frontend_url": "http://localhost:5173",
+        "health_check": "http://localhost:8000/health",
+        "system_status": "http://localhost:8000/api/system/status",
+    }
+
+
 @app.get("/health", tags=["system"])
 @app.get("/api/health", tags=["system"])
 async def health_check():

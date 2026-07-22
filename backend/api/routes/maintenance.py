@@ -90,6 +90,8 @@ async def get_failure_history(equipment_tag: str):
 
 
 @router.get("/overdue", summary="Get overdue preventive maintenance")
+@router.get("/alerts", summary="Get active maintenance alerts")
+@router.get("/maintenance/alerts", summary="Get active maintenance alerts")
 async def get_overdue_pm():
     """List all equipment with overdue preventive maintenance."""
     from backend.database.postgres_client import PostgresClient

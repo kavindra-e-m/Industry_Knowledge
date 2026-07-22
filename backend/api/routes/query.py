@@ -170,19 +170,42 @@ RULES:
 - Format responses with clear sections when helpful"""
 
             genai.configure(api_key=settings.GEMINI_API_KEY)
-            model = genai.GenerativeModel(settings.GEMINI_MODEL, system_instruction=system_prompt)
-            gemini_history = []
-            for msg in request.messages[:-1]:
-                role = "user" if msg.role == "user" else "model"
-                gemini_history.append({"role": role, "parts": [msg.content]})
-            chat = model.start_chat(history=gemini_history)
-            response = chat.send_message(
-                last_message,
-                stream=True,
-                generation_config=genai.GenerationConfig(
-                    max_output_tokens=settings.GEMINI_MAX_TOKENS, temperature=0.2
-                ),
-            )
+            model_names = [settings.GEMINI_MODEL, "gemini-1.5-flash-latest", "gemini-2.0-flash", "gemini-1.5-flash"]
+            chat = None
+            for m_name in model_names:
+                try:
+                    m = genai.GenerativeModel(m_name, system_instruction=system_prompt)
+                    gemini_history = []
+                    for msg in request.messages[:-1]:
+                        role = "user" if msg.role == "user" else "model"
+                        gemini_history.append({"role": role, "parts": [msg.content]})
+                    chat = m.start_chat(history=gemini_history)
+                    response = chat.send_message(
+                        last_message,
+                        stream=True,
+                        generation_config=genai.GenerationConfig(
+                            max_output_tokens=settings.GEMINI_MAX_TOKENS, temperature=0.2
+                        ),
+                    )
+                    break
+                except Exception as ex:
+                    if "404" in str(ex) or "not found" in str(ex):
+                        continue
+                    raise ex
+            if chat is None:
+                m = genai.GenerativeModel("gemini-1.5-flash-latest", system_instruction=system_prompt)
+                gemini_history = []
+                for msg in request.messages[:-1]:
+                    role = "user" if msg.role == "user" else "model"
+                    gemini_history.append({"role": role, "parts": [msg.content]})
+                chat = m.start_chat(history=gemini_history)
+                response = chat.send_message(
+                    last_message,
+                    stream=True,
+                    generation_config=genai.GenerationConfig(
+                        max_output_tokens=settings.GEMINI_MAX_TOKENS, temperature=0.2
+                    ),
+                )
             for chunk in response:
                 if chunk.text:
                     yield f"data: {json_module.dumps({'token': chunk.text, 'done': False})}\n\n"

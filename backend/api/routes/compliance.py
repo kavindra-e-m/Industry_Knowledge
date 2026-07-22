@@ -39,6 +39,8 @@ async def check_equipment_compliance(
 
 
 @router.get("/plant", summary="Plant-wide compliance summary")
+@router.get("/report", summary="Plant-wide compliance report")
+@router.get("/compliance/report", summary="Plant-wide compliance report")
 async def check_plant_compliance():
     """Run compliance across all equipment and return plant-wide summary."""
     agent = get_agent()
