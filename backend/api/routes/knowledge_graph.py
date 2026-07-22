@@ -80,3 +80,16 @@ async def update_health(
     neo4j = get_neo4j()
     neo4j.update_equipment_health(equipment_id, health_score, failure_probability)
     return {"equipment_id": equipment_id, "health_score": health_score, "failure_probability": failure_probability}
+
+
+# ---------------------------------------------------------------------------
+@router.get("/connections/{tag_id}")
+@router.get("/graph/connections/{tag_id}")
+async def get_equipment_connections(tag_id: str):
+    try:
+        neo4j = get_neo4j()
+        connections = neo4j.get_equipment_connections(tag_id)
+        return {"success": True, "tag_id": tag_id, "connections": connections, "connection_count": len(connections)}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+

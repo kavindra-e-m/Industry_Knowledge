@@ -123,3 +123,104 @@ async def get_overdue_pm():
                     except ValueError:
                         pass
         return overdue
+
+
+# ---------------------------------------------------------------------------
+import uuid
+
+
+class WorkOrderCreate(BaseModel):
+    equipment_tag: str
+    title: str
+    work_type: str = "predictive"
+    priority: str = "high"
+    description: str = ""
+    estimated_duration_hours: float = 4.0
+    parts_required: list = []
+
+
+@router.post("/work-orders")
+@router.post("/maintenance/work-orders")
+async def create_work_order(data: WorkOrderCreate):
+    try:
+        import json as json_lib
+        from datetime import datetime
+        from pathlib import Path
+
+        wo_number = f"WO-{datetime.now().year}-{str(uuid.uuid4())[:8].upper()}"
+        wo_file = Path("data/seeds/created_work_orders.json")
+        existing = []
+        if wo_file.exists():
+            with open(wo_file) as f:
+                existing = json_lib.load(f)
+        new_wo = {
+            "id": str(uuid.uuid4()),
+            "work_order_number": wo_number,
+            "equipment_tag": data.equipment_tag,
+            "title": data.title,
+            "work_type": data.work_type,
+            "priority": data.priority,
+            "description": data.description,
+            "estimated_duration_hours": data.estimated_duration_hours,
+            "status": "open",
+            "is_auto_generated": True,
+            "created_at": datetime.now().isoformat(),
+        }
+        existing.append(new_wo)
+        with open(wo_file, "w") as f:
+            json_lib.dump(existing, f, indent=2)
+        return {"success": True, "work_order_number": wo_number, "message": f"Work order {wo_number} created successfully"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/work-orders")
+@router.get("/maintenance/work-orders")
+async def get_work_orders(status: str = None, equipment_tag: str = None):
+    try:
+        import json
+
+        work_orders = []
+        try:
+            with open("data/seeds/work_orders.json") as f:
+                work_orders = json.load(f)
+        except FileNotFoundError:
+            pass
+        try:
+            from pathlib import Path
+
+            created_file = Path("data/seeds/created_work_orders.json")
+            if created_file.exists():
+                with open(created_file) as f:
+                    work_orders += json.load(f)
+        except Exception:
+            pass
+        if status:
+            work_orders = [wo for wo in work_orders if wo.get("status") == status]
+        if equipment_tag:
+            work_orders = [wo for wo in work_orders if wo.get("equipment_tag") == equipment_tag]
+        return {"success": True, "work_orders": work_orders[:50], "total": len(work_orders)}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/predict/{equipment_tag}")
+@router.get("/maintenance/predict/{equipment_tag}")
+async def predict_equipment_failure_get(equipment_tag: str):
+    try:
+        import csv as csv_module
+
+        with open("data/seeds/equipment_master.csv") as f:
+            all_equipment = list(csv_module.DictReader(f))
+        equipment = next((e for e in all_equipment if e["tag_id"] == equipment_tag), None)
+        if not equipment:
+            raise HTTPException(status_code=404, detail=f"Equipment {equipment_tag} not found")
+        agent = get_agent()
+        prediction = agent.predictor.predict(equipment)
+        work_order = agent.generate_work_order(equipment_tag, "predicted_failure", prediction)
+        return {"success": True, "equipment_tag": equipment_tag, "prediction": prediction, "suggested_work_order": work_order}
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+

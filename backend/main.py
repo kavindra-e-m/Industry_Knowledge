@@ -31,6 +31,7 @@ from backend.api.routes import (
     knowledge_graph,
     stream,
 )
+from backend.api.routes.system import router as system_router
 
 
 # ---------------------------------------------------------------------------
@@ -132,6 +133,7 @@ app.include_router(lessons.router,         prefix="/api/lessons",      tags=["�
 app.include_router(pid.router,             prefix="/api/pid",          tags=["📐 P&ID"])
 app.include_router(knowledge_graph.router, prefix="/api/graph",        tags=["🗺️ Knowledge Graph"])
 app.include_router(stream.router,          prefix="/api/stream",       tags=["⚡ Real-time Stream"])
+app.include_router(system_router,          prefix="/api",              tags=["System Status"])
 
 
 # ---------------------------------------------------------------------------

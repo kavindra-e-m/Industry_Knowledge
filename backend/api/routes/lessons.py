@@ -52,3 +52,52 @@ async def list_incidents():
         return []
     with open(path) as f:
         return json.load(f)
+
+
+# ---------------------------------------------------------------------------
+_pattern_detector = None
+
+
+def get_pattern_detector():
+    global _pattern_detector
+    if _pattern_detector is None:
+        from ml.lessons_learned.pattern_detector import PatternDetector
+        _pattern_detector = PatternDetector()
+    return _pattern_detector
+
+
+@router.get("/patterns")
+@router.get("/lessons/patterns")
+async def get_patterns():
+    try:
+        detector = get_pattern_detector()
+        patterns = detector.patterns
+        return {
+            "success": True,
+            "high_frequency_equipment": patterns.get("high_frequency_equipment", []),
+            "high_risk_locations": patterns.get("high_risk_locations", []),
+            "recurring_failure_types": patterns.get("recurring_failure_types", []),
+            "total_incidents_analysed": len(detector.incidents),
+        }
+    except Exception as e:
+        from fastapi import HTTPException
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/warnings/{equipment_tag}")
+@router.get("/lessons/warnings/{equipment_tag}")
+async def get_equipment_warnings(equipment_tag: str):
+    try:
+        detector = get_pattern_detector()
+        warnings = detector.check_for_warnings(equipment_tag)
+        pre_work = detector.get_warning_for_new_work_order(equipment_tag, "general")
+        return {
+            "success": True,
+            "equipment_tag": equipment_tag,
+            "warnings": warnings,
+            "pre_work_lesson": pre_work,
+        }
+    except Exception as e:
+        from fastapi import HTTPException
+        raise HTTPException(status_code=500, detail=str(e))
+
