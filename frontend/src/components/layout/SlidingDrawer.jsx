@@ -49,7 +49,13 @@ export default function SlidingDrawer() {
     }
 
     return () => {
-      if (ws) ws.close();
+      if (ws) {
+        if (ws.readyState === WebSocket.CONNECTING) {
+          ws.onopen = () => ws.close();
+        } else if (ws.readyState === WebSocket.OPEN) {
+          ws.close();
+        }
+      }
     };
   }, []);
 
