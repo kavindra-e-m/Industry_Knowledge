@@ -10,7 +10,8 @@ export const useComplianceStore = create((set, get) => ({
     set({ loading: true, error: null });
     try {
       const data = await fetchComplianceReport();
-      set({ records: data, loading: false });
+      const recordsArray = Array.isArray(data) ? data : (data?.results || data?.records || []);
+      set({ records: recordsArray, loading: false });
     } catch (err) {
       set({ error: err.message, loading: false });
     }
@@ -18,10 +19,14 @@ export const useComplianceStore = create((set, get) => ({
 
   averageScore: () => {
     const { records } = get();
-    if (!records.length) return 0;
-    return Math.round(records.reduce((sum, r) => sum + r.overall_score, 0) / records.length);
+    const list = Array.isArray(records) ? records : [];
+    if (!list.length) return 0;
+    return Math.round(list.reduce((sum, r) => sum + (r.overall_score || 0), 0) / list.length);
   },
 
-  nonCompliantCount: () =>
-    get().records.filter((r) => r.status === "non-compliant" || r.status === "expired").length,
+  nonCompliantCount: () => {
+    const { records } = get();
+    const list = Array.isArray(records) ? records : [];
+    return list.filter((r) => r.status === "non-compliant" || r.status === "expired" || (r.overall_score && r.overall_score < 70)).length;
+  },
 }));

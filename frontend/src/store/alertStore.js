@@ -11,7 +11,8 @@ export const useAlertStore = create((set, get) => ({
     set({ loading: true, error: null });
     try {
       const data = await fetchAlerts();
-      set({ alerts: data, loading: false, lastUpdated: new Date() });
+      const alertsArray = Array.isArray(data) ? data : (data?.alerts || data?.overdue_equipment || []);
+      set({ alerts: alertsArray, loading: false, lastUpdated: new Date() });
     } catch (err) {
       set({ error: err.message, loading: false });
     }
@@ -19,9 +20,12 @@ export const useAlertStore = create((set, get) => ({
 
   pushAlert: (alert) =>
     set((state) => ({
-      alerts: [alert, ...state.alerts.filter((a) => a.equipment_id !== alert.equipment_id)],
+      alerts: [alert, ...(Array.isArray(state.alerts) ? state.alerts : []).filter((a) => a.equipment_id !== alert.equipment_id)],
       lastUpdated: new Date(),
     })),
 
-  criticalCount: () => get().alerts.filter((a) => a.severity === "critical").length,
+  criticalCount: () => {
+    const list = Array.isArray(get().alerts) ? get().alerts : [];
+    return list.filter((a) => a.severity === "critical" || a.criticality === "High").length;
+  },
 }));
