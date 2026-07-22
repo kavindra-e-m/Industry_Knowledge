@@ -46,6 +46,7 @@ class Neo4jClient:
             logger.success("Neo4j connected")
         except Exception as e:
             logger.error(f"Neo4j connection failed: {e}")
+            self.driver = None
 
     # ------------------------------------------------------------------
     def run(self, query: str, params: dict | None = None) -> list[dict]:
