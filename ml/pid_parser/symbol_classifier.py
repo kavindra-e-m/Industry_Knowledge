@@ -42,6 +42,22 @@ class PIDSymbolClassifier:
 
     def _load_model(self):
         try:
+            import torch
+            import functools
+            # Monkeypatch torch.load to set weights_only=False by default (PyTorch 2.6 compatibility)
+            if hasattr(torch, "load"):
+                original_load = torch.load
+                @functools.wraps(original_load)
+                def patched_load(*args, **kwargs):
+                    if 'weights_only' not in kwargs:
+                        kwargs['weights_only'] = False
+                    return original_load(*args, **kwargs)
+                torch.load = patched_load
+                logger.info("Applied weights_only monkeypatch to torch.load for PyTorch 2.6/ultralytics compatibility.")
+        except Exception as patch_err:
+            logger.warning(f"Failed to apply PyTorch 2.6 weights_only patch: {patch_err}")
+
+        try:
             from ultralytics import YOLO
             if Path(MODEL_PATH).exists():
                 self.model = YOLO(MODEL_PATH)

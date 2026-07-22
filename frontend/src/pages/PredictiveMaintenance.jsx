@@ -1,6 +1,7 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
-import { AlertTriangle, Plus, Filter, CheckSquare, ExternalLink, TrendingUp } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { AlertTriangle, Plus, Filter, CheckSquare, ExternalLink, TrendingUp, X, Check } from "lucide-react";
 import PageShell from "../components/shared/PageShell";
 import StatRing from "../components/shared/StatRing";
 import { useAlerts } from "../hooks/useAlerts";
@@ -8,8 +9,8 @@ import { useToastStore } from "../store/toastStore";
 import { useUiStore } from "../store/uiStore";
 
 const EQUIPMENT_CARDS = [
-  { name: "Generator Unit G-7",  status: "Operational",         statusColor: "var(--success)", rul: "1,248h", failProb: "4.2%",  health: 92, healthColor: "var(--success)", img: "⚡" },
-  { name: "Coolant Pump P-12",   status: "Maintenance Imminent", statusColor: "var(--warning)", rul: "142h",   failProb: "18.5%", health: 74, healthColor: "var(--warning)", img: "💧" },
+  { name: "Generator Unit G-7",  status: "Operational",         statusColor: "var(--success)", rul: "1,248h", failProb: "4.2%",  health: 92, healthColor: "var(--success)", img: "⚡", site: "Jamnagar Refinery" },
+  { name: "Coolant Pump P-12",   status: "Maintenance Imminent", statusColor: "var(--warning)", rul: "142h",   failProb: "18.5%", health: 74, healthColor: "var(--warning)", img: "💧", site: "Mumbai Offshore" },
 ];
 
 const WORK_ORDERS = [
@@ -33,6 +34,61 @@ export default function PredictiveMaintenance() {
   const { alerts, loading } = useAlerts();
   const critical = alerts.filter((a) => a.severity === "critical");
 
+  const [equipment, setEquipment] = useState(EQUIPMENT_CARDS);
+  const [siteFilter, setSiteFilter] = useState("All");
+  const [filterMenuOpen, setFilterMenuOpen] = useState(false);
+  const [showNewObservation, setShowNewObservation] = useState(false);
+
+  // New observation states
+  const [obsName, setObsName] = useState("");
+  const [obsStatus, setObsStatus] = useState("Operational");
+  const [obsRul, setObsRul] = useState("500h");
+  const [obsFailProb, setObsFailProb] = useState("5.0%");
+  const [obsHealth, setObsHealth] = useState(90);
+  const [obsSite, setObsSite] = useState("Jamnagar Refinery");
+  const [obsImg, setObsImg] = useState("⚙️");
+
+  const filteredEquipment = equipment.filter(
+    (eq) => siteFilter === "All" || eq.site === siteFilter
+  );
+
+  const handleAddObservation = (e) => {
+    e.preventDefault();
+    if (!obsName.trim()) {
+      push({ type: "error", title: "Missing Field", message: "Please specify equipment name.", duration: 2500 });
+      return;
+    }
+    
+    const isImminent = obsStatus === "Maintenance Imminent";
+    const newCard = {
+      name: obsName,
+      status: obsStatus,
+      statusColor: isImminent ? "var(--warning)" : "var(--success)",
+      rul: obsRul,
+      failProb: obsFailProb,
+      health: Number(obsHealth),
+      healthColor: isImminent ? "var(--warning)" : "var(--success)",
+      img: obsImg,
+      site: obsSite
+    };
+
+    setEquipment((prev) => [...prev, newCard]);
+    push({
+      type: "success",
+      title: "Observation Registered",
+      message: `Successfully logged new health state for ${obsName} at ${obsSite}.`,
+      duration: 3500
+    });
+    
+    // Reset
+    setObsName("");
+    setObsStatus("Operational");
+    setObsRul("500h");
+    setObsFailProb("5.0%");
+    setObsHealth(90);
+    setShowNewObservation(false);
+  };
+
   return (
     <PageShell topbarPlaceholder="Search industrial assets...">
       <div className="p-6 space-y-5 min-h-full" style={{ background: "transparent" }}>
@@ -46,11 +102,28 @@ export default function PredictiveMaintenance() {
             <h1 className="text-4xl font-bold font-sora leading-tight" style={{ color: "var(--text-primary)" }}>Predictive<br />Maintenance</h1>
             <p className="text-[13px] mt-2" style={{ color: "var(--text-tertiary)" }}>Real-time asset telemetry & machine learning failure forecasts.</p>
           </div>
-          <div className="flex gap-2 mt-2">
-            <motion.button className="ib-btn ib-btn-ghost text-xs" whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
-              <Filter size={12} /> Filter Site
-            </motion.button>
-            <motion.button className="ib-btn ib-btn-primary text-xs" whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
+          <div className="flex gap-2 mt-2 relative">
+            <div className="relative">
+              <motion.button onClick={() => setFilterMenuOpen(!filterMenuOpen)} className="ib-btn ib-btn-ghost text-xs" whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
+                <Filter size={12} /> {siteFilter === "All" ? "Filter Site" : siteFilter}
+              </motion.button>
+              {filterMenuOpen && (
+                <div className="absolute right-0 mt-1 w-48 rounded-xl border p-1 shadow-lg z-20" style={{ background: "var(--surface-primary)", borderColor: "var(--border-primary)" }}>
+                  {["All", "Jamnagar Refinery", "Mumbai Offshore"].map((s) => (
+                    <button
+                      key={s}
+                      onClick={() => { setSiteFilter(s); setFilterMenuOpen(false); }}
+                      className="w-full text-left px-3 py-1.5 rounded-lg text-xs hover:bg-[var(--surface-secondary)] text-primary-app font-medium flex items-center justify-between"
+                      style={{ color: "var(--text-primary)" }}
+                    >
+                      {s}
+                      {siteFilter === s && <Check size={12} className="text-[var(--accent-primary)]" />}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+            <motion.button onClick={() => setShowNewObservation(true)} className="ib-btn ib-btn-primary text-xs" whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
               <Plus size={12} /> New Observation
             </motion.button>
           </div>
@@ -126,7 +199,7 @@ export default function PredictiveMaintenance() {
 
           {/* Equipment Cards */}
           <div className="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4">
-            {EQUIPMENT_CARDS.map((eq, i) => (
+            {filteredEquipment.map((eq, i) => (
               <motion.div
                 key={eq.name}
                 variants={fadeUp}
@@ -247,6 +320,134 @@ export default function PredictiveMaintenance() {
           </motion.div>
         </div>
       </div>
+      
+      {/* New Observation Modal */}
+      <AnimatePresence>
+        {showNewObservation && (
+          <div className="fixed inset-0 flex items-center justify-center z-50 p-4">
+            {/* Backdrop */}
+            <motion.div
+              className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setShowNewObservation(false)}
+            />
+            {/* Content */}
+            <motion.div
+              className="ib-card p-6 w-full max-w-md relative z-10 overflow-hidden shadow-2xl"
+              style={{ background: "var(--surface-primary)", borderColor: "var(--border-primary)" }}
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+            >
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-base font-bold font-sora" style={{ color: "var(--text-primary)" }}>New Asset Observation</h3>
+                <button onClick={() => setShowNewObservation(false)} className="p-1.5 rounded-lg hover:bg-[var(--surface-secondary)]" style={{ color: "var(--text-secondary)" }}>
+                  <X size={16} />
+                </button>
+              </div>
+              
+              <form onSubmit={handleAddObservation} className="space-y-4">
+                <div className="flex flex-col gap-1.5">
+                  <label className="ib-label text-[10px]">Equipment Name / Tag</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. Recirculating Pump P-202"
+                    value={obsName}
+                    onChange={(e) => setObsName(e.target.value)}
+                    className="ib-input bg-surface-secondary text-primary-app border-primary-app"
+                  />
+                </div>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="flex flex-col gap-1.5">
+                    <label className="ib-label text-[10px]">Site Location</label>
+                    <select
+                      value={obsSite}
+                      onChange={(e) => setObsSite(e.target.value)}
+                      className="ib-input bg-surface-secondary text-primary-app border-primary-app"
+                    >
+                      <option value="Jamnagar Refinery">Jamnagar Refinery</option>
+                      <option value="Mumbai Offshore">Mumbai Offshore</option>
+                    </select>
+                  </div>
+                  
+                  <div className="flex flex-col gap-1.5">
+                    <label className="ib-label text-[10px]">Status</label>
+                    <select
+                      value={obsStatus}
+                      onChange={(e) => setObsStatus(e.target.value)}
+                      className="ib-input bg-surface-secondary text-primary-app border-primary-app"
+                    >
+                      <option value="Operational">Operational</option>
+                      <option value="Maintenance Imminent">Maintenance Imminent</option>
+                    </select>
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-3 gap-3">
+                  <div className="flex flex-col gap-1.5">
+                    <label className="ib-label text-[10px]">Icon</label>
+                    <select
+                      value={obsImg}
+                      onChange={(e) => setObsImg(e.target.value)}
+                      className="ib-input bg-surface-secondary text-primary-app border-primary-app text-center"
+                    >
+                      <option value="⚙️">⚙️ Gear</option>
+                      <option value="⚡">⚡ Generator</option>
+                      <option value="💧">💧 Pump</option>
+                      <option value="🔥">🔥 Boiler</option>
+                    </select>
+                  </div>
+                  
+                  <div className="flex flex-col gap-1.5">
+                    <label className="ib-label text-[10px]">RUL</label>
+                    <input
+                      type="text"
+                      placeholder="e.g. 250h"
+                      value={obsRul}
+                      onChange={(e) => setObsRul(e.target.value)}
+                      className="ib-input bg-surface-secondary text-primary-app border-primary-app"
+                    />
+                  </div>
+                  
+                  <div className="flex flex-col gap-1.5">
+                    <label className="ib-label text-[10px]">Fail Prob.</label>
+                    <input
+                      type="text"
+                      placeholder="e.g. 10%"
+                      value={obsFailProb}
+                      onChange={(e) => setObsFailProb(e.target.value)}
+                      className="ib-input bg-surface-secondary text-primary-app border-primary-app"
+                    />
+                  </div>
+                </div>
+                
+                <div className="flex flex-col gap-1.5">
+                  <div className="flex justify-between">
+                    <label className="ib-label text-[10px]">Health Score ({obsHealth}%)</label>
+                  </div>
+                  <input
+                    type="range"
+                    min="10"
+                    max="100"
+                    value={obsHealth}
+                    onChange={(e) => setObsHealth(e.target.value)}
+                    className="w-full h-1.5 rounded-full appearance-none cursor-pointer accent-blue-600 bg-[var(--surface-tertiary)]"
+                  />
+                </div>
+                
+                <div className="flex gap-2 pt-2 justify-end">
+                  <button type="button" onClick={() => setShowNewObservation(false)} className="ib-btn ib-btn-ghost text-xs">Cancel</button>
+                  <button type="submit" className="ib-btn ib-btn-primary text-xs">Save Observation</button>
+                </div>
+              </form>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </PageShell>
   );
 }

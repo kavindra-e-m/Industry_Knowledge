@@ -1,9 +1,10 @@
 import { useState } from "react";
-import { motion } from "framer-motion";
-import { ChevronLeft, Camera, Edit, Download, CheckCircle, FileText, Bot, Calendar } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { ChevronLeft, Camera, Edit, Download, CheckCircle, FileText, Bot, Calendar, X, Save, Check } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import PageShell from "../components/shared/PageShell";
 import StatRing from "../components/shared/StatRing";
+import { useToastStore } from "../store/toastStore";
 
 const SENSORS = [
   { label: "CORE TEMP", value: "842°C", delta: "+1.2%", color: "var(--warning)", status: "nominal" },
@@ -30,6 +31,81 @@ const DOCS = [
 export default function EquipmentDetails() {
   const [tab, setTab] = useState("insights");
   const navigate = useNavigate();
+  const push = useToastStore((s) => s.push);
+
+  // Equipment info state
+  const [eqName, setEqName] = useState("General Tech GT-402X");
+  const [eqSub, setEqSub] = useState("High-Pressure Gas Combustion Turbine · Sector 7G");
+  const [isEditing, setIsEditing] = useState(false);
+  const [editName, setEditName] = useState("General Tech GT-402X");
+  const [editSub, setEditSub] = useState("High-Pressure Gas Combustion Turbine · Sector 7G");
+
+  // Insights state
+  const [insights, setInsights] = useState(AI_INSIGHTS);
+  
+  // Maintenance logs state
+  const [logs, setLogs] = useState([
+    { date: "2026-07-10", action: "Routine lubrication check", tech: "K. R. Patel", status: "Completed" },
+    { date: "2026-06-25", action: "Filter replacement Unit B", tech: "S. Sharma", status: "Completed" }
+  ]);
+
+  const handleScheduleAction = (insight) => {
+    const newLog = {
+      date: new Date().toISOString().split('T')[0],
+      action: `Scheduled: ${insight.title}`,
+      tech: "AI System Dispatch",
+      status: "Pending"
+    };
+    setLogs((prev) => [newLog, ...prev]);
+    setInsights((prev) => prev.filter(i => i.title !== insight.title));
+    push({
+      type: "success",
+      title: "Action Scheduled",
+      message: `Lubrication optimization logged under maintenance queue.`,
+      duration: 3500
+    });
+    setTab("maintenance");
+  };
+
+  const handleIgnore = (insight) => {
+    setInsights((prev) => prev.filter(i => i.title !== insight.title));
+    push({
+      type: "info",
+      title: "Insight Ignored",
+      message: `${insight.title} recommendation dismissed.`,
+      duration: 2500
+    });
+  };
+
+  const handleDownloadDoc = (docName) => {
+    push({ type: "info", title: "Downloading document", message: `Downloading ${docName}...`, duration: 2000 });
+    setTimeout(() => {
+      const element = document.createElement("a");
+      const fileBlob = new Blob([`Mock document content for ${docName}`], { type: 'text/plain' });
+      element.href = URL.createObjectURL(fileBlob);
+      element.download = docName;
+      document.body.appendChild(element);
+      element.click();
+      document.body.removeChild(element);
+      push({ type: "success", title: "Download complete", message: `${docName} saved successfully.`, duration: 2500 });
+    }, 1500);
+  };
+
+  const handleCameraUpload = () => {
+    push({ type: "success", title: "Asset Telemetry Synced", message: "Successfully refreshed optical sensor feeds.", duration: 3000 });
+  };
+
+  const handleSaveEdit = (e) => {
+    e.preventDefault();
+    if (!editName.trim()) {
+      push({ type: "error", title: "Missing Field", message: "Please specify asset name.", duration: 2500 });
+      return;
+    }
+    setEqName(editName);
+    setEqSub(editSub);
+    setIsEditing(false);
+    push({ type: "success", title: "Asset Info Updated", message: "Details successfully saved to local store.", duration: 2500 });
+  };
 
   return (
     <PageShell topbarPlaceholder="Search parameters, telemetry, or doc...">
@@ -54,18 +130,44 @@ export default function EquipmentDetails() {
                 <div className="text-8xl opacity-15">⚙</div>
                 <div className="absolute inset-0 bg-gradient-to-t from-[var(--surface-primary)] via-transparent to-transparent" />
                 <div className="absolute top-3 right-3 flex gap-2">
-                  <button className="w-8 h-8 rounded-lg flex items-center justify-center transition-all hover:bg-[var(--surface-tertiary)]" style={{ background: "var(--surface-primary)", color: "var(--text-tertiary)" }}>
+                  <button onClick={handleCameraUpload} className="w-8 h-8 rounded-lg flex items-center justify-center transition-all hover:bg-[var(--surface-tertiary)]" style={{ background: "var(--surface-primary)", color: "var(--text-tertiary)" }}>
                     <Camera size={13} />
                   </button>
-                  <button className="w-8 h-8 rounded-lg flex items-center justify-center transition-all hover:bg-[var(--surface-tertiary)]" style={{ background: "var(--surface-primary)", color: "var(--text-tertiary)" }}>
+                  <button onClick={() => { setEditName(eqName); setEditSub(eqSub); setIsEditing(true); }} className="w-8 h-8 rounded-lg flex items-center justify-center transition-all hover:bg-[var(--surface-tertiary)]" style={{ background: "var(--surface-primary)", color: "var(--text-tertiary)" }}>
                     <Edit size={13} />
                   </button>
                 </div>
-                <div className="absolute bottom-4 left-4">
+                <div className="absolute bottom-4 left-4 right-4">
                   <span className="ib-badge ib-badge-critical text-[9px] mb-2 inline-block">CRITICAL ASSET</span>
-                  <p className="text-lg font-bold font-sora" style={{ color: "var(--text-primary)" }}>General Tech GT-402X</p>
-                  <p className="text-[11px]" style={{ color: "var(--text-secondary)" }}>High-Pressure Gas Combustion Turbine · Sector 7G</p>
-                  <p className="text-[10px] mt-0.5 font-mono" style={{ color: "var(--text-tertiary)" }}>SN: 4920-IB-772</p>
+                  {isEditing ? (
+                    <form onSubmit={handleSaveEdit} className="space-y-1.5 max-w-sm">
+                      <input
+                        type="text"
+                        value={editName}
+                        onChange={(e) => setEditName(e.target.value)}
+                        className="ib-input text-xs py-1"
+                        style={{ background: "var(--surface-primary)", color: "var(--text-primary)", borderColor: "var(--border-primary)" }}
+                        required
+                      />
+                      <input
+                        type="text"
+                        value={editSub}
+                        onChange={(e) => setEditSub(e.target.value)}
+                        className="ib-input text-[10px] py-1"
+                        style={{ background: "var(--surface-primary)", color: "var(--text-secondary)", borderColor: "var(--border-primary)" }}
+                      />
+                      <div className="flex gap-1.5 pt-1">
+                        <button type="submit" className="ib-btn ib-btn-primary text-[9px] px-2.5 py-1 flex items-center gap-1"><Check size={9} /> Save</button>
+                        <button type="button" onClick={() => setIsEditing(false)} className="ib-btn ib-btn-ghost text-[9px] px-2.5 py-1 flex items-center gap-1"><X size={9} /> Cancel</button>
+                      </div>
+                    </form>
+                  ) : (
+                    <>
+                      <p className="text-lg font-bold font-sora" style={{ color: "var(--text-primary)" }}>{eqName}</p>
+                      <p className="text-[11px]" style={{ color: "var(--text-secondary)" }}>{eqSub}</p>
+                      <p className="text-[10px] mt-0.5 font-mono" style={{ color: "var(--text-tertiary)" }}>SN: 4920-IB-772</p>
+                    </>
+                  )}
                 </div>
               </div>
             </motion.div>
@@ -105,7 +207,13 @@ export default function EquipmentDetails() {
                 ))}
               </div>
 
-              {tab === "insights" && AI_INSIGHTS.map((ins, i) => (
+              {tab === "insights" && insights.length === 0 && (
+                <div className="text-center py-8 text-[12px]" style={{ color: "var(--text-tertiary)" }}>
+                  No active AI recommendations. System is running at optimal threshold.
+                </div>
+              )}
+
+              {tab === "insights" && insights.map((ins, i) => (
                 <div key={i} className="p-4 rounded-xl border" style={{ borderColor: "var(--border-primary)" }}>
                   <div className="flex items-start justify-between mb-2">
                     <div className="flex items-center gap-2">
@@ -120,15 +228,27 @@ export default function EquipmentDetails() {
                   </div>
                   <p className="text-[12px] leading-relaxed mb-3" style={{ color: "var(--text-secondary)" }}>{ins.desc}</p>
                   <div className="flex gap-2">
-                    <button className="ib-btn ib-btn-primary text-xs py-1.5">Schedule Action</button>
-                    <button className="ib-btn ib-btn-ghost text-xs py-1.5">Ignore</button>
+                    <button onClick={() => handleScheduleAction(ins)} className="ib-btn ib-btn-primary text-xs py-1.5">Schedule Action</button>
+                    <button onClick={() => handleIgnore(ins)} className="ib-btn ib-btn-ghost text-xs py-1.5">Ignore</button>
                   </div>
                 </div>
               ))}
 
               {tab === "maintenance" && (
-                <div className="text-center py-8 text-[12px]" style={{ color: "var(--text-tertiary)" }}>
-                  Maintenance log entries will appear here.
+                <div className="space-y-2.5 max-h-[300px] overflow-y-auto pr-1">
+                  {logs.map((log, index) => (
+                    <div key={index} className="p-3 rounded-xl border flex items-center justify-between text-xs transition-all hover:translate-x-0.5" style={{ borderColor: "var(--border-primary)", background: "var(--surface-secondary)" }}>
+                      <div>
+                        <p className="font-semibold" style={{ color: "var(--text-primary)" }}>{log.action}</p>
+                        <p className="text-[10px] mt-0.5" style={{ color: "var(--text-tertiary)" }}>Operator: {log.tech} · {log.date}</p>
+                      </div>
+                      <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                        log.status === "Completed" ? "bg-emerald-500/15 text-emerald-500" : "bg-amber-500/15 text-amber-500"
+                      }`}>
+                        {log.status}
+                      </span>
+                    </div>
+                  ))}
                 </div>
               )}
             </motion.div>
@@ -171,7 +291,7 @@ export default function EquipmentDetails() {
                       <p className="text-[11px] font-semibold truncate" style={{ color: "var(--text-primary)" }}>{d.name}</p>
                       <p className="text-[9px]" style={{ color: "var(--text-tertiary)" }}>{d.sub}</p>
                     </div>
-                    <Download size={12} style={{ color: "var(--text-tertiary)" }} className="hover:opacity-80 cursor-pointer shrink-0" />
+                    <Download onClick={() => handleDownloadDoc(d.name)} size={12} style={{ color: "var(--text-tertiary)" }} className="hover:opacity-80 cursor-pointer shrink-0" />
                   </div>
                 ))}
               </div>

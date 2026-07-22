@@ -1,6 +1,8 @@
-import { motion } from "framer-motion";
-import { GitBranch, Download, Award, ChevronRight, Clock, Share2 } from "lucide-react";
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { GitBranch, Download, Award, ChevronRight, Clock, Share2, ShieldCheck, X } from "lucide-react";
 import PageShell from "../components/shared/PageShell";
+import { useToastStore } from "../store/toastStore";
 
 const CHAIN = [
   { step: "01", type: "INITIAL DEVIATION", title: "Vibration Spike", desc: "Subtle 3.2mm/s vibration detected in inboard bearing at 02:14:05.", color: "var(--accent-primary)" },
@@ -21,6 +23,35 @@ const SIMILAR = [
 ];
 
 export default function RCAReport() {
+  const push = useToastStore((s) => s.push);
+  const [exporting, setExporting] = useState(false);
+  const [isCertified, setIsCertified] = useState(false);
+  const [showCertifyModal, setShowCertifyModal] = useState(false);
+
+  const handleExportPDF = () => {
+    setExporting(true);
+    push({ type: "info", title: "PDF Export Initiated", message: "Compiling telemetry traces and logic chain...", duration: 2500 });
+    
+    setTimeout(() => {
+      const element = document.createElement("a");
+      const fileBlob = new Blob(["RCA-2024-0892 ROOT CAUSE ANALYSIS REPORT\n\nResult: Seal Misalignment.\nConfidence: 98.4%"], { type: 'text/plain' });
+      element.href = URL.createObjectURL(fileBlob);
+      element.download = "RCA-2024-0892_Root_Cause_Analysis.pdf";
+      document.body.appendChild(element);
+      element.click();
+      document.body.removeChild(element);
+      
+      setExporting(false);
+      push({ type: "success", title: "PDF Export Complete", message: "Report successfully saved to downloads.", duration: 3000 });
+    }, 2000);
+  };
+
+  const handleCertifyReport = () => {
+    setIsCertified(true);
+    setShowCertifyModal(false);
+    push({ type: "success", title: "Report Certified", message: "RCA-2024-0892 has been stamped as verified in the plant ledger.", duration: 3500 });
+  };
+
   return (
     <PageShell topbarPlaceholder="Search analysis reports, P&IDs, or telemetry logs...">
       <div className="p-6 space-y-5 min-h-full" style={{ background: "transparent" }}>
@@ -32,17 +63,26 @@ export default function RCAReport() {
           </div>
           <div className="flex items-start justify-between">
             <div>
-              <div className="flex items-center gap-2 mb-1">
-                <h1 className="text-lg font-bold font-sora" style={{ color: "var(--text-primary)" }}>
+              <div className="flex items-center gap-2 mb-1 flex-wrap">
+                <h1 className="text-lg font-bold font-sora flex items-center gap-2" style={{ color: "var(--text-primary)" }}>
                   RCA-2024-0892: Centrifugal Pump Thermal Runaway
+                  {isCertified && (
+                    <span className="flex items-center gap-1 text-[10px] font-bold px-2.5 py-0.5 rounded-full" style={{ background: "rgba(16, 185, 129, 0.15)", color: "var(--success)" }}>
+                      <ShieldCheck size={11} /> CERTIFIED
+                    </span>
+                  )}
                 </h1>
                 <Share2 size={14} style={{ color: "var(--text-tertiary)" }} className="cursor-pointer hover:opacity-80" />
               </div>
               <p className="text-[12px]" style={{ color: "var(--text-tertiary)" }}>Investigation into the failure of Unit P-102A at South Refinery Block 4. Last updated: 2 hours ago by AI Copilot.</p>
             </div>
             <div className="flex gap-2 shrink-0">
-              <button className="ib-btn ib-btn-ghost text-xs"><Download size={12} /> Export PDF</button>
-              <button className="ib-btn ib-btn-primary text-xs"><Award size={12} /> Certify Report</button>
+              <button onClick={handleExportPDF} disabled={exporting} className="ib-btn ib-btn-ghost text-xs">
+                {exporting ? "Exporting..." : <><Download size={12} /> Export PDF</>}
+              </button>
+              <button onClick={() => setShowCertifyModal(true)} disabled={isCertified} className="ib-btn ib-btn-primary text-xs">
+                <Award size={12} /> {isCertified ? "Certified" : "Certify Report"}
+              </button>
             </div>
           </div>
         </div>
@@ -154,6 +194,42 @@ export default function RCAReport() {
           </div>
         </div>
       </div>
+
+      {/* Certify Modal */}
+      <AnimatePresence>
+        {showCertifyModal && (
+          <div className="fixed inset-0 flex items-center justify-center z-50 p-4">
+            <motion.div
+              className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+              onClick={() => setShowCertifyModal(false)}
+            />
+            <motion.div
+              className="ib-card p-6 w-full max-w-sm relative z-10 overflow-hidden shadow-2xl"
+              style={{ background: "var(--surface-primary)", borderColor: "var(--border-primary)" }}
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+            >
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-sm font-bold font-sora" style={{ color: "var(--text-primary)" }}>Certify RCA Report</h3>
+                <button onClick={() => setShowCertifyModal(false)} className="p-1 rounded-lg hover:bg-[var(--surface-secondary)]" style={{ color: "var(--text-secondary)" }}>
+                  <X size={15} />
+                </button>
+              </div>
+              <p className="text-xs mb-4 leading-relaxed" style={{ color: "var(--text-secondary)" }}>
+                By certifying this Root Cause Analysis, you stamp it as reviewed, verified, and ready to be locked in the compliance logbook. This action cannot be undone.
+              </p>
+              <div className="flex gap-2 justify-end">
+                <button onClick={() => setShowCertifyModal(false)} className="ib-btn ib-btn-ghost text-xs">Cancel</button>
+                <button onClick={handleCertifyReport} className="ib-btn ib-btn-primary text-xs flex items-center gap-1">
+                  <ShieldCheck size={12} /> Confirm Certification
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </PageShell>
   );
 }

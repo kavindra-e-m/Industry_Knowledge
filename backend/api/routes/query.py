@@ -183,37 +183,23 @@ RULES:
             )
 
             try:
-                genai.configure(api_key=settings.GEMINI_API_KEY)
-                model_names = [settings.GEMINI_MODEL, "gemini-1.5-flash-latest", "gemini-2.0-flash", "gemini-1.5-flash"]
-                chat = None
-                response = None
-                for m_name in model_names:
-                    try:
-                        m = genai.GenerativeModel(m_name, system_instruction=system_prompt)
-                        gemini_history = []
-                        for msg in request.messages[:-1]:
-                            role = "user" if msg.role == "user" else "model"
-                            gemini_history.append({"role": role, "parts": [msg.content]})
-                        chat = m.start_chat(history=gemini_history)
-                        response = chat.send_message(
-                            last_message,
-                            stream=True,
-                            generation_config=genai.GenerationConfig(
-                                max_output_tokens=settings.GEMINI_MAX_TOKENS, temperature=0.2
-                            ),
-                        )
-                        break
-                    except Exception as ex:
-                        if "404" in str(ex) or "not found" in str(ex):
-                            continue
-                        raise ex
+                from backend.rag.llm_chain import get_llm
+                from langchain.schema import HumanMessage, SystemMessage, AIMessage
 
-                if response is not None:
-                    for chunk in response:
-                        if chunk.text:
-                            yield f"data: {json_module.dumps({'token': chunk.text, 'done': False})}\n\n"
-                    yield f"data: {json_module.dumps({'token': '', 'done': True, 'sources': sources})}\n\n"
-                    return
+                llm = get_llm()
+                messages = [SystemMessage(content=system_prompt)]
+                for msg in request.messages[:-1]:
+                    if msg.role == "user":
+                        messages.append(HumanMessage(content=msg.content))
+                    else:
+                        messages.append(AIMessage(content=msg.content))
+                messages.append(HumanMessage(content=last_message))
+
+                for chunk in llm.stream(messages):
+                    if hasattr(chunk, "content") and chunk.content:
+                        yield f"data: {json_module.dumps({'token': chunk.content, 'done': False})}\n\n"
+                yield f"data: {json_module.dumps({'token': '', 'done': True, 'sources': sources})}\n\n"
+                return
             except Exception as llm_err:
                 logger.warning(f"LLM API limit or error encountered ({llm_err}). Falling back to Local RAG Synthesis Mode.")
 

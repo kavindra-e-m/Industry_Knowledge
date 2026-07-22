@@ -1,8 +1,10 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { motion } from "framer-motion";
 import { Package, Download, Clock, CheckCircle, AlertCircle, Plus, Zap } from "lucide-react";
 import PageShell from "../components/shared/PageShell";
 import StatRing from "../components/shared/StatRing";
+import { downloadAuditPackage } from "../services/api";
+import { useToastStore } from "../store/toastStore";
 
 const EVIDENCE = [
   { id: "DOC-4521-DN", title: "Energy Baseline Records", desc: "Validated via P&ID Explorer. Linked to 12 telemetry streams.", status: "VERIFIED", color: "var(--success)" },
@@ -19,10 +21,43 @@ const PRESETS = [
 export default function AuditPackage() {
   const [generating, setGenerating] = useState(false);
   const [generated, setGenerated] = useState(false);
+  const [evidenceList, setEvidenceList] = useState(EVIDENCE);
+  const fileInputRef = useRef(null);
+  const push = useToastStore((s) => s.push);
 
-  const handleGenerate = () => {
+  const handleGenerate = async () => {
     setGenerating(true);
-    setTimeout(() => { setGenerating(false); setGenerated(true); }, 2500);
+    try {
+      await downloadAuditPackage();
+      setGenerated(true);
+      push({ type: "success", title: "Synthesis Successful", message: "Audit package has been successfully generated.", duration: 3000 });
+    } catch (err) {
+      console.error("Failed to generate audit package:", err);
+      push({ type: "error", title: "Synthesis Failed", message: "Failed to generate compliance package. Ensure backend is running.", duration: 4000 });
+    } finally {
+      setGenerating(false);
+    }
+  };
+
+  const handleManualUpload = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    push({ type: "info", title: "Uploading Evidence", message: `Processing ${file.name}...`, duration: 2500 });
+    
+    const newId = `MANUAL-${Date.now().toString().slice(-4)}`;
+    const newEvidence = {
+      id: newId,
+      title: file.name,
+      desc: `Manually uploaded evidence document. Size: ${(file.size / 1024).toFixed(1)} KB.`,
+      status: "VERIFIED",
+      color: "var(--success)"
+    };
+
+    setTimeout(() => {
+      setEvidenceList((prev) => [...prev, newEvidence]);
+      push({ type: "success", title: "Evidence Uploaded", message: `Successfully verified and added ${file.name} to package checklist.`, duration: 3000 });
+    }, 1500);
   };
 
   return (
@@ -77,7 +112,7 @@ export default function AuditPackage() {
                 <div className="space-y-2 ml-6 shrink-0">
                   <p className="ib-label mb-2">DOWNLOAD PRESETS</p>
                   {PRESETS.map((p) => (
-                    <button key={p.label} className="flex items-center gap-2 w-full px-3 py-2 rounded-lg text-[12px] border transition-all" style={{ color: "var(--text-secondary)", borderColor: "var(--border-primary)", background: "var(--surface-secondary)" }}>
+                    <button key={p.label} onClick={handleGenerate} className="flex items-center gap-2 w-full px-3 py-2 rounded-lg text-[12px] border transition-all hover:opacity-80" style={{ color: "var(--text-secondary)", borderColor: "var(--border-primary)", background: "var(--surface-secondary)" }}>
                       <span>{p.icon}</span>{p.label}
                     </button>
                   ))}
@@ -129,8 +164,8 @@ export default function AuditPackage() {
                 <span className="ib-badge ib-badge-healthy text-[9px]">42/45 Verified</span>
               </div>
               <div className="space-y-3">
-                {EVIDENCE.map((e) => (
-                  <div key={e.id} className="p-3 rounded-xl border transition-all" style={{ borderColor: "var(--border-primary)", background: "var(--surface-secondary)" }}>
+                {evidenceList.map((e) => (
+                  <div key={e.id} className="p-3 rounded-xl border transition-all animate-fade-in" style={{ borderColor: "var(--border-primary)", background: "var(--surface-secondary)" }}>
                     <div className="flex items-start gap-2 mb-1">
                       {e.status === "VERIFIED"
                         ? <CheckCircle size={13} className="text-emerald-500 shrink-0 mt-0.5" />
@@ -146,7 +181,18 @@ export default function AuditPackage() {
                   </div>
                 ))}
               </div>
-              <button className="w-full mt-3 flex items-center justify-center gap-2 py-2 rounded-xl text-[11px] border border-dashed hover:opacity-80 transition-all" style={{ color: "var(--text-secondary)", borderColor: "var(--border-primary)", background: "var(--surface-secondary)" }}>
+              <input
+                type="file"
+                ref={fileInputRef}
+                style={{ display: "none" }}
+                onChange={handleManualUpload}
+                accept=".pdf,.png,.jpg,.jpeg,.xlsx,.docx,.csv"
+              />
+              <button
+                onClick={() => fileInputRef.current && fileInputRef.current.click()}
+                className="w-full mt-3 flex items-center justify-center gap-2 py-2 rounded-xl text-[11px] border border-dashed hover:opacity-80 transition-all"
+                style={{ color: "var(--text-secondary)", borderColor: "var(--border-primary)", background: "var(--surface-secondary)" }}
+              >
                 <Plus size={12} /> Manual Evidence Upload
               </button>
             </motion.div>

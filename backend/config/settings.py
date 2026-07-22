@@ -42,6 +42,12 @@ class Settings(BaseSettings):
     GEMINI_MAX_TOKENS: int = 8192
     GEMINI_TEMPERATURE: float = 0.1
 
+    # Groq
+    GROQ_API_KEY: str = Field(default="", env="GROQ_API_KEY")
+    GROQ_MODEL: str = "llama-3.3-70b-versatile"
+    GROQ_MAX_TOKENS: int = 8192
+    GROQ_TEMPERATURE: float = 0.1
+
     # Embeddings
     EMBEDDING_MODEL: str = "all-MiniLM-L6-v2"
 
@@ -62,3 +68,7 @@ class Settings(BaseSettings):
 
 
 settings = Settings()
+
+# Auto-detect if a Groq key was placed in GEMINI_API_KEY
+if settings.GEMINI_API_KEY.startswith("gsk_") and not settings.GROQ_API_KEY:
+    settings.GROQ_API_KEY = settings.GEMINI_API_KEY

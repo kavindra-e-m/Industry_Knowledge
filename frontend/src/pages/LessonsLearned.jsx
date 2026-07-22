@@ -1,6 +1,9 @@
+import { useState } from "react";
 import { motion } from "framer-motion";
-import { BookOpen, Download, Calendar, AlertTriangle, TrendingUp, Zap, ExternalLink } from "lucide-react";
+import { BookOpen, Download, Calendar, AlertTriangle, TrendingUp, Zap, ExternalLink, Check } from "lucide-react";
 import PageShell from "../components/shared/PageShell";
+import { useToastStore } from "../store/toastStore";
+import { downloadAuditPackage } from "../services/api";
 
 const INCIDENTS = [
   {
@@ -34,6 +37,38 @@ const AI_WARNINGS = [
 ];
 
 export default function LessonsLearned() {
+  const push = useToastStore((s) => s.push);
+  const [exporting, setExporting] = useState(false);
+  const [timeFilter, setTimeFilter] = useState("All");
+  const [timeMenuOpen, setTimeMenuOpen] = useState(false);
+
+  const handleExportAuditPackage = async () => {
+    setExporting(true);
+    push({ type: "info", title: "Audit Synthesis", message: "Assembling active compliance records and historical logs...", duration: 2500 });
+    try {
+      await downloadAuditPackage();
+      push({ type: "success", title: "Synthesis Successful", message: "Audit package has been successfully downloaded.", duration: 3000 });
+    } catch (err) {
+      console.error(err);
+      push({ type: "error", title: "Download Failed", message: "Failed to generate compliance package. Ensure backend is running.", duration: 4000 });
+    } finally {
+      setExporting(false);
+    }
+  };
+
+  const getFilteredIncidents = () => {
+    if (timeFilter === "All Time" || timeFilter === "All") return INCIDENTS;
+    if (timeFilter === "Last 30 Days") {
+      return INCIDENTS.filter(inc => inc.date.includes("OCT"));
+    }
+    if (timeFilter === "Last 6 Months") {
+      return INCIDENTS.filter(inc => !inc.date.includes("JULY"));
+    }
+    return INCIDENTS;
+  };
+
+  const displayedIncidents = getFilteredIncidents();
+
   return (
     <PageShell topbarPlaceholder="Search knowledge base...">
       <div className="p-6 space-y-5 min-h-full" style={{ background: "transparent" }}>
@@ -46,9 +81,30 @@ export default function LessonsLearned() {
               Transforming historical operational data into actionable industrial intelligence. Predictive insights derived from decades of telemetry and <span style={{ color: "var(--accent-primary)" }}>human reporting</span>.
             </p>
           </div>
-          <div className="flex gap-2 mt-2">
-            <button className="ib-btn ib-btn-primary text-xs"><Download size={12} /> Export Audit Package</button>
-            <button className="ib-btn ib-btn-ghost text-xs"><Calendar size={12} /> Time Range</button>
+          <div className="flex gap-2 mt-2 relative">
+            <button onClick={handleExportAuditPackage} disabled={exporting} className="ib-btn ib-btn-primary text-xs">
+              {exporting ? "Synthesizing..." : <><Download size={12} /> Export Audit Package</>}
+            </button>
+            <div className="relative">
+              <button onClick={() => setTimeMenuOpen(!timeMenuOpen)} className="ib-btn ib-btn-ghost text-xs flex items-center gap-1">
+                <Calendar size={12} /> {timeFilter === "All" ? "Time Range" : timeFilter}
+              </button>
+              {timeMenuOpen && (
+                <div className="absolute right-0 mt-1 w-44 rounded-xl border p-1 shadow-lg z-20" style={{ background: "var(--surface-primary)", borderColor: "var(--border-primary)" }}>
+                  {["All", "Last 30 Days", "Last 6 Months"].map((t) => (
+                    <button
+                      key={t}
+                      onClick={() => { setTimeFilter(t); setTimeMenuOpen(false); }}
+                      className="w-full text-left px-3 py-1.5 rounded-lg text-xs hover:bg-[var(--surface-secondary)] text-primary-app font-medium flex items-center justify-between"
+                      style={{ color: "var(--text-primary)" }}
+                    >
+                      {t}
+                      {timeFilter === t && <Check size={12} className="text-[var(--accent-primary)]" />}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
@@ -70,7 +126,7 @@ export default function LessonsLearned() {
 
               <div className="space-y-4 relative">
                 <div className="absolute left-[7px] top-2 bottom-2 w-px" style={{ background: "var(--border-primary)" }} />
-                {INCIDENTS.map((inc, i) => (
+                {displayedIncidents.map((inc, i) => (
                   <motion.div
                     key={i}
                     className="flex gap-4 relative"

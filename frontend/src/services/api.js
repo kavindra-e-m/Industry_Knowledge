@@ -22,13 +22,13 @@ export async function fetchWithFallback(endpoint, options = {}) {
 export const ingestDocument = (file) => {
   const fd = new FormData();
   fd.append("file", file);
-  return fetchWithFallback("/api/ingest", { method: "POST", body: fd, isFormData: true });
+  return fetchWithFallback("/api/ingest/document", { method: "POST", body: fd, isFormData: true });
 };
 
 export const ingestPID = (file) => {
   const fd = new FormData();
   fd.append("file", file);
-  return fetchWithFallback("/api/pid/analyse", { method: "POST", body: fd, isFormData: true });
+  return fetchWithFallback("/api/pid/analyse-drawing", { method: "POST", body: fd, isFormData: true });
 };
 
 export const queryKnowledgeBase = (question, equipmentTag = null) =>
@@ -40,10 +40,20 @@ export const queryKnowledgeBase = (question, equipmentTag = null) =>
 export const getMaintenanceAlerts = () => fetchWithFallback("/api/maintenance/alerts");
 export const predictFailure = (tagId) => fetchWithFallback(`/api/maintenance/predict/${tagId}`);
 export const getRCAReport = (tagId, failureMode = "general_failure") =>
-  fetchWithFallback(`/api/maintenance/rca/${tagId}?failure_mode=${failureMode}`);
+  fetchWithFallback("/api/maintenance/rca", {
+    method: "POST",
+    body: JSON.stringify({ equipment_tag: tagId, failure_mode: failureMode }),
+  });
 export const createWorkOrder = (data) =>
   fetchWithFallback("/api/maintenance/work-orders", { method: "POST", body: JSON.stringify(data) });
 export const getWorkOrders = () => fetchWithFallback("/api/maintenance/work-orders");
+
+export const getEquipmentList = () => fetchWithFallback("/api/graph/equipment");
+export const analyzeDrawingImpact = (equipmentTag, failureMode = "general_failure") =>
+  fetchWithFallback("/api/pid/impact", {
+    method: "POST",
+    body: JSON.stringify({ equipment_tag: equipmentTag, failure_mode: failureMode }),
+  });
 
 export const getComplianceReport = () => fetchWithFallback("/api/compliance/report");
 export const checkEquipmentCompliance = (tagId) => fetchWithFallback(`/api/compliance/check/${tagId}`);

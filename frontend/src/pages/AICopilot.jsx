@@ -1,5 +1,11 @@
 import { useState, useRef, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
+import PageShell from "../components/shared/PageShell";
+import { motion, AnimatePresence } from "framer-motion";
+import { Bot, User, Send, Trash2, StopCircle, Layers, Search, Zap, AlertTriangle, ShieldCheck } from "lucide-react";
+import { useToastStore } from "../store/toastStore";
+import { getEquipmentList } from "../services/api";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
 
@@ -15,6 +21,9 @@ const SUGGESTED_QUERIES = [
 ];
 
 export default function ChatCopilot() {
+  const location = useLocation();
+  const pushToast = useToastStore((s) => s.push);
+
   const [messages, setMessages] = useState([
     {
       role: "assistant",
@@ -27,8 +36,23 @@ export default function ChatCopilot() {
   const [equipmentTag, setEquipmentTag] = useState("");
   const [sources, setSources] = useState([]);
   const [error, setError] = useState(null);
+  const [equipmentList, setEquipmentList] = useState([]);
   const bottomRef = useRef(null);
   const abortRef = useRef(null);
+
+  // Load equipment list for dropdown
+  useEffect(() => {
+    getEquipmentList()
+      .then((data) => setEquipmentList(data.equipment || []))
+      .catch((err) => console.error("Failed to load equipment list:", err));
+  }, []);
+
+  // Handle location state redirect from Document Intelligence
+  useEffect(() => {
+    if (location.state?.initialPrompt) {
+      sendMessage(location.state.initialPrompt);
+    }
+  }, [location.state]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -39,7 +63,7 @@ export default function ChatCopilot() {
     setError(null);
     setSources([]);
     const userMessage = { role: "user", content: text };
-    const updatedMessages = [...messages, userMessage];
+    const updatedMessages = [...messages.filter(m => !m.streaming), userMessage];
     setMessages(updatedMessages);
     setInput("");
     setIsStreaming(true);
@@ -61,7 +85,8 @@ export default function ChatCopilot() {
         const { done, value } = await reader.read();
         if (done) break;
         const chunk = decoder.decode(value, { stream: true });
-        for (const line of chunk.split("\n")) {
+        const lines = chunk.split("\n");
+        for (const line of lines) {
           if (!line.startsWith("data: ")) continue;
           try {
             const data = JSON.parse(line.slice(6));
@@ -70,7 +95,9 @@ export default function ChatCopilot() {
               fullText += data.token;
               setMessages((prev) => {
                 const updated = [...prev];
-                updated[updated.length - 1] = { role: "assistant", content: fullText, streaming: !data.done };
+                if (updated[updated.length - 1]?.streaming) {
+                  updated[updated.length - 1] = { role: "assistant", content: fullText, streaming: !data.done };
+                }
                 return updated;
               });
             }
@@ -78,7 +105,9 @@ export default function ChatCopilot() {
               if (data.sources?.length) setSources(data.sources);
               setMessages((prev) => {
                 const updated = [...prev];
-                updated[updated.length - 1] = { role: "assistant", content: fullText, streaming: false };
+                if (updated[updated.length - 1]?.streaming) {
+                  updated[updated.length - 1] = { role: "assistant", content: fullText, streaming: false };
+                }
                 return updated;
               });
             }
@@ -107,169 +136,229 @@ export default function ChatCopilot() {
     setMessages([{ role: "assistant", content: "Chat cleared. What would you like to know?" }]);
     setSources([]);
     setError(null);
+    pushToast({ type: "info", title: "Chat Cleared", message: "Conversation history has been reset.", duration: 2000 });
   };
 
-  const S = {
-    wrap: { display: "flex", flexDirection: "column", height: "100vh", background: "#0f1117", color: "#e5e7eb" },
-    header: { display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 20px", borderBottom: "1px solid #1f2937" },
-    avatar: { width: 36, height: 36, borderRadius: "50%", background: "#2563eb", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: "bold", fontSize: 13 },
-    messages: { flex: 1, overflowY: "auto", padding: "20px 16px" },
-    userBubble: { maxWidth: "72%", padding: "12px 16px", borderRadius: "18px 18px 4px 18px", background: "#2563eb", fontSize: 14, lineHeight: 1.6, color: "#fff", whiteSpace: "pre-wrap" },
-    aiBubble: { maxWidth: "72%", padding: "12px 16px", borderRadius: "18px 18px 18px 4px", background: "#1f2937", fontSize: 14, lineHeight: 1.6, color: "#e5e7eb" },
-    input: { padding: "12px 16px", background: "#1f2937", border: "1px solid #374151", borderRadius: 16, color: "#e5e7eb", fontSize: 14, resize: "none", outline: "none", flex: 1, minHeight: 48, maxHeight: 160, fontFamily: "inherit", lineHeight: 1.5 },
-    sendBtn: (active) => ({ width: 46, height: 46, borderRadius: 14, background: active ? "#2563eb" : "#374151", border: "none", cursor: active ? "pointer" : "not-allowed", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }),
-    stopBtn: { width: 46, height: 46, borderRadius: 14, background: "#dc2626", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 },
-  };
+  const selectedEquipmentDetails = equipmentList.find(e => e.tag_id === equipmentTag);
 
   return (
-    <div style={S.wrap}>
-      <div style={S.header}>
-        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <div style={S.avatar}>IB</div>
+    <PageShell topbarPlaceholder="Ask Copilot about plant safety or maintenance procedures...">
+      <div className="flex flex-col md:flex-row h-full overflow-hidden bg-primary-app">
+        
+        {/* Left Side: Context Scoping Sidebar */}
+        <div className="w-full md:w-80 shrink-0 border-b md:border-b-0 md:border-r p-5 flex flex-col gap-5 bg-secondary-app border-primary-app overflow-y-auto">
           <div>
-            <div style={{ fontWeight: 600, fontSize: 15 }}>IndustrialBrain Copilot</div>
-            <div style={{ fontSize: 12, color: "#6b7280" }}>AI Knowledge Assistant — Plant Operations</div>
+            <h3 className="text-sm font-semibold font-sora text-primary-app flex items-center gap-2">
+              <Layers size={14} className="text-[var(--accent-primary)]" /> Context Scoping
+            </h3>
+            <p className="text-[11px] text-tertiary-app mt-1 leading-relaxed">
+              Tag an asset to automatically scope the AI reasoning engine to its Neo4j relationships and sensor data.
+            </p>
           </div>
-        </div>
-        <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
-          <input
-            type="text"
-            placeholder="Equipment tag (P-201)"
-            value={equipmentTag}
-            onChange={(e) => setEquipmentTag(e.target.value.toUpperCase())}
-            style={{ padding: "6px 12px", background: "#1f2937", border: "1px solid #374151", borderRadius: 8, color: "#e5e7eb", fontSize: 13, width: 180, outline: "none" }}
-          />
-          <button
-            onClick={clearChat}
-            style={{ padding: "6px 14px", background: "transparent", border: "1px solid #374151", borderRadius: 8, color: "#9ca3af", cursor: "pointer", fontSize: 13 }}
-          >
-            Clear
-          </button>
-        </div>
-      </div>
 
-      <div style={S.messages}>
-        {messages.map((msg, i) => (
-          <div key={i} style={{ display: "flex", gap: 12, marginBottom: 20, justifyContent: msg.role === "user" ? "flex-end" : "flex-start" }}>
-            {msg.role === "assistant" && <div style={{ ...S.avatar, marginTop: 4 }}>IB</div>}
-            <div style={msg.role === "user" ? S.userBubble : S.aiBubble}>
-              {msg.role === "assistant" ? (
-                <div>
-                  <ReactMarkdown>{msg.content}</ReactMarkdown>
-                  {msg.streaming && <span style={{ display: "inline-block", width: 8, height: 16, background: "#60a5fa", marginLeft: 2, animation: "pulse 1s infinite" }} />}
+          <div className="flex flex-col gap-2">
+            <label className="ib-label">Scope Equipment Tag</label>
+            <select
+              value={equipmentTag}
+              onChange={(e) => setEquipmentTag(e.target.value)}
+              className="ib-input w-full bg-surface-secondary border-primary-app text-primary-app"
+            >
+              <option value="">-- Search General Knowledge --</option>
+              {equipmentList.map((eq) => (
+                <option key={eq.tag_id} value={eq.tag_id}>
+                  {eq.tag_id} - {eq.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Scoped Context Preview */}
+          <AnimatePresence>
+            {equipmentTag && selectedEquipmentDetails && (
+              <motion.div
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 8 }}
+                className="p-4 rounded-xl border border-primary-app bg-surface-primary flex flex-col gap-3"
+              >
+                <div className="flex items-center justify-between border-b pb-2 border-primary-app">
+                  <span className="text-[11px] font-bold font-mono text-primary-app">{selectedEquipmentDetails.tag_id}</span>
+                  <span className={`ib-badge ${
+                    selectedEquipmentDetails.criticality === "Critical" ? "ib-badge-critical" :
+                    selectedEquipmentDetails.criticality === "High" ? "ib-badge-warning" : "ib-badge-info"
+                  } scale-90`}>
+                    {selectedEquipmentDetails.criticality}
+                  </span>
                 </div>
-              ) : (
-                msg.content
-              )}
+                <div className="space-y-1.5 text-[11px] text-secondary-app">
+                  <p><strong className="text-tertiary-app font-normal">Name:</strong> {selectedEquipmentDetails.name}</p>
+                  <p><strong className="text-tertiary-app font-normal">Type:</strong> {selectedEquipmentDetails.equipment_type}</p>
+                  <p><strong className="text-tertiary-app font-normal">Location:</strong> {selectedEquipmentDetails.location}</p>
+                </div>
+                <div className="p-2 rounded bg-blue-500/5 border border-blue-500/15 flex items-start gap-1.5 text-[10px] text-secondary-app mt-1">
+                  <Zap size={11} className="text-blue-500 mt-0.5 shrink-0" />
+                  <span>Neo4j Graph Topology & past incidents merged into prompt context.</span>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+
+        {/* Right Side: Chat Area */}
+        <div className="flex-1 flex flex-col overflow-hidden bg-primary-app">
+          
+          {/* Chat Header */}
+          <div className="px-6 py-4 border-b flex items-center justify-between border-primary-app bg-secondary-app">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-xl flex items-center justify-center font-bold text-white shrink-0 shadow-sm"
+                style={{ background: "linear-gradient(135deg, #2563EB 0%, #7C3AED 100%)" }}>
+                <Bot size={18} />
+              </div>
+              <div>
+                <h2 className="text-sm font-semibold font-sora text-primary-app">IndustrialBrain Copilot</h2>
+                <p className="text-[10px] text-tertiary-app mt-0.5">Dual-RAG Specialist Agent Routing</p>
+              </div>
             </div>
-            {msg.role === "user" && (
-              <div style={{ width: 32, height: 32, borderRadius: "50%", background: "#374151", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: "bold", flexShrink: 0, marginTop: 4 }}>
-                You
+            <button
+              onClick={clearChat}
+              className="ib-btn ib-btn-ghost py-1.5 px-3 text-[11px] font-bold flex items-center gap-1.5"
+            >
+              <Trash2 size={12} /> Reset Chat
+            </button>
+          </div>
+
+          {/* Messages Area */}
+          <div className="flex-1 overflow-y-auto p-6 space-y-5">
+            {messages.map((msg, i) => (
+              <div key={i} className={`flex gap-3.5 max-w-[85%] md:max-w-[75%] ${msg.role === "user" ? "ml-auto flex-row-reverse" : "mr-auto"}`}>
+                <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 text-white font-bold text-xs ${
+                  msg.role === "user" ? "bg-slate-600" : "bg-blue-600"
+                }`}>
+                  {msg.role === "user" ? <User size={14} /> : <Bot size={14} />}
+                </div>
+                <div className={`p-4 rounded-2xl text-sm leading-relaxed border ${
+                  msg.role === "user"
+                    ? "bg-[var(--accent-primary)]/10 border-[var(--accent-primary)]/20 text-primary-app"
+                    : "bg-surface-primary border-primary-app text-primary-app shadow-sm"
+                }`}>
+                  {msg.role === "assistant" ? (
+                    <div className="prose prose-sm dark:prose-invert max-w-none text-primary-app">
+                      <ReactMarkdown>{msg.content}</ReactMarkdown>
+                      {msg.streaming && (
+                        <span className="inline-block w-1.5 h-4 bg-blue-500 ml-1.5 animate-pulse" />
+                      )}
+                    </div>
+                  ) : (
+                    <span className="whitespace-pre-wrap">{msg.content}</span>
+                  )}
+                </div>
+              </div>
+            ))}
+
+            {isStreaming && messages[messages.length - 1]?.content === "" && (
+              <div className="flex gap-3.5 mr-auto">
+                <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 bg-blue-600 text-white">
+                  <Bot size={14} />
+                </div>
+                <div className="p-4 rounded-2xl bg-surface-primary border border-primary-app flex gap-1.5 items-center">
+                  {[0, 150, 300].map((delay, i) => (
+                    <div key={i} className="w-2 h-2 rounded-full bg-slate-400 dark:bg-slate-500 animate-bounce" style={{ animationDelay: `${delay}ms` }} />
+                  ))}
+                </div>
               </div>
             )}
-          </div>
-        ))}
 
-        {isStreaming && messages[messages.length - 1]?.content === "" && (
-          <div style={{ display: "flex", gap: 12, marginBottom: 20 }}>
-            <div style={S.avatar}>IB</div>
-            <div style={{ background: "#1f2937", borderRadius: "18px 18px 18px 4px", padding: "14px 18px", display: "flex", gap: 4, alignItems: "center" }}>
-              {[0, 150, 300].map((delay, i) => (
-                <div key={i} style={{ width: 8, height: 8, borderRadius: "50%", background: "#6b7280", animation: `bounce 1s ${delay}ms infinite` }} />
-              ))}
-            </div>
-          </div>
-        )}
-
-        {error && (
-          <div style={{ textAlign: "center", marginBottom: 16 }}>
-            <div style={{ display: "inline-block", background: "rgba(239,68,68,0.1)", border: "1px solid #ef4444", color: "#fca5a5", padding: "10px 16px", borderRadius: 10, fontSize: 13 }}>
-              {error}
-              <button onClick={() => setError(null)} style={{ marginLeft: 10, color: "#f87171", background: "none", border: "none", cursor: "pointer", textDecoration: "underline" }}>
-                Dismiss
-              </button>
-            </div>
-          </div>
-        )}
-        <div ref={bottomRef} />
-      </div>
-
-      {sources.length > 0 && (
-        <div style={{ padding: "10px 20px", borderTop: "1px solid #1f2937", background: "#111827" }}>
-          <div style={{ fontSize: 11, color: "#6b7280", marginBottom: 6 }}>Sources used:</div>
-          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-            {sources.map((src, i) => (
-              <div key={i} style={{ fontSize: 12, background: "#1f2937", border: "1px solid #374151", borderRadius: 8, padding: "4px 10px", color: "#d1d5db" }} title={src.preview}>
-                📄 {src.filename} <span style={{ color: "#6b7280" }}>({Math.round(src.relevance * 100)}%)</span>
+            {error && (
+              <div className="flex justify-center py-4">
+                <div className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-red-500/30 bg-red-500/5 text-xs text-red-500 font-medium">
+                  <AlertTriangle size={13} />
+                  <span>{error}</span>
+                  <button onClick={() => setError(null)} className="underline hover:text-red-600 ml-1">
+                    Dismiss
+                  </button>
+                </div>
               </div>
-            ))}
+            )}
+            <div ref={bottomRef} />
           </div>
-        </div>
-      )}
 
-      {messages.length <= 1 && (
-        <div style={{ padding: "12px 20px", borderTop: "1px solid #1f2937" }}>
-          <div style={{ fontSize: 12, color: "#6b7280", marginBottom: 8 }}>Try asking:</div>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
-            {SUGGESTED_QUERIES.slice(0, 4).map((q, i) => (
-              <button
-                key={i}
-                onClick={() => sendMessage(q)}
-                style={{ textAlign: "left", padding: "10px 14px", background: "#1f2937", border: "1px solid #374151", borderRadius: 12, color: "#d1d5db", fontSize: 13, cursor: "pointer", lineHeight: 1.4 }}
-              >
-                {q}
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
-
-      <div style={{ padding: "14px 20px", borderTop: "1px solid #1f2937", background: "#111827" }}>
-        <div style={{ display: "flex", gap: 10, alignItems: "flex-end", maxWidth: 900, margin: "0 auto" }}>
-          <textarea
-            ref={null}
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={handleKeyDown}
-            disabled={isStreaming}
-            placeholder="Ask anything about your plant, equipment, procedures, or compliance..."
-            rows={1}
-            style={S.input}
-            onInput={(e) => {
-              e.target.style.height = "auto";
-              e.target.style.height = Math.min(e.target.scrollHeight, 160) + "px";
-            }}
-          />
-          {isStreaming ? (
-            <button
-              onClick={() => {
-                if (abortRef.current) abortRef.current.abort();
-                setIsStreaming(false);
-              }}
-              style={S.stopBtn}
-            >
-              <div style={{ width: 14, height: 14, background: "#fff", borderRadius: 2 }} />
-            </button>
-          ) : (
-            <button onClick={() => sendMessage()} disabled={!input.trim()} style={S.sendBtn(!!input.trim())}>
-              <svg width="18" height="18" fill="none" stroke="#fff" strokeWidth={2} viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-              </svg>
-            </button>
+          {/* Sources panel */}
+          {sources.length > 0 && (
+            <div className="px-6 py-2.5 border-t border-primary-app bg-secondary-app">
+              <span className="text-[10px] text-tertiary-app uppercase font-bold tracking-wider">Citations Verified:</span>
+              <div className="flex flex-wrap gap-2 mt-1.5">
+                {sources.map((src, i) => (
+                  <div key={i} className="text-xs px-2.5 py-1 rounded-md border border-primary-app bg-surface-primary text-secondary-app font-medium" title={src.preview}>
+                    📄 {src.filename} <span className="text-tertiary-app font-normal">({Math.round(src.relevance * 100)}%)</span>
+                  </div>
+                ))}
+              </div>
+            </div>
           )}
-        </div>
-        <div style={{ textAlign: "center", fontSize: 11, color: "#4b5563", marginTop: 8 }}>
-          Enter to send · Shift+Enter for new line · Stop button cancels response
-        </div>
-      </div>
 
-      <style>{`
-        @keyframes bounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-4px)} }
-        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0} }
-        *{box-sizing:border-box}
-        ::-webkit-scrollbar{width:6px}
-        ::-webkit-scrollbar-thumb{background:#374151;border-radius:3px}
-      `}</style>
-    </div>
+          {/* Suggested prompts grid */}
+          {messages.length <= 1 && (
+            <div className="px-6 py-4 border-t border-primary-app bg-secondary-app">
+              <span className="text-[10px] text-tertiary-app uppercase font-bold tracking-wider">Suggested Queries:</span>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mt-2">
+                {SUGGESTED_QUERIES.map((q, i) => (
+                  <button
+                    key={i}
+                    onClick={() => sendMessage(q)}
+                    className="p-3 text-left rounded-xl border transition-all text-xs font-medium text-secondary-app border-primary-app bg-surface-primary hover:border-[var(--accent-primary)] hover:bg-surface-secondary"
+                  >
+                    {q}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Input Area */}
+          <div className="p-4 border-t border-primary-app bg-secondary-app">
+            <div className="max-w-4xl mx-auto flex items-end gap-3">
+              <textarea
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyDown={handleKeyDown}
+                disabled={isStreaming}
+                placeholder="Ask Copilot about troubleshooting guidelines, inspection manuals, safety forms..."
+                rows={1}
+                className="ib-input flex-1 min-h-[44px] max-h-[140px] resize-none overflow-y-auto font-sans leading-normal"
+                onInput={(e) => {
+                  e.target.style.height = "auto";
+                  e.target.style.height = Math.min(e.target.scrollHeight, 140) + "px";
+                }}
+              />
+              {isStreaming ? (
+                <button
+                  onClick={() => {
+                    if (abortRef.current) abortRef.current.abort();
+                    setIsStreaming(false);
+                  }}
+                  className="ib-btn flex-none w-11 h-11 justify-center rounded-xl bg-red-500 text-white hover:bg-red-600 shrink-0 p-0"
+                >
+                  <StopCircle size={18} />
+                </button>
+              ) : (
+                <button
+                  onClick={() => sendMessage()}
+                  disabled={!input.trim()}
+                  className={`ib-btn flex-none w-11 h-11 justify-center rounded-xl shrink-0 p-0 ${
+                    input.trim() ? "ib-btn-primary" : "bg-slate-300 dark:bg-slate-700 text-slate-400 cursor-not-allowed"
+                  }`}
+                >
+                  <Send size={15} />
+                </button>
+              )}
+            </div>
+            <div className="text-[10px] text-center text-tertiary-app mt-2">
+              Enter to send · Shift+Enter for new line · AI generated answers should be validated.
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </PageShell>
   );
 }

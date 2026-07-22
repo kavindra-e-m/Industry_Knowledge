@@ -172,7 +172,9 @@ async def system_status():
         "neo4j": "unknown",
         "postgres": "unknown",
         "redis": "unknown",
-        "gemini_configured": bool(settings.GEMINI_API_KEY),
+        "gemini_configured": bool(settings.GEMINI_API_KEY or settings.GROQ_API_KEY),
+        "groq_configured": bool(settings.GROQ_API_KEY),
+        "active_llm": "groq" if settings.GROQ_API_KEY else ("gemini" if settings.GEMINI_API_KEY else "none"),
     }
 
     # ChromaDB
