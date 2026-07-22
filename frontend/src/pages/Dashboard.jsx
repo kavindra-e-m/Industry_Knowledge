@@ -19,23 +19,23 @@ const BASE_TREND = [
 ];
 
 const AI_INSIGHTS = [
-  { tag: "OPTIMIZATION", time: "2m ago", color: "#4F9DFF", text: "Reduce Turbine-04 load by 12% to prevent thermal runaway. Reroute excess energy to Storage Block B." },
-  { tag: "MAINTENANCE",  time: "15m ago", color: "#FBBF24", text: "Hydraulic Seal #42 reaching fatigue limit. Schedule replacement within 48 operational hours." },
-  { tag: "INVENTORY",    time: "1h ago",  color: "#FF5C5C", text: "Critical spare part 'GE-Filter-X' out of stock. Automatic procurement request initiated." },
+  { tag: "OPTIMIZATION", time: "2m ago", color: "#2563EB", text: "Reduce Turbine-04 load by 12% to prevent thermal runaway. Reroute excess energy to Storage Block B." },
+  { tag: "MAINTENANCE",  time: "15m ago", color: "#D97706", text: "Hydraulic Seal #42 reaching fatigue limit. Schedule replacement within 48 operational hours." },
+  { tag: "INVENTORY",    time: "1h ago",  color: "#DC2626", text: "Critical spare part 'GE-Filter-X' out of stock. Automatic procurement request initiated." },
 ];
 
 const TIMELINE = [
-  { label: "Filter Replacement", sub: "Section A-12 · Done by Tech-04", status: "COMPLETED",    color: "#34D399" },
-  { label: "Calibration Check",  sub: "Sensor Array 09 · AI Assisted",  status: "IN PROGRESS",  color: "#4F9DFF" },
-  { label: "Lubrication Cycle",  sub: "Conveyor Link 04 · System Auto",  status: "SCHEDULED 2H", color: "#4A6080" },
+  { label: "Filter Replacement", sub: "Section A-12 · Done by Tech-04", status: "COMPLETED",    color: "#10B981" },
+  { label: "Calibration Check",  sub: "Sensor Array 09 · AI Assisted",  status: "IN PROGRESS",  color: "#2563EB" },
+  { label: "Lubrication Cycle",  sub: "Conveyor Link 04 · System Auto",  status: "SCHEDULED 2H", color: "#64748B" },
 ];
 
 const ChartTooltip = ({ active, payload }) => {
   if (!active || !payload?.length) return null;
   return (
-    <div className="ib-glass px-3 py-2 text-xs">
-      <p className="text-[#8BA3C7]">Predicted Peak Risk</p>
-      <p className="text-white font-bold text-sm">{payload[0].value}%</p>
+    <div className="ib-glass px-3 py-2 text-xs shadow-md">
+      <p style={{ color: "var(--text-secondary)" }}>Predicted Peak Risk</p>
+      <p className="font-bold text-sm" style={{ color: "var(--text-primary)" }}>{payload[0].value}%</p>
     </div>
   );
 };
@@ -43,7 +43,7 @@ const ChartTooltip = ({ active, payload }) => {
 const stagger = { hidden: {}, show: { transition: { staggerChildren: 0.08 } } };
 const fadeUp  = { hidden: { opacity: 0, y: 14 }, show: { opacity: 1, y: 0, transition: { duration: 0.35, ease: "easeOut" } } };
 
-function KpiTile({ label, value, unit = "", color = "#4F9DFF", icon: Icon, loading }) {
+function KpiTile({ label, value, unit = "", color = "var(--accent-primary)", icon: Icon, loading }) {
   const count = useCountUp(loading ? 0 : value);
   return (
     <motion.div
@@ -105,24 +105,24 @@ export default function Dashboard() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
               className={`ib-card p-4 flex items-center justify-between critical-pulse ${alertShake ? "animate-shake" : ""}`}
-              style={{ borderColor: "rgba(255,92,92,0.45)", background: "rgba(255,92,92,0.06)" }}
+              style={{ borderColor: "rgba(239, 68, 68, 0.4)", background: "rgba(239, 68, 68, 0.08)" }}
             >
               <div className="flex items-center gap-3">
                 <motion.div
                   className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
-                  style={{ background: "rgba(255,92,92,0.15)" }}
+                  style={{ background: "rgba(239, 68, 68, 0.15)" }}
                   animate={{ rotate: [0, -8, 8, -4, 4, 0] }}
                   transition={{ duration: 0.5, delay: 0.1 }}
                 >
-                  <AlertTriangle size={18} className="text-[#FF5C5C]" />
+                  <AlertTriangle size={18} className="text-red-500" />
                 </motion.div>
                 <div>
-                  <p className="text-sm font-semibold text-white font-sora">Critical System Alert</p>
-                  <p className="text-xs text-[#8BA3C7]">Turbine-04: Abnormal Thermal Deviation Detected</p>
+                  <p className="text-sm font-semibold font-sora text-red-600 dark:text-red-400">Critical System Alert</p>
+                  <p className="text-xs" style={{ color: "var(--text-secondary)" }}>Turbine-04: Abnormal Thermal Deviation Detected</p>
                 </div>
               </div>
               <motion.button
-                className="ib-btn ib-btn-critical text-xs px-4 py-2"
+                className="ib-btn ib-btn-primary text-xs px-4 py-2 bg-red-600 border-red-600"
                 whileHover={{ scale: 1.04 }}
                 whileTap={{ scale: 0.96 }}
               >
@@ -144,9 +144,9 @@ export default function Dashboard() {
               variants={stagger} initial="hidden" animate="show"
             >
               {[
-                { label: "Overall Health Index",    sublabel: "MAIN PLANT",    value: 92, color: "#34D399" },
-                { label: "Efficiency Optimization", sublabel: "PROCESS LOAD",  value: 74, color: "#4F9DFF" },
-                { label: "Risk Mitigation",         sublabel: "SAFETY MARGIN", value: 98, color: "#7C5CFC" },
+                { label: "Overall Health Index",    sublabel: "MAIN PLANT",    value: 92, color: "#10B981" },
+                { label: "Efficiency Optimization", sublabel: "PROCESS LOAD",  value: 74, color: "#2563EB" },
+                { label: "Risk Mitigation",         sublabel: "SAFETY MARGIN", value: 98, color: "#7C3AED" },
               ].map((ring) => (
                 <motion.div
                   key={ring.sublabel}
@@ -156,7 +156,7 @@ export default function Dashboard() {
                 >
                   <p className="ib-label self-start">{ring.sublabel}</p>
                   <StatRing value={ring.value} size={110} stroke={9} color={ring.color} loading={aLoading} />
-                  <p className="text-[11px] text-[#8BA3C7] text-center font-jakarta">{ring.label}</p>
+                  <p className="text-[11px] text-center font-jakarta" style={{ color: "var(--text-secondary)" }}>{ring.label}</p>
                 </motion.div>
               ))}
             </motion.div>
@@ -169,8 +169,8 @@ export default function Dashboard() {
             >
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
-                  <TrendingUp size={14} className="text-[#4F9DFF]" />
-                  <p className="text-sm font-semibold text-white font-sora">Failure Prediction Trends</p>
+                  <TrendingUp size={14} style={{ color: "var(--accent-primary)" }} />
+                  <p className="text-sm font-semibold font-sora" style={{ color: "var(--text-primary)" }}>Failure Prediction Trends</p>
                 </div>
                 <div className="flex gap-1">
                   {["24h", "7d", "30d"].map((r) => (
@@ -180,9 +180,10 @@ export default function Dashboard() {
                       whileTap={{ scale: 0.93 }}
                       className={`px-2.5 py-1 rounded-lg text-[11px] font-semibold transition-all ${
                         trendRange === r
-                          ? "bg-[#4F9DFF]/20 text-[#4F9DFF] border border-[#4F9DFF]/30"
-                          : "text-[#4A6080] hover:text-[#8BA3C7]"
+                          ? "bg-[var(--accent-primary)]/15 text-[var(--accent-primary)] border border-[var(--accent-primary)]/30"
+                          : "hover:bg-[var(--surface-tertiary)]"
                       }`}
+                      style={{ color: trendRange === r ? "var(--accent-primary)" : "var(--text-tertiary)" }}
                     >
                       {r}
                     </motion.button>
@@ -193,20 +194,20 @@ export default function Dashboard() {
                 <AreaChart data={trendData} margin={{ top: 4, right: 4, left: -24, bottom: 0 }}>
                   <defs>
                     <linearGradient id="trendGrad" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%"   stopColor="#4F9DFF" stopOpacity={0.35} />
-                      <stop offset="100%" stopColor="#4F9DFF" stopOpacity={0} />
+                      <stop offset="0%"   stopColor="var(--accent-primary)" stopOpacity={0.35} />
+                      <stop offset="100%" stopColor="var(--accent-primary)" stopOpacity={0} />
                     </linearGradient>
                   </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#1E3A5F" vertical={false} />
-                  <XAxis dataKey="t" tick={{ fill: "#4A6080", fontSize: 10 }} axisLine={false} tickLine={false} />
-                  <YAxis tick={{ fill: "#4A6080", fontSize: 10 }} axisLine={false} tickLine={false} domain={[0, 100]} />
-                  <Tooltip content={<ChartTooltip />} cursor={{ stroke: "#4F9DFF", strokeWidth: 1, strokeDasharray: "4 4" }} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="var(--border-primary)" vertical={false} />
+                  <XAxis dataKey="t" tick={{ fill: "var(--text-tertiary)", fontSize: 10 }} axisLine={false} tickLine={false} />
+                  <YAxis tick={{ fill: "var(--text-tertiary)", fontSize: 10 }} axisLine={false} tickLine={false} domain={[0, 100]} />
+                  <Tooltip content={<ChartTooltip />} cursor={{ stroke: "var(--accent-primary)", strokeWidth: 1, strokeDasharray: "4 4" }} />
                   <Area
                     type="monotone" dataKey="v"
-                    stroke="#4F9DFF" strokeWidth={2}
+                    stroke="var(--accent-primary)" strokeWidth={2}
                     fill="url(#trendGrad)"
                     dot={false}
-                    activeDot={{ r: 4, fill: "#4F9DFF", stroke: "#07111F", strokeWidth: 2 }}
+                    activeDot={{ r: 4, fill: "var(--accent-primary)", stroke: "var(--bg-primary)", strokeWidth: 2 }}
                     isAnimationActive={true}
                     animationDuration={600}
                   />
@@ -219,10 +220,10 @@ export default function Dashboard() {
               className="grid grid-cols-2 md:grid-cols-4 gap-3"
               variants={stagger} initial="hidden" animate="show"
             >
-              <KpiTile label="Critical Alerts"  value={criticalCount}    color="#FF5C5C" icon={AlertTriangle} loading={aLoading} />
-              <KpiTile label="Avg RUL"          value={avgRUL} unit=" d" color="#4F9DFF" icon={Activity}      loading={aLoading} />
-              <KpiTile label="Compliance Score" value={averageScore} unit="%" color="#34D399" icon={Zap}      loading={cLoading} />
-              <KpiTile label="Non-Compliant"    value={nonCompliantCount} color="#FBBF24" icon={AlertTriangle} loading={cLoading} />
+              <KpiTile label="Critical Alerts"  value={criticalCount}    color="#EF4444" icon={AlertTriangle} loading={aLoading} />
+              <KpiTile label="Avg RUL"          value={avgRUL} unit=" d" color="#2563EB" icon={Activity}      loading={aLoading} />
+              <KpiTile label="Compliance Score" value={averageScore} unit="%" color="#10B981" icon={Zap}      loading={cLoading} />
+              <KpiTile label="Non-Compliant"    value={nonCompliantCount} color="#F59E0B" icon={AlertTriangle} loading={cLoading} />
             </motion.div>
           </div>
 
@@ -237,9 +238,9 @@ export default function Dashboard() {
             >
               <div className="flex items-center gap-2 mb-4">
                 <motion.div animate={{ rotate: [0, 15, -15, 0] }} transition={{ duration: 2, repeat: Infinity, repeatDelay: 4 }}>
-                  <Zap size={14} className="text-[#7C5CFC]" />
+                  <Zap size={14} style={{ color: "var(--accent-secondary)" }} />
                 </motion.div>
-                <p className="text-sm font-semibold text-white font-sora">AI Insights</p>
+                <p className="text-sm font-semibold font-sora" style={{ color: "var(--text-primary)" }}>AI Insights</p>
               </div>
               <div className="space-y-3">
                 {AI_INSIGHTS.map((ins, i) => (
@@ -248,22 +249,31 @@ export default function Dashboard() {
                     initial={{ opacity: 0, x: 10 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.15 + i * 0.08 }}
-                    className="p-3 rounded-xl border border-[#1E3A5F] hover:border-[#2a4a6b] transition-all cursor-pointer"
-                    whileHover={{ x: 2, borderColor: ins.color + "40" }}
+                    className="p-3 rounded-xl border transition-all cursor-pointer"
+                    style={{
+                      borderColor: "var(--border-primary)",
+                      background: "var(--surface-secondary)",
+                    }}
+                    whileHover={{ x: 2, borderColor: ins.color }}
                   >
                     <div className="flex items-center gap-2 mb-1.5">
-                      <span className="ib-badge" style={{ background: `${ins.color}18`, color: ins.color, border: `1px solid ${ins.color}35` }}>
+                      <span className="ib-badge" style={{ background: `${ins.color}15`, color: ins.color, border: `1px solid ${ins.color}35` }}>
                         {ins.tag}
                       </span>
-                      <span className="text-[10px] text-[#4A6080]">{ins.time}</span>
+                      <span className="text-[10px]" style={{ color: "var(--text-tertiary)" }}>{ins.time}</span>
                     </div>
-                    <p className="text-[12px] text-[#8BA3C7] leading-relaxed">{ins.text}</p>
+                    <p className="text-[12px] leading-relaxed" style={{ color: "var(--text-secondary)" }}>{ins.text}</p>
                   </motion.div>
                 ))}
               </div>
               <motion.button
                 onClick={() => navigate("/copilot")}
-                className="w-full mt-3 py-2.5 rounded-xl text-[12px] font-semibold text-[#2563EB] border border-[#2563EB]/20 hover:bg-[#2563EB]/8 transition-all font-jakarta"
+                className="w-full mt-3 py-2.5 rounded-xl text-[12px] font-semibold border transition-all font-jakarta"
+                style={{
+                  color: "var(--accent-primary)",
+                  borderColor: "var(--border-primary)",
+                  background: "var(--surface-secondary)",
+                }}
                 whileHover={{ scale: 1.01 }}
                 whileTap={{ scale: 0.98 }}
               >
@@ -278,8 +288,8 @@ export default function Dashboard() {
               whileHover={{ y: -2, transition: { duration: 0.18 } }}
             >
               <div className="flex items-center gap-2 mb-4">
-                <Calendar size={14} className="text-[#4F9DFF]" />
-                <p className="text-sm font-semibold text-white font-sora">Maintenance Timeline</p>
+                <Calendar size={14} style={{ color: "var(--accent-primary)" }} />
+                <p className="text-sm font-semibold font-sora" style={{ color: "var(--text-primary)" }}>Maintenance Timeline</p>
               </div>
               <div className="space-y-3">
                 {TIMELINE.map((item, i) => (
@@ -298,10 +308,10 @@ export default function Dashboard() {
                     />
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between gap-2">
-                        <p className="text-[12px] font-semibold text-white font-jakarta truncate">{item.label}</p>
+                        <p className="text-[12px] font-semibold font-jakarta truncate" style={{ color: "var(--text-primary)" }}>{item.label}</p>
                         <span className="text-[10px] font-bold shrink-0" style={{ color: item.color }}>{item.status}</span>
                       </div>
-                      <p className="text-[11px] text-[#4A6080] mt-0.5">{item.sub}</p>
+                      <p className="text-[11px] mt-0.5" style={{ color: "var(--text-tertiary)" }}>{item.sub}</p>
                     </div>
                   </motion.div>
                 ))}
