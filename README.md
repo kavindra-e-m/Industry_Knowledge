@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # PS08 — Industrial Knowledge Intelligence
 
 **One-liner:** Give it every scattered document a plant has ever produced —
@@ -41,7 +40,7 @@ See `docs/architecture.md` for the full data flow.
 | 1 | Backend & RAG Lead | `backend/` |
 | 2 | ML & Document Intelligence Lead | `ml/` |
 | 3 | Frontend & Dashboard Lead | `frontend/` |
-| 4 | Data & DevOps Lead | `data-infra/` |
+| 4 | Data & DevOps Lead | `data/ + devops/` |
 
 Everyone reads/writes `docs/` — that's the shared contract layer.
 
@@ -56,13 +55,13 @@ docker compose up -d postgres neo4j chromadb
 
 # backend (Member 1)
 cd backend && pip install -r requirements.txt --break-system-packages
-uvicorn app.main:app --reload
+uvicorn backend.main:app --reload --port 8000
 
 # ml (Member 2)
 cd ml && pip install -r requirements.txt --break-system-packages
 
 # frontend (Member 3)
-cd frontend/web-dashboard && npm install && npm run dev
+cd frontend && npm install && npm run dev
 
 # data / SKAB dataset stream (Member 4)
 python devops/scripts/stream_skab.py --backend-url http://localhost:8000/api/stream/event --delay 1.0
