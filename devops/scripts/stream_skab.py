@@ -29,7 +29,8 @@ def stream_csv_file(file_path: Path, url: str, source_id: str, delay: float, lim
         reader = csv.DictReader(f, delimiter=";")
         count = 0
         for row in reader:
-            event = {
+            is_anomaly = float(row.get("anomaly", "0") or 0) > 0
+            payload_data = {
                 "timestamp": row.get("datetime"),
                 "source_id": source_id,
                 "machine": source_id,
@@ -43,12 +44,19 @@ def stream_csv_file(file_path: Path, url: str, source_id: str, delay: float, lim
                     "Voltage": float(row.get("Voltage", "0") or 0),
                     "Volume_Flow_RateRMS": float(row.get("Volume Flow RateRMS", "0") or 0),
                 },
-                "anomaly": float(row.get("anomaly", "0") or 0),
+                "is_anomaly": is_anomaly,
+                "anomaly_score": float(row.get("anomaly", "0") or 0),
                 "changepoint": float(row.get("changepoint", "0") or 0),
+                "recommendation": f"CRITICAL anomaly detected on {source_id}! Verify process metrics." if is_anomaly else "",
                 "metadata": {
                     "file": file_path.name,
                     "category": file_path.parent.name,
                 },
+            }
+            event = {
+                "event_type": "sensor_snapshot",
+                "equipment_tag": "P-101",
+                "payload": payload_data,
             }
             print(f"Sending event {count+1} from {source_id} ({file_path.name})")
             post_event(url, event)
@@ -70,7 +78,7 @@ def main():
     parser = argparse.ArgumentParser(description="Stream SKAB dataset rows as real-time events to the backend.")
     parser.add_argument("--dataset-path", type=Path, default=Path.home() / ".cache" / "kagglehub" / "datasets" / "yuriykatser" / "skoltech-anomaly-benchmark-skab" / "versions" / "1",
                         help="Root path to the downloaded SKAB dataset")
-    parser.add_argument("--backend-url", default="http://localhost:8000/api/stream/event",
+    parser.add_argument("--backend-url", default="http://localhost:8000/api/ingest/stream-event",
                         help="Backend event ingestion endpoint")
     parser.add_argument("--delay", type=float, default=1.0,
                         help="Delay in seconds between events")

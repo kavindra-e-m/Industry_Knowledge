@@ -20,7 +20,7 @@ const RCAReport             = lazy(() => import("./pages/RCAReport"));
 const ComplianceIntelligence= lazy(() => import("./pages/ComplianceIntelligence"));
 const AuditPackage          = lazy(() => import("./pages/AuditPackage"));
 const LessonsLearned        = lazy(() => import("./pages/LessonsLearned"));
-const PIDExplorer           = lazy(() => import("./pages/PIDExplorer"));
+const PidPage               = lazy(() => import("./pages/PidPage"));
 const EquipmentDetails      = lazy(() => import("./pages/EquipmentDetails"));
 const Settings              = lazy(() => import("./pages/Settings"));
 
@@ -78,7 +78,7 @@ function MainContent() {
                 <Route path="/compliance"      element={<ComplianceIntelligence />} />
                 <Route path="/audit"           element={<AuditPackage />} />
                 <Route path="/lessons"         element={<LessonsLearned />} />
-                <Route path="/pid"             element={<PIDExplorer />} />
+                <Route path="/pid"             element={<PidPage />} />
                 <Route path="/equipment/:id"   element={<EquipmentDetails />} />
                 <Route path="/settings"        element={<Settings />} />
               </Routes>

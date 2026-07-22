@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Upload, FileText, CheckCircle, Archive, BarChart2, Share2 } from "lucide-react";
 import PageShell from "../components/shared/PageShell";
 import { useToastStore } from "../store/toastStore";
+import { ingestDocument } from "../services/api";
 
 const FILE_TYPES = [".PDF", ".DWG", ".CSV", ".JSON", ".TIFF"];
 
@@ -23,6 +24,87 @@ export default function DocumentIntelligence() {
   const push = useToastStore((s) => s.push);
   const [uploads, setUploads] = useState(INITIAL_UPLOADS);
   const [dragging, setDragging] = useState(false);
+  const fileInputRef = useRef(null);
+
+  const handleRealUpload = async (eventOrFile) => {
+    let fileToUpload = null;
+    if (eventOrFile && eventOrFile.target && eventOrFile.target.files) {
+      fileToUpload = eventOrFile.target.files[0];
+    } else if (eventOrFile instanceof File) {
+      fileToUpload = eventOrFile;
+    }
+    if (!fileToUpload) return;
+
+    const fileName = fileToUpload.name;
+    const newUploadId = Date.now();
+    const newFile = {
+      name: fileName,
+      time: "Just now",
+      size: `${(fileToUpload.size / (1024 * 1024)).toFixed(1)} MB`,
+      status: "extracting",
+      progress: 20,
+      color: "var(--warning)",
+      icon: FileText,
+      id: newUploadId
+    };
+
+    setUploads((prev) => [newFile, ...prev]);
+    push({ type: "info", title: "File Ingestion", message: `Uploading ${fileName}...`, duration: 2500 });
+
+    try {
+      let currentProgress = 20;
+      const interval = setInterval(() => {
+        currentProgress = Math.min(currentProgress + 15, 90);
+        setUploads((prev) =>
+          prev.map((item) =>
+            item.id === newUploadId ? { ...item, progress: currentProgress } : item
+          )
+        );
+      }, 300);
+
+      const response = await ingestDocument(fileToUpload);
+      clearInterval(interval);
+
+      setUploads((prev) =>
+        prev.map((item) =>
+          item.id === newUploadId
+            ? {
+                ...item,
+                progress: 100,
+                status: "extracted",
+                color: "var(--success)"
+              }
+            : item
+        )
+      );
+      push({
+        type: "success",
+        title: "Ingestion Successful",
+        message: `Extracted ${response.chunk_count} chunks from ${fileName}`,
+        duration: 3500
+      });
+    } catch (err) {
+      console.error(err);
+      setUploads((prev) =>
+        prev.map((item) =>
+          item.id === newUploadId
+            ? {
+                ...item,
+                progress: 100,
+                status: "error",
+                color: "var(--error)"
+              }
+            : item
+        )
+      );
+      push({
+        type: "error",
+        title: "Ingestion Failed",
+        message: err.message || "Failed to parse document",
+        duration: 4000
+      });
+    }
+  };
 
   const simulateUpload = (type) => {
     const ext = type.toLowerCase();
@@ -109,10 +191,17 @@ export default function DocumentIntelligence() {
             style={{ borderStyle: "dashed", borderWidth: 2, borderColor: dragging ? "var(--accent-primary)" : "var(--border-primary)" }}
             onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
             onDragLeave={() => setDragging(false)}
-            onDrop={(e) => { e.preventDefault(); setDragging(false); simulateUpload(".PDF"); }}
-            onClick={() => simulateUpload(".PDF")}
+            onDrop={(e) => { e.preventDefault(); setDragging(false); if (e.dataTransfer.files.length) handleRealUpload(e.dataTransfer.files[0]); }}
+            onClick={() => fileInputRef.current && fileInputRef.current.click()}
             whileHover={{ borderColor: "var(--accent-primary)" }}
           >
+            <input
+              type="file"
+              ref={fileInputRef}
+              style={{ display: "none" }}
+              onChange={handleRealUpload}
+              accept=".pdf,.png,.jpg,.jpeg,.tiff,.tif,.xlsx,.xls,.csv,.docx,.eml,.msg"
+            />
             <div className="w-14 h-14 rounded-2xl flex items-center justify-center" style={{ background: "var(--surface-secondary)" }}>
               <Upload size={24} style={{ color: "var(--accent-primary)" }} />
             </div>

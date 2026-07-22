@@ -40,13 +40,24 @@ def _get_cached_redis():
     return _redis_client
 
 
-def get_llm() -> ChatGoogleGenerativeAI:
-    """Instantiate Gemini 1.5 Flash LLM."""
+def get_llm():
+    """Instantiate configured LLM (Groq or Gemini)."""
+    if settings.GROQ_API_KEY:
+        from langchain_groq import ChatGroq
+        logger.info(f"Using Groq LLM: {settings.GROQ_MODEL}")
+        return ChatGroq(
+            model=settings.GROQ_MODEL,
+            groq_api_key=settings.GROQ_API_KEY,
+            temperature=settings.GROQ_TEMPERATURE,
+            max_tokens=settings.GROQ_MAX_TOKENS,
+        )
+
     if not settings.GEMINI_API_KEY:
         raise ValueError(
-            "GEMINI_API_KEY not set. Get a free key from https://aistudio.google.com "
-            "and add it to your .env file."
+            "Neither GROQ_API_KEY nor GEMINI_API_KEY is set. Add one to your .env file."
         )
+
+    logger.info(f"Using Gemini LLM: {settings.GEMINI_MODEL}")
     genai.configure(api_key=settings.GEMINI_API_KEY)
     return ChatGoogleGenerativeAI(
         model=settings.GEMINI_MODEL,

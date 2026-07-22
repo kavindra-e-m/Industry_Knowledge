@@ -1,9 +1,11 @@
-import { motion } from "framer-motion";
-import { ShieldCheck, Download, AlertTriangle, Clock, FileText, ChevronRight } from "lucide-react";
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { ShieldCheck, Download, AlertTriangle, Clock, FileText, ChevronRight, Check } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from "recharts";
 import PageShell from "../components/shared/PageShell";
 import StatRing from "../components/shared/StatRing";
 import { useCompliance } from "../hooks/useCompliance";
+import { useToastStore } from "../store/toastStore";
 
 const REG_DATA = [
   { month: "JAN", v: 78 }, { month: "FEB", v: 82 }, { month: "MAR", v: 71 },
@@ -42,6 +44,76 @@ const ChartTooltip = ({ active, payload }) => {
 
 export default function ComplianceIntelligence() {
   const { records, averageScore, loading } = useCompliance();
+  const push = useToastStore((s) => s.push);
+  const [exporting, setExporting] = useState(false);
+  const [auditMode, setAuditMode] = useState(false);
+
+  const handleExportReport = () => {
+    setExporting(true);
+    push({ type: "info", title: "Compliance Report", message: "Generating consolidated audit report...", duration: 2000 });
+    setTimeout(() => {
+      const element = document.createElement("a");
+      const fileBlob = new Blob(["Compliance Audit Report\n\nOverall Score: " + averageScore + "%\nStatus: Compliant"], { type: 'text/plain' });
+      element.href = URL.createObjectURL(fileBlob);
+      element.download = "Compliance_Audit_Report.txt";
+      document.body.appendChild(element);
+      element.click();
+      document.body.removeChild(element);
+      
+      setExporting(false);
+      push({ type: "success", title: "Export Complete", message: "Compliance report downloaded successfully.", duration: 2500 });
+    }, 1500);
+  };
+
+  const handleToggleAuditMode = () => {
+    const nextMode = !auditMode;
+    setAuditMode(nextMode);
+    if (nextMode) {
+      push({
+        type: "success",
+        title: "Audit Mode Active",
+        message: "Visual guidelines and regulatory verification lists highlighted.",
+        duration: 3500
+      });
+    } else {
+      push({
+        type: "info",
+        title: "Audit Mode Inactive",
+        message: "Restored default compliance dashboard view.",
+        duration: 2500
+      });
+    }
+  };
+
+  const allGaps = (records || []).flatMap((r) =>
+    (r.gaps || []).map((g) => ({
+      ...g,
+      equipment_tag: r.equipment_tag,
+      equipment_type: r.equipment_type,
+    }))
+  );
+
+  const displayedGaps = allGaps.map((gap) => {
+    let icon = FileText;
+    let color = "var(--accent-primary)";
+    if (gap.severity === "critical") {
+      icon = AlertTriangle;
+      color = "var(--error)";
+    } else if (gap.severity === "major" || gap.gap_type === "overdue") {
+      icon = Clock;
+      color = "var(--warning)";
+    }
+    return {
+      icon,
+      color,
+      title: `${gap.regulation_source} ${gap.clause_id || ""}: ${gap.requirement}`,
+      sub: `${gap.gap_description} · ${gap.equipment_tag} (${gap.equipment_type})`,
+      corrective_action: gap.corrective_action,
+      legal_consequence: gap.legal_consequence,
+    };
+  });
+
+  const criticalCount = allGaps.filter(g => g.severity === "critical").length;
 
   return (
     <PageShell topbarPlaceholder="Query regulatory framework...">
@@ -60,10 +132,35 @@ export default function ComplianceIntelligence() {
             </h1>
           </div>
           <div className="flex gap-2">
-            <button className="ib-btn ib-btn-ghost text-xs"><Download size={12} /> Export Report</button>
-            <button className="ib-btn ib-btn-primary text-xs"><ShieldCheck size={12} /> Audit Mode</button>
+            <button onClick={handleExportReport} disabled={exporting} className="ib-btn ib-btn-ghost text-xs">
+              {exporting ? "Exporting..." : <><Download size={12} /> Export Report</>}
+            </button>
+            <button
+              onClick={handleToggleAuditMode}
+              className={`ib-btn text-xs flex items-center gap-1.5 transition-all ${
+                auditMode
+                  ? "bg-emerald-600/20 text-emerald-500 border border-emerald-500/30 hover:bg-emerald-600/30 font-bold"
+                  : "ib-btn-primary"
+              }`}
+            >
+              <ShieldCheck size={12} />
+              {auditMode ? "Audit Active" : "Audit Mode"}
+            </button>
           </div>
         </div>
+
+        {/* Active Audit Mode Banner */}
+        {auditMode && (
+          <motion.div
+            initial={{ opacity: 0, y: -5 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="p-3 rounded-xl border flex items-center gap-2 text-xs font-semibold text-emerald-500"
+            style={{ background: "rgba(16, 185, 129, 0.08)", borderColor: "rgba(16, 185, 129, 0.25)" }}
+          >
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+            Active Audit Session: ISO 50001:2018 compliance framework overlay applied.
+          </motion.div>
+        )}
 
         {/* Top row */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -141,25 +238,35 @@ export default function ComplianceIntelligence() {
           <motion.div className="ib-card p-4" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
             <div className="flex items-center justify-between mb-4">
               <p className="text-sm font-semibold font-sora" style={{ color: "var(--text-primary)" }}>Action Items</p>
-              <span className="ib-badge ib-badge-critical">4 CRITICAL</span>
+              <span className="ib-badge ib-badge-critical">{criticalCount} CRITICAL</span>
             </div>
-            <div className="space-y-2">
-              {ACTIONS.map((a, i) => (
-                <button key={i} className="w-full flex items-center gap-3 p-3 rounded-xl border transition-all text-left"
-                  style={{
-                    borderColor: "var(--border-primary)",
-                    background: "var(--surface-secondary)",
-                  }}>
-                  <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0" style={{ background: `${a.color}15` }}>
-                    <a.icon size={15} style={{ color: a.color }} />
+            <div className="space-y-2 max-h-[220px] overflow-y-auto pr-1">
+              {loading ? (
+                <div className="text-xs text-center py-8 animate-pulse" style={{ color: "var(--text-tertiary)" }}>Scanning regulations...</div>
+              ) : displayedGaps.length === 0 ? (
+                <div className="text-xs text-center py-8 text-green-500 font-semibold">✓ No compliance gaps found. All assets compliant!</div>
+              ) : (
+                displayedGaps.map((a, i) => (
+                  <div key={i} className="w-full flex items-start gap-3 p-3 rounded-xl border transition-all text-left"
+                    style={{
+                      borderColor: "var(--border-primary)",
+                      background: "var(--surface-secondary)",
+                    }}>
+                    <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0" style={{ background: `${a.color}15` }}>
+                      <a.icon size={15} style={{ color: a.color }} />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-[12px] font-semibold truncate animate-fade-in" style={{ color: "var(--text-primary)" }}>{a.title}</p>
+                      <p className="text-[10px] mt-0.5 animate-fade-in" style={{ color: "var(--text-tertiary)" }}>{a.sub}</p>
+                      {a.corrective_action && (
+                        <div className="mt-1 text-[9.5px] p-1.5 rounded animate-fade-in" style={{ background: "rgba(16, 185, 129, 0.08)", border: "1px solid rgba(16, 185, 129, 0.2)", color: "var(--success)" }}>
+                          <span className="font-bold">Corrective Action:</span> {a.corrective_action}
+                        </div>
+                      )}
+                    </div>
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-[12px] font-semibold" style={{ color: "var(--text-primary)" }}>{a.title}</p>
-                    <p className="text-[10px]" style={{ color: "var(--text-tertiary)" }}>{a.sub}</p>
-                  </div>
-                  <ChevronRight size={13} style={{ color: "var(--text-tertiary)" }} className="shrink-0" />
-                </button>
-              ))}
+                ))
+              )}
             </div>
           </motion.div>
         </div>

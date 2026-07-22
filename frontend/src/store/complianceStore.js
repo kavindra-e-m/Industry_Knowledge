@@ -3,6 +3,8 @@ import { fetchComplianceReport } from "../api/complianceApi";
 
 export const useComplianceStore = create((set, get) => ({
   records: [],
+  summary: {},
+  criticalEquipment: [],
   loading: false,
   error: null,
 
@@ -10,18 +12,24 @@ export const useComplianceStore = create((set, get) => ({
     set({ loading: true, error: null });
     try {
       const data = await fetchComplianceReport();
-      set({ records: data, loading: false });
+      set({
+        records: data.results || [],
+        summary: data.summary || {},
+        criticalEquipment: data.critical_equipment || [],
+        loading: false
+      });
     } catch (err) {
       set({ error: err.message, loading: false });
     }
   },
 
   averageScore: () => {
-    const { records } = get();
-    if (!records.length) return 0;
-    return Math.round(records.reduce((sum, r) => sum + r.overall_score, 0) / records.length);
+    const { summary } = get();
+    return summary?.average_compliance_score || 0;
   },
 
-  nonCompliantCount: () =>
-    get().records.filter((r) => r.status === "non-compliant" || r.status === "expired").length,
+  nonCompliantCount: () => {
+    const { summary } = get();
+    return summary?.non_compliant || 0;
+  },
 }));

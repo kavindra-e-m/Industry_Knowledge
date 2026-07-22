@@ -39,7 +39,9 @@ async def list_equipment():
     equipment = []
     for row in rows:
         e = row.get("e") or row
-        if isinstance(e, dict):
+        if hasattr(e, "items"):
+            equipment.append(dict(e))
+        elif isinstance(e, dict):
             equipment.append(e)
     return {"total": len(equipment), "equipment": equipment}
 

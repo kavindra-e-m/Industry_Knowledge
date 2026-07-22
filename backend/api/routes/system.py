@@ -41,6 +41,7 @@ async def system_status():
     except Exception as e:
         status["redis"] = f"error: {str(e)[:60]}"
 
-    status["gemini"] = "configured" if settings.GEMINI_API_KEY else "missing — set GEMINI_API_KEY in .env"
+    status["gemini"] = "configured" if (settings.GEMINI_API_KEY or settings.GROQ_API_KEY) else "missing — set GEMINI_API_KEY or GROQ_API_KEY in .env"
     overall = "healthy" if all(v in ["connected", "configured"] for v in status.values()) else "degraded"
+    status["active_llm"] = "groq" if settings.GROQ_API_KEY else ("gemini" if settings.GEMINI_API_KEY else "none")
     return {"overall": overall, **status}
