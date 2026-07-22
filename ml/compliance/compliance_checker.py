@@ -31,7 +31,12 @@ class ComplianceChecker:
         if self.REGULATIONS_PATH.exists():
             with open(self.REGULATIONS_PATH) as f:
                 data = json.load(f)
-                self.regulations = data.get("regulations", [])
+                if isinstance(data, list):
+                    self.regulations = data
+                elif isinstance(data, dict):
+                    self.regulations = data.get("regulations", [])
+                else:
+                    self.regulations = []
             logger.success(f"Loaded {len(self.regulations)} regulation clauses")
         else:
             logger.warning("regulation_clauses.json not found")

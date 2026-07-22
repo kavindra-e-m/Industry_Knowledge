@@ -50,9 +50,15 @@ class Neo4jClient:
     # ------------------------------------------------------------------
     def run(self, query: str, params: dict | None = None) -> list[dict]:
         """Execute a Cypher query and return results as list of dicts."""
-        with self.driver.session() as session:
-            result = session.run(query, params or {})
-            return [dict(record) for record in result]
+        if not hasattr(self, "driver") or self.driver is None:
+            return []
+        try:
+            with self.driver.session() as session:
+                result = session.run(query, params or {})
+                return [dict(record) for record in result]
+        except Exception as e:
+            logger.warning(f"Neo4j query execution skipped ({e})")
+            return []
 
     def close(self):
         if self.driver:
